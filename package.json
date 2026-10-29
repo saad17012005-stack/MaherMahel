@@ -2,7 +2,7 @@
   "name": "maher-mahel-payments",
   "version": "1.0.0",
   "description": "Automated Razorpay Payment Integration with Order, Verification, and Webhook handling",
-  "main": "dist/server.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
