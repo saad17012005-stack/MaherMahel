@@ -2,11 +2,274 @@
 // MEHER MAHEL LUXURY BOUTIQUE E-COMMERCE ENGINE
 // ========================================================
 
+const DEFAULT_HERO_SLIDES = [
+  {
+    id: 1,
+    eyebrow: 'THE MEHER MAHEL COLLECTION',
+    heading: 'Elegance, Draped in Grace.',
+    description: 'Discover graceful abayas and thoughtfully curated pieces designed for the woman who appreciates timeless modest luxury.',
+    desktop_image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=1600&auto=format&fit=crop',
+    mobile_image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop',
+    cta_primary_text: 'Shop Abayas',
+    cta_primary_link: '#shop-section',
+    cta_secondary_text: 'Explore Collection',
+    cta_secondary_link: '#categories-section',
+  },
+  {
+    id: 2,
+    eyebrow: 'BESPOKE ATELIER',
+    heading: 'Your Style. Your Measurements. Your Abaya.',
+    description: 'Create an abaya that reflects your individuality, from the drape of silk crepe to delicate pearl and antique gold hand-finishes.',
+    desktop_image: 'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=1600&auto=format&fit=crop',
+    mobile_image: 'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=800&auto=format&fit=crop',
+    cta_primary_text: 'Design Your Abaya',
+    cta_primary_link: '#custom-abaya-section',
+    cta_secondary_text: 'View Size Guide',
+    cta_secondary_link: '#size-guide-modal',
+  },
+  {
+    id: 3,
+    eyebrow: 'THE FINISHING TOUCH',
+    heading: 'Complete Your Elegance.',
+    description: 'Discover structured porcelain-inspired handbags, rose-gold timepieces, and accessories that bring every outfit together.',
+    desktop_image: '/images/products/handbag-toile.jpg',
+    mobile_image: '/images/products/handbag-toile.jpg',
+    cta_primary_text: 'Shop Handbags',
+    cta_primary_link: '#shop-section',
+    cta_secondary_text: 'Explore Watches',
+    cta_secondary_link: '#shop-section',
+  }
+];
+
+const DEFAULT_PRODUCTS = [
+  {
+    id: 1,
+    title: 'Noor Black Crepe Open-Front Abaya',
+    slug: 'noor-black-crepe-open-front-abaya',
+    category_id: 1,
+    category_name: 'Abayas',
+    category_slug: 'abayas',
+    price: 4999,
+    compare_at_price: 6499,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'Flowing open-front abaya with antique gold buttons and graceful bell sleeves.',
+    description: 'A flowing black crepe abaya with a clean open front, antique gold-toned button detail, and soft bell sleeves. Lightweight and breathable, it falls elegantly from shoulder to hem.',
+    images: [
+      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=900&auto=format&fit=crop'
+    ],
+    fabric_care: 'Fabric: Premium Matte Crepe. Care: Dry clean or hand wash cold inside out. Steam iron.',
+    tags: ['abaya', 'crepe', 'open-front', 'gold-detail', 'eid'],
+    variants: [
+      { id: 1, size: '52', color: 'Midnight Black' },
+      { id: 2, size: '54', color: 'Midnight Black' },
+      { id: 3, size: '56', color: 'Midnight Black' },
+      { id: 4, size: '58', color: 'Midnight Black' },
+      { id: 5, size: '60', color: 'Midnight Black' }
+    ]
+  },
+  {
+    id: 2,
+    title: 'Zahra Rose Pearl Velvet Abaya',
+    slug: 'zahra-rose-pearl-velvet-abaya',
+    category_id: 1,
+    category_name: 'Abayas',
+    category_slug: 'abayas',
+    price: 6499,
+    compare_at_price: 7999,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'Dusty rose silk-velvet with delicate pearl droplet cuffs.',
+    description: 'Luxurious dusty rose silk-velvet abaya detailed with genuine freshwater pearl tassels along the cuffs and neckline. Designed for celebration and special evenings.',
+    images: [
+      'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=900&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop'
+    ],
+    fabric_care: 'Fabric: Silk-blend Velvet. Care: Professional dry clean only.',
+    tags: ['abaya', 'velvet', 'dusty-rose', 'pearls', 'luxury'],
+    variants: [
+      { id: 6, size: '52', color: 'Dusty Rose' },
+      { id: 7, size: '54', color: 'Dusty Rose' },
+      { id: 8, size: '56', color: 'Dusty Rose' },
+      { id: 9, size: '58', color: 'Dusty Rose' }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Amani Kimono Butterfly Abaya',
+    slug: 'amani-kimono-butterfly-abaya',
+    category_id: 1,
+    category_name: 'Abayas',
+    category_slug: 'abayas',
+    price: 5499,
+    compare_at_price: null,
+    is_new_arrival: 0,
+    is_best_seller: 1,
+    short_description: 'Lightweight georgette butterfly cut with subtle gold topstitching.',
+    description: 'An ultra-comfortable batwing silhouette that provides supreme modesty and effortless movement. Finished in lightweight breathable georgette with subtle gold French seam stitching.',
+    images: [
+      'https://images.unsplash.com/photo-1534126511673-b6899657816a?q=80&w=900&auto=format&fit=crop'
+    ],
+    fabric_care: 'Fabric: Korean Georgette. Care: Gentle machine wash on delicate cycle.',
+    tags: ['abaya', 'butterfly', 'kimono', 'modest'],
+    variants: [
+      { id: 10, size: 'Free Size (54-58)', color: 'Champagne Ivory' },
+      { id: 11, size: 'Free Size (54-58)', color: 'Sage Green' }
+    ]
+  },
+  {
+    id: 4,
+    title: 'Ayla Pastel Blue Bell-Sleeve Lace Set',
+    slug: 'ayla-pastel-blue-bell-sleeve-lace-set',
+    category_id: 2,
+    category_name: 'Traditional Wear',
+    category_slug: 'traditional-wear',
+    price: 7299,
+    compare_at_price: 8999,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'Powder blue corded lace co-ord set with bell sleeves and matching pants.',
+    description: 'Artisanal powder blue corded lace tunic with statement flared bell sleeves, square sweetheart neckline, and tailored straight-leg trousers. Paired effortlessly with ethnic silver jhumkas or clutch.',
+    images: [
+      '/images/products/traditional-blue-lace.jpg'
+    ],
+    fabric_care: 'Fabric: Corded French Lace with crepe silk lining. Care: Dry clean only.',
+    tags: ['traditional', 'lace', 'bell-sleeve', 'powder-blue', 'co-ord'],
+    variants: [
+      { id: 12, size: 'XS', color: 'Powder Blue' },
+      { id: 13, size: 'S', color: 'Powder Blue' },
+      { id: 14, size: 'M', color: 'Powder Blue' },
+      { id: 15, size: 'L', color: 'Powder Blue' },
+      { id: 16, size: 'XL', color: 'Powder Blue' }
+    ]
+  },
+  {
+    id: 5,
+    title: 'Gulnar Antique Gold Brocade Ensemble',
+    slug: 'gulnar-antique-gold-brocade-ensemble',
+    category_id: 2,
+    category_name: 'Traditional Wear',
+    category_slug: 'traditional-wear',
+    price: 8999,
+    compare_at_price: 10999,
+    is_new_arrival: 1,
+    is_best_seller: 0,
+    short_description: 'Woven silk brocade in antique gold with hand-finished organza dupatta.',
+    description: 'Heirloom banarasi woven silk kurta adorned with subtle antique zardozi work, paired with palazzo trousers and a sheer organza dupatta with scalloped borders.',
+    images: [
+      'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop'
+    ],
+    fabric_care: 'Fabric: Pure Banarasi Silk. Care: Dry clean only.',
+    tags: ['traditional', 'brocade', 'festive', 'wedding', 'antique-gold'],
+    variants: [
+      { id: 17, size: 'S', color: 'Antique Gold' },
+      { id: 18, size: 'M', color: 'Antique Gold' },
+      { id: 19, size: 'L', color: 'Antique Gold' },
+      { id: 20, size: 'XL', color: 'Antique Gold' }
+    ]
+  },
+  {
+    id: 6,
+    title: 'Toile de Jouy Structured Ribbon Handbag',
+    slug: 'toile-de-jouy-structured-ribbon-handbag',
+    category_id: 3,
+    category_name: 'Handbags',
+    category_slug: 'handbags',
+    price: 4499,
+    compare_at_price: 5999,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'Ivory canvas with navy Toile tapestry embroidery and royal navy satin bow.',
+    description: 'A structured heritage silhouette crafted in woven ivory canvas with classic navy botanical Toile de Jouy tapestry embroidery. Crowned with a luxurious navy silk-satin bow twilly wrapped across the top handle and antique brass hardware.',
+    images: [
+      '/images/products/handbag-toile.jpg'
+    ],
+    fabric_care: 'Material: Structured Tapestry Canvas, Vegan Leather Trim, Brass Clasp. Care: Spot clean with damp soft cloth.',
+    tags: ['handbag', 'toile-de-jouy', 'satin-ribbon', 'boutique', 'luxury'],
+    variants: [
+      { id: 21, size: 'One Size', color: 'Navy & Ivory' }
+    ]
+  },
+  {
+    id: 7,
+    title: 'Satin Pearl Evening Minaudière',
+    slug: 'satin-pearl-evening-minaudiere',
+    category_id: 3,
+    category_name: 'Handbags',
+    category_slug: 'handbags',
+    price: 3899,
+    compare_at_price: 4699,
+    is_new_arrival: 0,
+    is_best_seller: 1,
+    short_description: 'Dusty rose duchess satin clutch with gold frame and pearl chain.',
+    description: 'Dainty hard-case clutch upholstered in shimmering dusty-rose duchess satin, framed in antique gold with a detachable pearl droplet shoulder chain.',
+    images: [
+      'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?q=80&w=900&auto=format&fit=crop'
+    ],
+    fabric_care: 'Material: Duchess Satin & Brass Frame. Care: Keep in dust bag.',
+    tags: ['handbag', 'clutch', 'evening', 'pearls', 'dusty-rose'],
+    variants: [
+      { id: 22, size: 'One Size', color: 'Dusty Rose' }
+    ]
+  },
+  {
+    id: 8,
+    title: 'Heritage Rose Gold Mesh Watch',
+    slug: 'heritage-rose-gold-mesh-watch',
+    category_id: 4,
+    category_name: 'Watches',
+    category_slug: 'watches',
+    price: 5299,
+    compare_at_price: 6499,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'Ultra-slim 6mm rose gold timepiece with Milanese mesh strap.',
+    description: 'An ultra-slim 6mm profile engineered to slide comfortably under abaya sleeves without catching. Features an ivory enamel dial, rose gold Milanese magnetic strap, and Japanese quartz movement.',
+    images: [
+      'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=900&auto=format&fit=crop'
+    ],
+    fabric_care: 'Case: 32mm Rose Gold Stainless Steel. Water Resistance: 3 ATM (Splash resistant).',
+    tags: ['watch', 'rose-gold', 'mesh', 'slim', 'minimal'],
+    variants: [
+      { id: 23, size: '32mm', color: 'Rose Gold' }
+    ]
+  },
+  {
+    id: 9,
+    title: 'Mother of Pearl Diamond Bezel Watch',
+    slug: 'mother-of-pearl-diamond-bezel-watch',
+    category_id: 4,
+    category_name: 'Watches',
+    category_slug: 'watches',
+    price: 6199,
+    compare_at_price: 7500,
+    is_new_arrival: 0,
+    is_best_seller: 1,
+    short_description: 'Genuine mother-of-pearl face with antique gold fluted bezel.',
+    description: 'Captivating iridescent natural mother-of-pearl dial enclosed within an antique gold fluted bezel set with subtle crystal markers. Fitted with an interchangeable genuine leather strap in blush pink.',
+    images: [
+      'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=900&auto=format&fit=crop'
+    ],
+    fabric_care: 'Dial: Genuine White MOP. Movement: Swiss Quartz. Glass: Sapphire Coated.',
+    tags: ['watch', 'mother-of-pearl', 'gold', 'blush'],
+    variants: [
+      { id: 24, size: '34mm', color: 'Champagne & Blush' }
+    ]
+  }
+];
+
 let state = {
-  products: [],
+  products: [...DEFAULT_PRODUCTS],
   categories: [],
-  heroSlides: [],
-  settings: {},
+  heroSlides: [...DEFAULT_HERO_SLIDES],
+  settings: {
+    announcement_bar: '✨ Discover Timeless Modest Luxury — Free Custom Bespoke Consultations Available',
+    currency: 'INR',
+    whatsapp_number: '+919876543210',
+    shipping_flat_rate: '150',
+    free_shipping_threshold: '5000',
+  },
   cart: JSON.parse(localStorage.getItem('mm_cart') || '[]'),
   wishlist: JSON.parse(localStorage.getItem('mm_wishlist') || '[]'),
   currentSlideIndex: 0,
@@ -16,17 +279,27 @@ let state = {
   customWizardStep: 1,
 };
 
-// Initialize Application
-document.addEventListener('DOMContentLoaded', async () => {
-  document.getElementById('year').textContent = new Date().getFullYear();
-  document.getElementById('footerYear').textContent = new Date().getFullYear();
+// Initialize Application (Instant rendering with zero delay, followed by live background hydration)
+document.addEventListener('DOMContentLoaded', () => {
+  const y1 = document.getElementById('year');
+  if (y1) y1.textContent = new Date().getFullYear();
+  const y2 = document.getElementById('footerYear');
+  if (y2) y2.textContent = new Date().getFullYear();
 
-  await loadSettings();
-  await loadHeroSlides();
-  await loadProducts();
+  // 1. Instant UI Render (Zero delay, works immediately on any network)
+  renderHeroSlides();
+  startHeroAutoplay();
+  renderProducts(state.products);
   updateCartUI();
   updateWishlistUI();
   setupEventListeners();
+
+  // 2. Parallel Background Hydration from API/Database
+  Promise.allSettled([
+    loadSettings(),
+    loadHeroSlides(),
+    loadProducts('all'),
+  ]).catch(err => console.debug('Background hydration notice:', err));
 });
 
 // Load Settings from API
@@ -269,6 +542,13 @@ function filterCategory(slug) {
   const titleEl = document.getElementById('catalogTitle');
   if (titleEl) titleEl.textContent = titles[slug] || 'Curated Collection';
 
+  // Instant local filtering
+  state.activeCategory = slug;
+  const filtered = slug === 'all' 
+    ? state.products 
+    : state.products.filter(p => p.category_slug === slug || (p.category_name && p.category_name.toLowerCase().includes(slug.replace('-', ' '))));
+  renderProducts(filtered);
+
   loadProducts(slug);
 
   const shopSec = document.getElementById('shop-section');
@@ -289,15 +569,22 @@ function filterByTag(tag) {
 // 3. PRODUCT QUICK-VIEW MODAL
 // --------------------------------------------------------
 async function quickViewProduct(slug) {
+  let p = state.products.find(item => item.slug === slug);
   try {
     const res = await fetch(`/api/products/${slug}`);
     const data = await res.json();
-    if (!data.success || !data.product) return;
+    if (data.success && data.product) {
+      p = data.product;
+    }
+  } catch (err) {
+    console.debug('API lookup note:', err);
+  }
 
-    const p = data.product;
-    const modal = document.getElementById('quickViewModal');
-    const content = document.getElementById('quickViewContent');
-    if (!modal || !content) return;
+  if (!p) return;
+
+  const modal = document.getElementById('quickViewModal');
+  const content = document.getElementById('quickViewContent');
+  if (!modal || !content) return;
 
     const mainImg = p.images?.[0] || '';
     const variants = p.variants || [];

@@ -97,16 +97,25 @@ export const getProducts = (req: Request, res: Response) => {
 
     const products = db.prepare(query).all(...params) as any[];
 
-    // Parse JSON fields
+    // Parse JSON fields safely
     products.forEach(p => {
-      try {
-        p.images = JSON.parse(p.images);
-      } catch {
+      if (typeof p.images === 'string') {
+        try {
+          p.images = JSON.parse(p.images);
+        } catch {
+          p.images = p.images ? [p.images] : [];
+        }
+      } else if (!Array.isArray(p.images)) {
         p.images = [];
       }
-      try {
-        p.tags = JSON.parse(p.tags);
-      } catch {
+
+      if (typeof p.tags === 'string') {
+        try {
+          p.tags = JSON.parse(p.tags);
+        } catch {
+          p.tags = [];
+        }
+      } else if (!Array.isArray(p.tags)) {
         p.tags = [];
       }
 
@@ -136,8 +145,25 @@ export const getProductBySlug = (req: Request, res: Response) => {
       return res.status(404).json({ success: false, message: 'Product not found.' });
     }
 
-    product.images = JSON.parse(product.images || '[]');
-    product.tags = JSON.parse(product.tags || '[]');
+    if (typeof product.images === 'string') {
+      try {
+        product.images = JSON.parse(product.images);
+      } catch {
+        product.images = product.images ? [product.images] : [];
+      }
+    } else if (!Array.isArray(product.images)) {
+      product.images = [];
+    }
+
+    if (typeof product.tags === 'string') {
+      try {
+        product.tags = JSON.parse(product.tags);
+      } catch {
+        product.tags = [];
+      }
+    } else if (!Array.isArray(product.tags)) {
+      product.tags = [];
+    }
     product.variants = db.prepare('SELECT * FROM product_variants WHERE product_id = ?').all(product.id);
     product.reviews = db.prepare('SELECT * FROM reviews WHERE product_id = ? AND is_approved = 1 ORDER BY created_at DESC').all(product.id);
 
@@ -147,7 +173,7 @@ export const getProductBySlug = (req: Request, res: Response) => {
       .all(product.category_id, product.id)
       .map((item: any) => ({
         ...item,
-        images: JSON.parse(item.images || '[]'),
+        images: typeof item.images === 'string' ? JSON.parse(item.images || '[]') : (Array.isArray(item.images) ? item.images : []),
       }));
 
     res.json({ success: true, product });

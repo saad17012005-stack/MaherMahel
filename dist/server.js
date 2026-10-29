@@ -39,9 +39,11 @@ const publicDir = [
     path.join(process.cwd(), 'public'),
 ].find(d => fs.existsSync(d)) || path.join(__dirname, '../public');
 app.use(express.static(publicDir));
-// Mount API Routes
-app.use('/api', apiRoutes);
+// Mount API Routes (support both /api and root paths for serverless compatibility)
 app.use('/api/payments', paymentRoutes);
+app.use('/payments', paymentRoutes);
+app.use('/api', apiRoutes);
+app.use(apiRoutes);
 // Health check endpoint
 app.get('/health', (_req, res) => {
     res.json({
