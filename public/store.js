@@ -10,7 +10,7 @@ const DEFAULT_HERO_SLIDES = [
     description: 'Discover graceful abayas and thoughtfully curated pieces designed for the woman who appreciates timeless modest luxury.',
     desktop_image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=2000&auto=format&fit=crop',
     mobile_image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=1000&auto=format&fit=crop',
-    focal_position: 'center 20%',
+    focal_position: 'center 58%',
     cta_primary_text: 'Shop Abayas',
     cta_primary_link: '#shop-section',
     cta_secondary_text: 'Explore Collection',
@@ -23,7 +23,7 @@ const DEFAULT_HERO_SLIDES = [
     description: 'Create an abaya that reflects your individuality, from the drape of silk crepe to delicate pearl and antique gold hand-finishes.',
     desktop_image: 'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=2000&auto=format&fit=crop',
     mobile_image: 'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=1000&auto=format&fit=crop',
-    focal_position: 'center 30%',
+    focal_position: 'center 45%',
     cta_primary_text: 'Design Your Abaya',
     cta_primary_link: '#custom-abaya-section',
     cta_secondary_text: 'View Size Guide',
@@ -357,7 +357,7 @@ function renderHeroSlides() {
   state.heroSlides.forEach((slide, idx) => {
     const slideEl = document.createElement('div');
     slideEl.className = `hero-slide ${idx === 0 ? 'active' : ''}`;
-    const focalPos = slide.focal_position || (idx === 0 ? 'center 20%' : (idx === 1 ? 'center 30%' : 'center center'));
+    const focalPos = slide.focal_position || (idx === 0 ? 'center 58%' : (idx === 1 ? 'center 45%' : 'center center'));
     slideEl.innerHTML = `
       <picture class="w-full h-full block">
         <source media="(max-width: 640px)" srcset="${slide.mobile_image || slide.desktop_image}">
