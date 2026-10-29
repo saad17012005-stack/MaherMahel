@@ -5,12 +5,19 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dbPath = path.join(__dirname, '../../meher_mahel.db');
+const isVercel = Boolean(process.env.VERCEL);
+const dbPath = isVercel ? '/tmp/meher_mahel.db' : path.join(__dirname, '../../meher_mahel.db');
 export const db = new Database(dbPath);
 
-// Enable WAL mode and foreign keys for high performance & integrity
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+// Enable pragmas safely
+try {
+  if (!isVercel) {
+    db.pragma('journal_mode = WAL');
+  }
+  db.pragma('foreign_keys = ON');
+} catch (e) {
+  console.warn('[Database] Pragma setup warning:', e);
+}
 
 export function initDatabase() {
   db.exec(`

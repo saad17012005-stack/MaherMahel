@@ -62,15 +62,17 @@ app.get('/admin/:path', (_req, res) => {
   res.sendFile(path.join(__dirname, '../public/admin.html'));
 });
 
-// Start Server
-const server = app.listen(PORT, () => {
-  console.log(`=============================================================`);
-  console.log(`MEHER MAHEL — LUXURY BOUTIQUE E-COMMERCE PLATFORM`);
-  console.log(`Storefront: http://localhost:${PORT}`);
-  console.log(`Admin Dashboard: http://localhost:${PORT}/admin`);
-  console.log(`API Health: http://localhost:${PORT}/health`);
-  console.log(`Payment Status: ${isConfigured() ? 'Active (Live/Test keys)' : 'Awaiting credentials (.env ready)'}`);
-  console.log(`=============================================================`);
-});
+// Start Server if not running in serverless environment (e.g. Vercel)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`=============================================================`);
+    console.log(`MEHER MAHEL — LUXURY BOUTIQUE E-COMMERCE PLATFORM`);
+    console.log(`Storefront: http://localhost:${PORT}`);
+    console.log(`Admin Dashboard: http://localhost:${PORT}/admin`);
+    console.log(`API Health: http://localhost:${PORT}/health`);
+    console.log(`Payment Status: ${isConfigured() ? 'Active (Live/Test keys)' : 'Awaiting credentials (.env ready)'}`);
+    console.log(`=============================================================`);
+  });
+}
 
 export default app;
