@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: meher-mahel-boutique
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+      - key: CURRENCY
+        value: INR
