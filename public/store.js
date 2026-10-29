@@ -569,22 +569,23 @@ function filterByTag(tag) {
 // 3. PRODUCT QUICK-VIEW MODAL
 // --------------------------------------------------------
 async function quickViewProduct(slug) {
-  let p = state.products.find(item => item.slug === slug);
   try {
-    const res = await fetch(`/api/products/${slug}`);
-    const data = await res.json();
-    if (data.success && data.product) {
-      p = data.product;
+    let p = state.products.find(item => item.slug === slug);
+    try {
+      const res = await fetch(`/api/products/${slug}`);
+      const data = await res.json();
+      if (data.success && data.product) {
+        p = data.product;
+      }
+    } catch (err) {
+      console.debug('API lookup note:', err);
     }
-  } catch (err) {
-    console.debug('API lookup note:', err);
-  }
 
-  if (!p) return;
+    if (!p) return;
 
-  const modal = document.getElementById('quickViewModal');
-  const content = document.getElementById('quickViewContent');
-  if (!modal || !content) return;
+    const modal = document.getElementById('quickViewModal');
+    const content = document.getElementById('quickViewContent');
+    if (!modal || !content) return;
 
     const mainImg = p.images?.[0] || '';
     const variants = p.variants || [];
@@ -1259,14 +1260,61 @@ function openPolicyModal(type) {
 // --------------------------------------------------------
 function setupEventListeners() {
   // Carousel controls
-  document.getElementById('heroPrevBtn')?.addEventListener('click', prevHeroSlide);
-  document.getElementById('heroNextBtn')?.addEventListener('click', nextHeroSlide);
+  document.getElementById('heroPrevBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    prevHeroSlide();
+    startHeroAutoplay();
+  });
+  document.getElementById('heroNextBtn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    nextHeroSlide();
+    startHeroAutoplay();
+  });
 
   const heroSection = document.getElementById('heroCarousel');
   if (heroSection) {
     heroSection.addEventListener('mouseenter', stopHeroAutoplay);
     heroSection.addEventListener('mouseleave', startHeroAutoplay);
+
+    // Touch & Swipe gestures for mobile / touch devices
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    heroSection.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+      stopHeroAutoplay();
+    }, { passive: true });
+
+    heroSection.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
+        if (diffX < 0) {
+          nextHeroSlide();
+        } else {
+          prevHeroSlide();
+        }
+      }
+      startHeroAutoplay();
+    }, { passive: true });
   }
+
+  // Keyboard navigation for hero carousel
+  window.addEventListener('keydown', (e) => {
+    if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowLeft') {
+      prevHeroSlide();
+      startHeroAutoplay();
+    } else if (e.key === 'ArrowRight') {
+      nextHeroSlide();
+      startHeroAutoplay();
+    }
+  });
 
   // Drawers & Modals
   document.getElementById('cartBtn')?.addEventListener('click', openCartDrawer);
