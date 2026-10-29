@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meher Mahel — Draped in Grace | Premium Women's Modest Boutique</title>
+  <meta name="description" content="Discover graceful abayas, custom made-to-measure abayas, traditional dresses, luxury handbags and watches at Meher Mahel. Modest luxury tailored for you.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dustyRose: '#C88F91',
+            deepRose: '#A9676C',
+            antiqueGold: '#C6A15B',
+            champagneGold: '#E4CC9A',
+            ivory: '#FAF7F2',
+            charcoal: '#292526',
+            mutedText: '#777071',
+            subtleBorder: '#E9DFD9',
+          },
+          fontFamily: {
+            serif: ['Cormorant Garamond', 'Playfair Display', 'Georgia', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/style.css">
+  <!-- Razorpay Standard Checkout Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body class="bg-ivory text-charcoal font-sans flex flex-col min-h-screen">
+
+  <!-- 1. Announcement Bar -->
+  <div id="announcementBar" class="bg-charcoal text-champagneGold py-2 px-4 text-center text-xs tracking-widest uppercase font-medium border-b border-antiqueGold/20 transition-all">
+    <span id="announcementText">✨ Discover Timeless Modest Luxury — Free Bespoke Consultation on All Custom Abayas</span>
+  </div>
+
+  <!-- 2. Sticky Header & Navigation -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-subtleBorder transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" aria-label="Open navigation menu" class="md:hidden p-2 text-charcoal hover:text-dustyRose focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+
+        <!-- Brand Logo -->
+        <a href="/" class="flex items-center gap-3 py-1 group">
+          <img src="/images/logo.jpg" alt="Meher Mahel" class="h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105">
+          <div class="hidden sm:block">
+            <span class="font-serif text-2xl tracking-wider text-charcoal block leading-none font-semibold">Meher Mahel</span>
+            <span class="text-[9px] tracking-[0.28em] text-antiqueGold uppercase block mt-1 font-medium">Draped in Grace</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center space-x-7 text-xs font-medium uppercase tracking-[0.16em] text-charcoal">
+          <a href="/" class="hover:text-dustyRose transition-colors py-2 border-b-2 border-transparent hover:border-dustyRose">Home</a>
+          
+          <!-- Shop Mega Menu Trigger -->
+          <div class="relative group">
+            <a href="#shop-section" class="flex items-center gap-1 hover:text-dustyRose transition-colors py-2 border-b-2 border-transparent group-hover:border-dustyRose">
+              <span>Shop</span>
+              <svg class="w-3.5 h-3.5 transition-transform group-hover:rotate-180 text-mutedText" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </a>
+            <!-- Mega Dropdown -->
+            <div class="absolute left-1/2 -translate-x-1/2 top-full w-96 bg-white shadow-xl border border-subtleBorder rounded-xl p-6 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 class="text-[10px] text-antiqueGold font-bold uppercase tracking-wider mb-2">Collections</h4>
+                  <ul class="space-y-2 text-xs normal-case tracking-normal">
+                    <li><button onclick="filterCategory('all')" class="hover:text-dustyRose text-charcoal font-medium">All Collections</button></li>
+                    <li><button onclick="filterCategory('abayas')" class="hover:text-dustyRose text-charcoal font-medium">Ready-to-Wear Abayas</button></li>
+                    <li><button onclick="openCustomAbayaModal()" class="hover:text-dustyRose text-deepRose font-semibold">Custom Abayas</button></li>
+                    <li><button onclick="filterCategory('traditional-wear')" class="hover:text-dustyRose text-charcoal font-medium">Traditional Wear</button></li>
+                    <li><button onclick="filterCategory('handbags')" class="hover:text-dustyRose text-charcoal font-medium">Handbags & Clutches</button></li>
+                    <li><button onclick="filterCategory('watches')" class="hover:text-dustyRose text-charcoal font-medium">Watches</button></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 class="text-[10px] text-antiqueGold font-bold uppercase tracking-wider mb-2">Highlights</h4>
+                  <ul class="space-y-2 text-xs normal-case tracking-normal">
+                    <li><button onclick="filterByTag('new_arrival')" class="hover:text-dustyRose text-charcoal font-medium">✨ New Arrivals</button></li>
+                    <li><button onclick="filterByTag('best_seller')" class="hover:text-dustyRose text-charcoal font-medium">⭐ Best Sellers</button></li>
+                    <li><button onclick="openSizeGuideModal()" class="hover:text-dustyRose text-mutedText">Interactive Size Guide</button></li>
+                    <li><button onclick="openOrderTrackModal()" class="hover:text-dustyRose text-mutedText">Track My Order</button></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="filterCategory('abayas')" class="hover:text-dustyRose transition-colors py-2">Abayas</button>
+          <button onclick="filterCategory('traditional-wear')" class="hover:text-dustyRose transition-colors py-2">Traditional Wear</button>
+          <button onclick="filterCategory('handbags')" class="hover:text-dustyRose transition-colors py-2">Handbags</button>
+          <button onclick="filterCategory('watches')" class="hover:text-dustyRose transition-colors py-2">Watches</button>
+          <button onclick="openCustomAbayaModal()" class="text-deepRose font-semibold hover:text-dustyRose transition-colors py-2 flex items-center gap-1">
+            <span>Custom Abaya</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-deepRose inline-block animate-pulse"></span>
+          </button>
+        </nav>
+
+        <!-- Right Quick Actions -->
+        <div class="flex items-center space-x-4 sm:space-x-5">
+          <!-- Search Button -->
+          <button id="searchBtn" aria-label="Search collection" class="text-charcoal hover:text-dustyRose transition-colors p-1.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </button>
+
+          <!-- Order Tracking -->
+          <button onclick="openOrderTrackModal()" title="Track Order" class="text-charcoal hover:text-dustyRose transition-colors p-1.5 hidden sm:block">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+          </button>
+
+          <!-- Wishlist Button -->
+          <button id="wishlistBtn" aria-label="Wishlist" class="relative text-charcoal hover:text-dustyRose transition-colors p-1.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            <span id="wishlistCount" class="absolute -top-1 -right-1 bg-dustyRose text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
+          </button>
+
+          <!-- Shopping Bag Button -->
+          <button id="cartBtn" aria-label="Shopping bag" class="relative text-charcoal hover:text-dustyRose transition-colors p-1.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span id="cartCount" class="absolute -top-1 -right-1 bg-antiqueGold text-white font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
+          </button>
+
+          <!-- Admin Portal Link -->
+          <a href="/admin" title="Admin Dashboard" class="text-mutedText hover:text-charcoal transition-colors p-1.5 text-xs font-semibold uppercase tracking-wider hidden lg:flex items-center gap-1 border border-subtleBorder px-2.5 py-1 rounded-md">
+            <span>Admin</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Slide-out Drawer -->
+    <div id="mobileDrawer" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden transition-opacity">
+      <div class="fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-2xl flex flex-col p-6 overflow-y-auto">
+        <div class="flex items-center justify-between pb-4 border-b border-subtleBorder mb-6">
+          <div class="flex items-center gap-2">
+            <img src="/images/logo.jpg" alt="Meher Mahel" class="h-10 w-auto">
+            <span class="font-serif text-xl font-bold">Meher Mahel</span>
+          </div>
+          <button id="closeMobileDrawer" class="p-2 text-mutedText hover:text-charcoal">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <nav class="space-y-4 text-sm uppercase tracking-wider font-medium">
+          <a href="/" class="block py-2 text-charcoal hover:text-dustyRose border-b border-subtleBorder/50">Home</a>
+          <button onclick="filterCategory('abayas'); closeDrawer();" class="w-full text-left py-2 text-charcoal hover:text-dustyRose border-b border-subtleBorder/50">Abayas</button>
+          <button onclick="openCustomAbayaModal(); closeDrawer();" class="w-full text-left py-2 text-deepRose font-bold border-b border-subtleBorder/50 flex items-center justify-between">
+            <span>Design Custom Abaya</span>
+            <span class="text-xs font-normal bg-deepRose/10 text-deepRose px-2 py-0.5 rounded">Atelier</span>
+          </button>
+          <button onclick="filterCategory('traditional-wear'); closeDrawer();" class="w-full text-left py-2 text-charcoal hover:text-dustyRose border-b border-subtleBorder/50">Traditional Wear</button>
+          <button onclick="filterCategory('handbags'); closeDrawer();" class="w-full text-left py-2 text-charcoal hover:text-dustyRose border-b border-subtleBorder/50">Handbags & Clutches</button>
+          <button onclick="filterCategory('watches'); closeDrawer();" class="w-full text-left py-2 text-charcoal hover:text-dustyRose border-b border-subtleBorder/50">Watches</button>
+          <button onclick="openSizeGuideModal(); closeDrawer();" class="w-full text-left py-2 text-mutedText hover:text-charcoal border-b border-subtleBorder/50">Size Guide</button>
+          <button onclick="openOrderTrackModal(); closeDrawer();" class="w-full text-left py-2 text-mutedText hover:text-charcoal border-b border-subtleBorder/50">Track Order</button>
+          <a href="/admin" class="block py-2 text-antiqueGold font-semibold">Admin Dashboard</a>
+        </nav>
+
+        <div class="mt-auto pt-6 border-t border-subtleBorder text-xs text-mutedText">
+          <p class="font-serif italic text-sm mb-1">“Draped in grace.”</p>
+          <p>© <span id="year"></span> Meher Mahel. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Search Modal -->
+  <div id="searchModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-start justify-center pt-20 px-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-subtleBorder relative">
+      <div class="flex items-center gap-3 border-b border-subtleBorder pb-3">
+        <svg class="w-5 h-5 text-mutedText" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="searchInput" placeholder="Search by abaya silhouette, lace, crepe, handbag, watch..." class="w-full text-base focus:outline-none placeholder:text-mutedText/60">
+        <button id="closeSearchBtn" class="text-mutedText hover:text-charcoal p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="searchResults" class="mt-4 max-h-96 overflow-y-auto divide-y divide-subtleBorder">
+        <p class="text-xs text-mutedText py-4 text-center">Type keyword above to explore the collection.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-grow">
+
+    <!-- 3. SECTION 1: HOMEPAGE HERO CAROUSEL (Highest Priority Feature) -->
+    <section id="heroCarousel" class="relative w-full h-[75vh] md:h-[85vh] bg-charcoal overflow-hidden group">
+      <!-- Slides Container (injected dynamically from database) -->
+      <div id="heroSlidesContainer" class="relative w-full h-full">
+        <!-- Loading placeholder slide -->
+        <div class="hero-slide active">
+          <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=1600&auto=format&fit=crop" alt="Meher Mahel" class="hero-image w-full h-full object-cover">
+          <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/30 to-charcoal/20"></div>
+          <div class="absolute inset-0 flex items-center justify-center text-center p-6">
+            <div class="max-w-2xl text-white">
+              <span class="text-xs uppercase tracking-[0.3em] text-champagneGold font-semibold mb-3 block">THE MEHER MAHEL COLLECTION</span>
+              <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 tracking-tight leading-tight">Elegance, Draped in Grace.</h1>
+              <p class="text-sm md:text-base text-ivory/90 font-light mb-8 max-w-lg mx-auto">Discover graceful abayas and thoughtfully selected pieces designed for the woman who appreciates timeless elegance.</p>
+              <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="#shop-section" class="bg-dustyRose hover:bg-deepRose text-white text-xs uppercase tracking-widest font-semibold px-8 py-3.5 rounded-full transition-all shadow-lg shadow-dustyRose/30">Shop Abayas</a>
+                <button onclick="openCustomAbayaModal()" class="border border-white/80 hover:bg-white hover:text-charcoal text-white text-xs uppercase tracking-widest font-semibold px-8 py-3.5 rounded-full transition-all">Design Your Abaya</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carousel Navigation Arrows -->
+      <button id="heroPrevBtn" aria-label="Previous Slide" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/20 hover:bg-white text-white hover:text-charcoal backdrop-blur-md border border-white/30 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <button id="heroNextBtn" aria-label="Next Slide" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/20 hover:bg-white text-white hover:text-charcoal backdrop-blur-md border border-white/30 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </button>
+
+      <!-- Carousel Progress Dots -->
+      <div id="heroDots" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2.5">
+        <!-- Injected dynamically -->
+      </div>
+    </section>
+
+    <!-- 4. SECTION 2: SHOP BY CATEGORY (4 Elegant Tiles) -->
+    <section id="categories-section" class="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <span class="text-xs uppercase tracking-[0.25em] text-antiqueGold font-semibold block mb-2">CURATED COLLECTIONS</span>
+        <h2 class="font-serif text-3xl sm:text-4xl text-charcoal font-bold">Shop by Category</h2>
+        <div class="w-12 h-0.5 bg-dustyRose mx-auto mt-4"></div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+        <!-- Tile 1: Abayas -->
+        <div onclick="filterCategory('abayas')" class="group cursor-pointer relative rounded-2xl overflow-hidden aspect-[3/4] bg-charcoal/10 shadow-sm border border-subtleBorder">
+          <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop" alt="Abayas" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108">
+          <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent"></div>
+          <div class="absolute bottom-0 inset-x-0 p-5 text-center text-white">
+            <h3 class="font-serif text-xl sm:text-2xl font-bold tracking-wide">Abayas</h3>
+            <p class="text-[11px] uppercase tracking-widest text-champagneGold mt-1 font-medium group-hover:text-white transition-colors">Ready-to-Wear & Custom →</p>
+          </div>
+        </div>
+
+        <!-- Tile 2: Traditional Wear (User Uploaded Image) -->
+        <div onclick="filterCategory('traditional-wear')" class="group cursor-pointer relative rounded-2xl overflow-hidden aspect-[3/4] bg-charcoal/10 shadow-sm border border-subtleBorder">
+          <img src="/images/products/traditional-blue-lace.jpg" alt="Traditional Wear" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108">
+          <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent"></div>
+          <div class="absolute bottom-0 inset-x-0 p-5 text-center text-white">
+            <h3 class="font-serif text-xl sm:text-2xl font-bold tracking-wide">Traditional Wear</h3>
+            <p class="text-[11px] uppercase tracking-widest text-champagneGold mt-1 font-medium group-hover:text-white transition-colors">Festive & Everyday →</p>
+          </div>
+        </div>
+
+        <!-- Tile 3: Handbags (User Uploaded Image) -->
+        <div onclick="filterCategory('handbags')" class="group cursor-pointer relative rounded-2xl overflow-hidden aspect-[3/4] bg-charcoal/10 shadow-sm border border-subtleBorder">
+          <img src="/images/products/handbag-toile.jpg" alt="Handbags" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108">
+          <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent"></div>
+          <div class="absolute bottom-0 inset-x-0 p-5 text-center text-white">
+            <h3 class="font-serif text-xl sm:text-2xl font-bold tracking-wide">Handbags</h3>
+            <p class="text-[11px] uppercase tracking-widest text-champagneGold mt-1 font-medium group-hover:text-white transition-colors">Embroidered & Satin →</p>
+          </div>
+        </div>
+
+        <!-- Tile 4: Watches -->
+        <div onclick="filterCategory('watches')" class="group cursor-pointer relative rounded-2xl overflow-hidden aspect-[3/4] bg-charcoal/10 shadow-sm border border-subtleBorder">
+          <img src="https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=800&auto=format&fit=crop" alt="Watches" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108">
+          <div class="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/20 to-transparent"></div>
+          <div class="absolute bottom-0 inset-x-0 p-5 text-center text-white">
+            <h3 class="font-serif text-xl sm:text-2xl font-bold tracking-wide">Watches</h3>
+            <p class="text-[11px] uppercase tracking-widest text-champagneGold mt-1 font-medium group-hover:text-white transition-colors">Sleeve-Friendly Profiles →</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SECTION 3: NEW ARRIVALS & ACTIVE CATALOG -->
+    <section id="shop-section" class="py-16 bg-white border-y border-subtleBorder">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Filter Bar & Section Heading -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 pb-6 border-b border-subtleBorder">
+          <div>
+            <span class="text-xs uppercase tracking-[0.2em] text-antiqueGold font-semibold block mb-1">SHOP THE ATELIER</span>
+            <h2 id="catalogTitle" class="font-serif text-3xl sm:text-4xl text-charcoal font-bold">New Arrivals</h2>
+          </div>
+
+          <!-- Category Filter Tabs -->
+          <div class="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wider font-medium">
+            <button onclick="filterCategory('all')" class="cat-pill active px-4 py-2 rounded-full border border-subtleBorder hover:border-dustyRose transition-colors">All</button>
+            <button onclick="filterCategory('abayas')" class="cat-pill px-4 py-2 rounded-full border border-subtleBorder hover:border-dustyRose transition-colors">Abayas</button>
+            <button onclick="filterCategory('traditional-wear')" class="cat-pill px-4 py-2 rounded-full border border-subtleBorder hover:border-dustyRose transition-colors">Traditional</button>
+            <button onclick="filterCategory('handbags')" class="cat-pill px-4 py-2 rounded-full border border-subtleBorder hover:border-dustyRose transition-colors">Handbags</button>
+            <button onclick="filterCategory('watches')" class="cat-pill px-4 py-2 rounded-full border border-subtleBorder hover:border-dustyRose transition-colors">Watches</button>
+          </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          <!-- Dynamic Products Injected via JS -->
+          <div class="col-span-full py-12 text-center text-mutedText text-sm">Loading Meher Mahel catalog...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. SECTION 4: BESPOKE CUSTOM ABAYA SPOTLIGHT (Signature Feature) -->
+    <section class="py-20 bg-ivory">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-3xl overflow-hidden border border-subtleBorder shadow-xl grid grid-cols-1 lg:grid-cols-12 items-center">
+          
+          <div class="lg:col-span-6 h-80 sm:h-96 lg:h-full relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=1200&auto=format&fit=crop" alt="Bespoke Abaya Craftsmanship" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black/20"></div>
+            <div class="absolute top-6 left-6 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase text-antiqueGold border border-antiqueGold/30">
+              Handcrafted To Order
+            </div>
+          </div>
+
+          <div class="lg:col-span-6 p-8 sm:p-12 lg:p-16">
+            <span class="text-xs uppercase tracking-[0.25em] text-antiqueGold font-semibold block mb-2">MADE TO YOUR MEASUREMENTS</span>
+            <h2 class="font-serif text-3xl sm:text-4xl text-charcoal font-bold mb-4 leading-tight">Your Size. Your Fabric. Your Details.</h2>
+            <p class="text-mutedText text-sm sm:text-base font-light leading-relaxed mb-6">
+              Create an abaya that feels uniquely yours. Choose the silhouette, luxurious fabrics from Korean Georgette to Silk Velvet, and personalize with pearl accents, antique gold seam trims, or bespoke sleeve lengths tailored to your exact height.
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8 text-xs font-medium text-charcoal">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-dustyRose"></span>
+                <span>4 Distinct Silhouettes</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-dustyRose"></span>
+                <span>Pearl & Gold Accents</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-dustyRose"></span>
+                <span>Custom Body or Garment Specs</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-dustyRose"></span>
+                <span>7–12 Days Dedicated Atelier</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-4">
+              <button onclick="openCustomAbayaModal()" class="bg-dustyRose hover:bg-deepRose text-white text-xs uppercase tracking-widest font-semibold px-8 py-4 rounded-xl transition-all shadow-md shadow-dustyRose/20 gold-sheen-hover">
+                Start Customising
+              </button>
+              <button onclick="openSizeGuideModal()" class="text-charcoal hover:text-dustyRose text-xs uppercase tracking-widest font-semibold px-4 py-3 transition-colors flex items-center gap-1.5">
+                <span>View Size Guide</span>
+                <span>→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. SECTION 5: WHY MEHER MAHEL (4 Pillars) -->
+    <section class="py-16 border-t border-subtleBorder bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          
+          <div class="text-center p-6 rounded-2xl bg-ivory/60 border border-subtleBorder/60">
+            <div class="w-12 h-12 rounded-full bg-dustyRose/10 text-dustyRose mx-auto flex items-center justify-center font-bold text-xl mb-4">
+              ✦
+            </div>
+            <h4 class="font-serif text-lg font-bold text-charcoal mb-1">Quality Fabrics</h4>
+            <p class="text-xs text-mutedText leading-relaxed">Hand-selected Korean georgettes, silk blends, and rich velvets with graceful weight and breathability.</p>
+          </div>
+
+          <div class="text-center p-6 rounded-2xl bg-ivory/60 border border-subtleBorder/60">
+            <div class="w-12 h-12 rounded-full bg-dustyRose/10 text-dustyRose mx-auto flex items-center justify-center font-bold text-xl mb-4">
+              ✂
+            </div>
+            <h4 class="font-serif text-lg font-bold text-charcoal mb-1">Thoughtful Craftsmanship</h4>
+            <p class="text-xs text-mutedText leading-relaxed">French seams, clean open fronts, and pearl touches designed with modesty and refinement in mind.</p>
+          </div>
+
+          <div class="text-center p-6 rounded-2xl bg-ivory/60 border border-subtleBorder/60">
+            <div class="w-12 h-12 rounded-full bg-dustyRose/10 text-dustyRose mx-auto flex items-center justify-center font-bold text-xl mb-4">
+              🔒
+            </div>
+            <h4 class="font-serif text-lg font-bold text-charcoal mb-1">Secure Checkout</h4>
+            <p class="text-xs text-mutedText leading-relaxed">Encrypted payments powered by Razorpay with automatic order confirmation and live shipment tracking.</p>
+          </div>
+
+          <div class="text-center p-6 rounded-2xl bg-ivory/60 border border-subtleBorder/60">
+            <div class="w-12 h-12 rounded-full bg-dustyRose/10 text-dustyRose mx-auto flex items-center justify-center font-bold text-xl mb-4">
+              💬
+            </div>
+            <h4 class="font-serif text-lg font-bold text-charcoal mb-1">Personalised Support</h4>
+            <p class="text-xs text-mutedText leading-relaxed">Direct WhatsApp styling concierge for measurement queries, bespoke consultations, and order updates.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. SECTION 6: COMPLETE THE LOOK (Editorial Pairing) -->
+    <section class="py-16 md:py-20 bg-ivory border-t border-subtleBorder">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <span class="text-xs uppercase tracking-[0.25em] text-antiqueGold font-semibold block mb-2">HARMONIOUS STYLING</span>
+          <h2 class="font-serif text-3xl sm:text-4xl text-charcoal font-bold">Complete the Look</h2>
+          <p class="text-xs text-mutedText mt-2 max-w-md mx-auto">Elevate your ensemble with coordinated accessories chosen to accentuate modest silhouette drape.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Item 1: Abaya -->
+          <div class="bg-white rounded-2xl p-5 border border-subtleBorder shadow-sm flex flex-col items-center text-center">
+            <img src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=600&auto=format&fit=crop" alt="Noor Abaya" class="w-full h-72 object-cover rounded-xl mb-4">
+            <span class="text-[10px] text-antiqueGold font-bold uppercase tracking-wider mb-1">Base Ensemble</span>
+            <h4 class="font-serif text-lg font-bold text-charcoal">Noor Black Crepe Abaya</h4>
+            <p class="text-xs font-semibold text-dustyRose mt-1">₹4,999</p>
+            <button onclick="quickViewProduct('noor-black-crepe-open-front-abaya')" class="mt-4 text-xs font-semibold text-charcoal hover:text-dustyRose border border-subtleBorder hover:border-dustyRose px-4 py-2 rounded-lg transition-colors">View Details</button>
+          </div>
+
+          <!-- Item 2: Toile Bag (User Uploaded Image) -->
+          <div class="bg-white rounded-2xl p-5 border border-subtleBorder shadow-sm flex flex-col items-center text-center">
+            <img src="/images/products/handbag-toile.jpg" alt="Toile Handbag" class="w-full h-72 object-cover rounded-xl mb-4">
+            <span class="text-[10px] text-antiqueGold font-bold uppercase tracking-wider mb-1">Coordinated Bag</span>
+            <h4 class="font-serif text-lg font-bold text-charcoal">Toile Ribbon Handbag</h4>
+            <p class="text-xs font-semibold text-dustyRose mt-1">₹4,499</p>
+            <button onclick="quickViewProduct('toile-de-jouy-structured-ribbon-handbag')" class="mt-4 text-xs font-semibold text-charcoal hover:text-dustyRose border border-subtleBorder hover:border-dustyRose px-4 py-2 rounded-lg transition-colors">View Details</button>
+          </div>
+
+          <!-- Item 3: Slim Watch -->
+          <div class="bg-white rounded-2xl p-5 border border-subtleBorder shadow-sm flex flex-col items-center text-center">
+            <img src="https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=600&auto=format&fit=crop" alt="Heritage Watch" class="w-full h-72 object-cover rounded-xl mb-4">
+            <span class="text-[10px] text-antiqueGold font-bold uppercase tracking-wider mb-1">Timepiece</span>
+            <h4 class="font-serif text-lg font-bold text-charcoal">Heritage Rose Gold Mesh Watch</h4>
+            <p class="text-xs font-semibold text-dustyRose mt-1">₹5,299</p>
+            <button onclick="quickViewProduct('heritage-rose-gold-mesh-watch')" class="mt-4 text-xs font-semibold text-charcoal hover:text-dustyRose border border-subtleBorder hover:border-dustyRose px-4 py-2 rounded-lg transition-colors">View Details</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. SECTION 7: VERIFIED CUSTOMER REVIEWS -->
+    <section class="py-16 bg-white border-t border-subtleBorder">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <span class="text-xs uppercase tracking-[0.25em] text-antiqueGold font-semibold block mb-2">WORDS FROM OUR CIRCLE</span>
+          <h2 class="font-serif text-3xl sm:text-4xl text-charcoal font-bold">Client Reflections</h2>
+          <div class="flex items-center justify-center gap-1 text-antiqueGold mt-3">
+            ★★★★★ <span class="text-xs text-mutedText ml-2">Verified Modest Luxury</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-6 rounded-2xl bg-ivory border border-subtleBorder flex flex-col justify-between">
+            <div>
+              <div class="text-antiqueGold text-sm mb-3">★★★★★</div>
+              <p class="text-sm font-light text-charcoal leading-relaxed italic">“The fabric drape on the Noor abaya is breathtaking. The antique gold buttons have a subtle, premium weight to them that feels bespoke.”</p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-subtleBorder flex items-center justify-between text-xs">
+              <span class="font-semibold text-charcoal">Fatima Al-Sayed</span>
+              <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">Verified Purchase</span>
+            </div>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-ivory border border-subtleBorder flex flex-col justify-between">
+            <div>
+              <div class="text-antiqueGold text-sm mb-3">★★★★★</div>
+              <p class="text-sm font-light text-charcoal leading-relaxed italic">“The Toile de Jouy handbag with the navy satin bow is an absolute work of art. I received compliments all evening!”</p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-subtleBorder flex items-center justify-between text-xs">
+              <span class="font-semibold text-charcoal">Zainab Qureshi</span>
+              <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">Verified Purchase</span>
+            </div>
+          </div>
+
+          <div class="p-6 rounded-2xl bg-ivory border border-subtleBorder flex flex-col justify-between">
+            <div>
+              <div class="text-antiqueGold text-sm mb-3">★★★★★</div>
+              <p class="text-sm font-light text-charcoal leading-relaxed italic">“The custom abaya atelier was seamless. Entering my sleeve and length measurements ensured the drape did not drag on the floor. Stunning craftsmanship.”</p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-subtleBorder flex items-center justify-between text-xs">
+              <span class="font-semibold text-charcoal">Mariam Siddiqui</span>
+              <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">Custom Order</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. SECTION 8: NEWSLETTER "JOIN OUR CIRCLE" -->
+    <section class="py-16 bg-charcoal text-white">
+      <div class="max-w-3xl mx-auto px-4 text-center">
+        <span class="text-xs uppercase tracking-[0.3em] text-champagneGold font-semibold block mb-2">PRIVATE ATELIER DISPATCH</span>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold mb-4">Join Our Circle</h2>
+        <p class="text-ivory/80 text-sm max-w-lg mx-auto font-light leading-relaxed mb-8">
+          Discover new arrivals, thoughtful modest styling notes, and early access to bespoke seasonal collections.
+        </p>
+
+        <form id="newsletterForm" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+          <input type="email" id="newsletterEmail" placeholder="Enter your email address" required
+            class="w-full px-5 py-3.5 rounded-full bg-white/10 text-white placeholder-ivory/50 border border-white/20 focus:outline-none focus:border-champagneGold text-xs tracking-wider">
+          <button type="submit" class="bg-dustyRose hover:bg-deepRose text-white text-xs uppercase tracking-widest font-semibold px-8 py-3.5 rounded-full transition-all shrink-0">
+            Subscribe
+          </button>
+        </form>
+        <p id="newsletterFeedback" class="text-xs mt-3 text-champagneGold hidden"></p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 11. FOOTER -->
+  <footer class="bg-ivory border-t border-subtleBorder pt-16 pb-12 text-charcoal">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
+        
+        <!-- Col 1: Brand Info -->
+        <div class="lg:col-span-2">
+          <div class="flex items-center gap-3 mb-4">
+            <img src="/images/logo.jpg" alt="Meher Mahel" class="h-12 w-auto">
+            <div>
+              <span class="font-serif text-2xl font-bold tracking-wider">Meher Mahel</span>
+              <span class="block text-[10px] tracking-[0.25em] text-antiqueGold uppercase">Draped in Grace</span>
+            </div>
+          </div>
+          <p class="text-xs text-mutedText leading-relaxed max-w-sm mb-4">
+            Meher Mahel was created for women who value modesty without compromising on beauty. Every abaya, dress, bag and watch is chosen or crafted with care, with attention to fabric, fit and finish.
+          </p>
+          <div class="text-xs text-charcoal font-medium space-y-1">
+            <p>Atelier WhatsApp: <a href="https://wa.me/919876543210" target="_blank" class="text-dustyRose hover:underline">+91 98765 43210</a></p>
+            <p>Concierge Email: <span class="text-mutedText">concierge@mehermahel.com</span></p>
+          </div>
+        </div>
+
+        <!-- Col 2: Collections -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-charcoal mb-4">Shop Collections</h4>
+          <ul class="space-y-2.5 text-xs text-mutedText">
+            <li><button onclick="filterCategory('abayas')" class="hover:text-dustyRose">Ready-to-Wear Abayas</button></li>
+            <li><button onclick="openCustomAbayaModal()" class="hover:text-dustyRose text-deepRose font-semibold">Custom Abaya Atelier</button></li>
+            <li><button onclick="filterCategory('traditional-wear')" class="hover:text-dustyRose">Traditional Wear</button></li>
+            <li><button onclick="filterCategory('handbags')" class="hover:text-dustyRose">Handbags & Clutches</button></li>
+            <li><button onclick="filterCategory('watches')" class="hover:text-dustyRose">Watches</button></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Customer Care -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-charcoal mb-4">Customer Care</h4>
+          <ul class="space-y-2.5 text-xs text-mutedText">
+            <li><button onclick="openSizeGuideModal()" class="hover:text-dustyRose">Interactive Size Guide</button></li>
+            <li><button onclick="openOrderTrackModal()" class="hover:text-dustyRose">Track My Order</button></li>
+            <li><button onclick="openPolicyModal('shipping')" class="hover:text-dustyRose">Shipping & Dispatch</button></li>
+            <li><button onclick="openPolicyModal('returns')" class="hover:text-dustyRose">Returns & Custom Policy</button></li>
+            <li><a href="/admin" class="hover:text-charcoal font-medium text-antiqueGold">Admin Portal</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Trust & Payment -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-charcoal mb-4">Payment Security</h4>
+          <p class="text-xs text-mutedText leading-relaxed mb-3">All transactions encrypted via Razorpay with automated webhook and cryptographic verification.</p>
+          <div class="flex flex-wrap gap-2 text-[10px] font-semibold text-charcoal">
+            <span class="bg-white px-2.5 py-1 rounded border border-subtleBorder">Razorpay</span>
+            <span class="bg-white px-2.5 py-1 rounded border border-subtleBorder">UPI</span>
+            <span class="bg-white px-2.5 py-1 rounded border border-subtleBorder">Visa / MC</span>
+            <span class="bg-white px-2.5 py-1 rounded border border-subtleBorder">NetBanking</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="pt-8 border-t border-subtleBorder flex flex-col sm:flex-row items-center justify-between text-xs text-mutedText gap-4">
+        <p>© <span id="footerYear"></span> Meher Mahel. All rights reserved. “Draped in grace.”</p>
+        <div class="flex space-x-6 text-xs">
+          <button onclick="openPolicyModal('privacy')" class="hover:text-charcoal">Privacy Policy</button>
+          <button onclick="openPolicyModal('terms')" class="hover:text-charcoal">Terms of Service</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- DRAWERS & INTERACTIVE MODALS -->
+  <!-- ======================================================== -->
+
+  <!-- 1. SLIDING SHOPPING CART DRAWER -->
+  <div id="cartDrawerOverlay" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden transition-opacity">
+    <div id="cartDrawer" class="fixed inset-y-0 right-0 max-w-md w-full bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+      
+      <!-- Drawer Header -->
+      <div class="p-6 border-b border-subtleBorder flex items-center justify-between">
+        <div>
+          <h3 class="font-serif text-xl font-bold text-charcoal">Shopping Bag</h3>
+          <p class="text-xs text-mutedText"><span id="cartDrawerItemCount">0</span> items selected</p>
+        </div>
+        <button id="closeCartBtn" class="p-2 text-mutedText hover:text-charcoal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Cart Line Items List -->
+      <div id="cartItemsList" class="flex-grow overflow-y-auto p-6 space-y-4 divide-y divide-subtleBorder">
+        <div class="py-12 text-center text-mutedText text-xs">Your shopping bag is currently empty.</div>
+      </div>
+
+      <!-- Drawer Footer with Totals & Checkout -->
+      <div class="p-6 border-t border-subtleBorder bg-ivory/50 space-y-3">
+        <!-- Coupon Form -->
+        <div class="flex gap-2">
+          <input type="text" id="couponInput" placeholder="Promo code (e.g. WELCOME10)" class="w-full text-xs uppercase px-3.5 py-2.5 rounded-lg border border-subtleBorder focus:outline-none focus:border-dustyRose">
+          <button onclick="applyCouponCode()" class="bg-charcoal text-white text-xs uppercase tracking-wider font-semibold px-4 py-2.5 rounded-lg hover:bg-dustyRose transition-colors">Apply</button>
+        </div>
+        <div id="couponMsg" class="text-xs hidden font-medium"></div>
+
+        <div class="space-y-1.5 text-xs text-charcoal pt-2">
+          <div class="flex justify-between">
+            <span class="text-mutedText">Subtotal</span>
+            <span class="font-semibold" id="cartSubtotal">₹0</span>
+          </div>
+          <div id="discountRow" class="flex justify-between text-emerald-700 hidden">
+            <span>Discount</span>
+            <span class="font-semibold" id="cartDiscount">-₹0</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-mutedText">Estimated Shipping</span>
+            <span class="font-semibold" id="cartShipping">₹0</span>
+          </div>
+          <div class="flex justify-between text-sm font-bold text-charcoal pt-2 border-t border-subtleBorder">
+            <span>Estimated Total</span>
+            <span class="text-dustyRose text-base" id="cartTotal">₹0</span>
+          </div>
+        </div>
+
+        <button onclick="openCheckoutModal()" class="w-full bg-dustyRose hover:bg-deepRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md gold-sheen-hover">
+          Proceed to Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. SIGNATURE CUSTOM ABAYA ATELIER MODAL (6-Step Interactive Wizard) -->
+  <div id="customAbayaModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-subtleBorder relative my-8">
+      
+      <!-- Close Button -->
+      <button onclick="closeCustomAbayaModal()" class="absolute top-6 right-6 p-2 text-mutedText hover:text-charcoal z-10">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <!-- Wizard Header -->
+      <div class="text-center mb-6">
+        <span class="text-xs uppercase tracking-[0.25em] text-antiqueGold font-semibold">MEHER MAHEL BESPOKE ATELIER</span>
+        <h3 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal mt-1">Design Your Abaya</h3>
+        <p class="text-xs text-mutedText mt-1">A tailored consultation experience crafted to your exact fit and drape.</p>
+        
+        <!-- Step Progress Indicator -->
+        <div class="flex items-center justify-center gap-2 mt-4 text-[11px] font-bold">
+          <span id="wizardStepIndicator" class="text-deepRose">Step 1 of 5: Choose Silhouette</span>
+        </div>
+      </div>
+
+      <!-- Wizard Steps Container -->
+      <form id="customAbayaForm" onsubmit="handleCustomAbayaSubmit(event)">
+        
+        <!-- STEP 1: Silhouette -->
+        <div id="step1" class="wizard-step space-y-4">
+          <p class="text-xs text-mutedText">Select the foundation silhouette for your custom piece:</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <label class="cursor-pointer">
+              <input type="radio" name="silhouette" value="Closed Abaya" checked class="hidden peer">
+              <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3 text-center transition-all h-full flex flex-col justify-between">
+                <span class="font-serif text-sm font-bold block mb-1">Closed Abaya</span>
+                <span class="text-[10px] text-mutedText block">Modest, clean straight fall</span>
+                <span class="text-[10px] text-dustyRose font-semibold mt-2">Base Price</span>
+              </div>
+            </label>
+
+            <label class="cursor-pointer">
+              <input type="radio" name="silhouette" value="Open-Front Abaya" class="hidden peer">
+              <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3 text-center transition-all h-full flex flex-col justify-between">
+                <span class="font-serif text-sm font-bold block mb-1">Open-Front</span>
+                <span class="text-[10px] text-mutedText block">Layerable with concealed snaps</span>
+                <span class="text-[10px] text-dustyRose font-semibold mt-2">+₹300</span>
+              </div>
+            </label>
+
+            <label class="cursor-pointer">
+              <input type="radio" name="silhouette" value="Butterfly Abaya" class="hidden peer">
+              <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3 text-center transition-all h-full flex flex-col justify-between">
+                <span class="font-serif text-sm font-bold block mb-1">Butterfly</span>
+                <span class="text-[10px] text-mutedText block">Voluminous sweeping wings</span>
+                <span class="text-[10px] text-dustyRose font-semibold mt-2">+₹600</span>
+              </div>
+            </label>
+
+            <label class="cursor-pointer">
+              <input type="radio" name="silhouette" value="Kimono Abaya" class="hidden peer">
+              <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3 text-center transition-all h-full flex flex-col justify-between">
+                <span class="font-serif text-sm font-bold block mb-1">Kimono Cut</span>
+                <span class="text-[10px] text-mutedText block">Wide modern draped sleeves</span>
+                <span class="text-[10px] text-dustyRose font-semibold mt-2">+₹500</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 2: Fabric & Color -->
+        <div id="step2" class="wizard-step hidden space-y-4">
+          <p class="text-xs text-mutedText">Choose your drape fabric and artisanal shade:</p>
+          
+          <div>
+            <label class="block text-xs font-semibold uppercase text-charcoal mb-2">1. Fabric Texture</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+              <label class="cursor-pointer">
+                <input type="radio" name="fabric" value="Premium Matte Crepe" checked class="hidden peer">
+                <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3">
+                  <span class="font-semibold block">Premium Matte Crepe</span>
+                  <span class="text-[10px] text-mutedText">Lightweight, opaque, breathable</span>
+                  <span class="text-[10px] text-dustyRose font-semibold block mt-1">Included</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="fabric" value="Silk-Blend Velvet" class="hidden peer">
+                <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3">
+                  <span class="font-semibold block">Silk-Blend Velvet</span>
+                  <span class="text-[10px] text-mutedText">Lush sheen, warm & festive</span>
+                  <span class="text-[10px] text-dustyRose font-semibold block mt-1">+₹2,200</span>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="fabric" value="Korean Chiffon (Double Layer)" class="hidden peer">
+                <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3">
+                  <span class="font-semibold block">Korean Chiffon</span>
+                  <span class="text-[10px] text-mutedText">Airy, double-lined drape</span>
+                  <span class="text-[10px] text-dustyRose font-semibold block mt-1">+₹900</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-charcoal mb-2">2. Color Palette</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <label class="cursor-pointer flex items-center gap-2 p-2 rounded-lg border border-subtleBorder">
+                <input type="radio" name="customColor" value="Midnight Black" checked>
+                <span class="w-4 h-4 rounded-full bg-black border"></span>
+                <span>Midnight Black</span>
+              </label>
+              <label class="cursor-pointer flex items-center gap-2 p-2 rounded-lg border border-subtleBorder">
+                <input type="radio" name="customColor" value="Dusty Rose">
+                <span class="w-4 h-4 rounded-full bg-[#C88F91] border"></span>
+                <span>Dusty Rose</span>
+              </label>
+              <label class="cursor-pointer flex items-center gap-2 p-2 rounded-lg border border-subtleBorder">
+                <input type="radio" name="customColor" value="Champagne Ivory">
+                <span class="w-4 h-4 rounded-full bg-[#FAF7F2] border"></span>
+                <span>Champagne Ivory</span>
+              </label>
+              <label class="cursor-pointer flex items-center gap-2 p-2 rounded-lg border border-subtleBorder">
+                <input type="radio" name="customColor" value="Sage Green">
+                <span class="w-4 h-4 rounded-full bg-[#A8D5BA] border"></span>
+                <span>Sage Green</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Details & Accents -->
+        <div id="step3" class="wizard-step hidden space-y-4">
+          <p class="text-xs text-mutedText">Select bespoke artisanal embellishments:</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <label class="flex items-center justify-between p-3.5 rounded-xl border border-subtleBorder cursor-pointer hover:bg-ivory/50">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" name="customDetails" value="Pearl Drop Cuffs" class="rounded text-dustyRose focus:ring-dustyRose">
+                <span>Pearl Droplet Cuffs</span>
+              </div>
+              <span class="text-dustyRose font-semibold">+₹750</span>
+            </label>
+
+            <label class="flex items-center justify-between p-3.5 rounded-xl border border-subtleBorder cursor-pointer hover:bg-ivory/50">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" name="customDetails" value="Antique Gold Trim" class="rounded text-dustyRose focus:ring-dustyRose">
+                <span>Antique Gold Seam Trim</span>
+              </div>
+              <span class="text-dustyRose font-semibold">+₹850</span>
+            </label>
+
+            <label class="flex items-center justify-between p-3.5 rounded-xl border border-subtleBorder cursor-pointer hover:bg-ivory/50">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" name="customDetails" value="Hand-Embroidered Hem" class="rounded text-dustyRose focus:ring-dustyRose">
+                <span>Hand-Embroidered Floral Hem</span>
+              </div>
+              <span class="text-dustyRose font-semibold">+₹1,200</span>
+            </label>
+
+            <label class="flex items-center justify-between p-3.5 rounded-xl border border-subtleBorder cursor-pointer hover:bg-ivory/50">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" name="customDetails" value="Concealed Pockets" class="rounded text-dustyRose focus:ring-dustyRose">
+                <span>Concealed Side Pockets</span>
+              </div>
+              <span class="text-dustyRose font-semibold">+₹350</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 4: Measurements -->
+        <div id="step4" class="wizard-step hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-mutedText">Enter finished garment measurements (or your body measurements):</p>
+            <button type="button" onclick="openSizeGuideModal()" class="text-xs text-dustyRose underline">View Illustrated Guide</button>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-charcoal mb-1">Abaya Length (in)</label>
+              <input type="number" id="mLength" value="54" min="48" max="65" required class="w-full text-xs p-2.5 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+              <span class="text-[9px] text-mutedText">Shoulder to hem</span>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-charcoal mb-1">Shoulder Width (in)</label>
+              <input type="number" id="mShoulder" value="15" min="12" max="22" step="0.5" required class="w-full text-xs p-2.5 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-charcoal mb-1">Bust / Chest (in)</label>
+              <input type="number" id="mBust" value="40" min="30" max="60" required class="w-full text-xs p-2.5 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-charcoal mb-1">Waist (in)</label>
+              <input type="number" id="mWaist" value="38" min="26" max="58" required class="w-full text-xs p-2.5 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-charcoal mb-1">Hips (in)</label>
+              <input type="number" id="mHips" value="44" min="30" max="66" required class="w-full text-xs p-2.5 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-charcoal mb-1">Sleeve Length (in)</label>
+              <input type="number" id="mSleeve" value="26" min="20" max="32" step="0.5" required class="w-full text-xs p-2.5 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: Notes & Summary -->
+        <div id="step5" class="wizard-step hidden space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-charcoal mb-1">Special Notes for the Tailor (Optional)</label>
+            <textarea id="customNotes" rows="2" placeholder="e.g. Please ensure 2-inch loose ease around bust; prefer antique gold snaps instead of buttons." class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none"></textarea>
+          </div>
+
+          <!-- Live Price Summary Card -->
+          <div class="bg-ivory rounded-2xl p-4 border border-subtleBorder text-xs space-y-2">
+            <h5 class="font-serif text-base font-bold text-charcoal">Customization Summary</h5>
+            <div class="flex justify-between text-mutedText">
+              <span>Bespoke Atelier Craftsmanship</span>
+              <span id="summaryBasePrice">₹5,500</span>
+            </div>
+            <div class="flex justify-between text-mutedText">
+              <span>Selected Upgrades & Accents</span>
+              <span id="summaryAdditions">₹0</span>
+            </div>
+            <div class="flex justify-between text-sm font-bold text-charcoal pt-2 border-t border-subtleBorder">
+              <span>Estimated Order Total</span>
+              <span class="text-dustyRose text-base" id="summaryTotal">₹5,500</span>
+            </div>
+            <p class="text-[10px] text-mutedText pt-1">Estimated production: 7–12 business days. Free alteration consultation on bespoke pieces.</p>
+          </div>
+        </div>
+
+        <!-- Wizard Navigation Buttons -->
+        <div class="flex items-center justify-between pt-6 border-t border-subtleBorder mt-6">
+          <button type="button" id="wizardPrevBtn" onclick="prevWizardStep()" class="text-xs uppercase tracking-wider font-semibold text-mutedText hover:text-charcoal px-4 py-2 hidden">
+            ← Back
+          </button>
+          <div class="ml-auto flex items-center gap-3">
+            <button type="button" id="wizardNextBtn" onclick="nextWizardStep()" class="bg-charcoal hover:bg-dustyRose text-white text-xs uppercase tracking-wider font-semibold px-6 py-2.5 rounded-xl transition-colors">
+              Continue →
+            </button>
+            <button type="submit" id="wizardSubmitBtn" class="bg-dustyRose hover:bg-deepRose text-white text-xs uppercase tracking-wider font-semibold px-6 py-2.5 rounded-xl transition-colors hidden gold-sheen-hover">
+              Add Custom Abaya to Bag
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. INTERACTIVE SIZE GUIDE MODAL -->
+  <div id="sizeGuideModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-subtleBorder relative my-8">
+      <button onclick="closeSizeGuideModal()" class="absolute top-6 right-6 p-2 text-mutedText hover:text-charcoal">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="text-center mb-6">
+        <span class="text-xs uppercase tracking-[0.2em] text-antiqueGold font-semibold">MEHER MAHEL FIT DIRECTORY</span>
+        <h3 class="font-serif text-2xl font-bold text-charcoal">Abaya Sizing Guide</h3>
+        <p class="text-xs text-mutedText mt-1">Abayas are sized by length (shoulder to hem). Use your height to find your perfect drape.</p>
+      </div>
+
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs text-left border-collapse">
+          <thead>
+            <tr class="bg-ivory border-b border-subtleBorder text-charcoal font-bold">
+              <th class="p-3">Abaya Size</th>
+              <th class="p-3">Recommended Height</th>
+              <th class="p-3">Length (in / cm)</th>
+              <th class="p-3">Bust (in)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-subtleBorder text-mutedText">
+            <tr>
+              <td class="p-3 font-bold text-charcoal">Size 52</td>
+              <td class="p-3">5'0" – 5'2" (152–157 cm)</td>
+              <td class="p-3">52 in / 132 cm</td>
+              <td class="p-3">40 in</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-charcoal">Size 54</td>
+              <td class="p-3">5'3" – 5'4" (160–163 cm)</td>
+              <td class="p-3">54 in / 137 cm</td>
+              <td class="p-3">42 in</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-charcoal">Size 56</td>
+              <td class="p-3">5'5" – 5'6" (165–168 cm)</td>
+              <td class="p-3">56 in / 142 cm</td>
+              <td class="p-3">44 in</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-charcoal">Size 58</td>
+              <td class="p-3">5'7" – 5'8" (170–173 cm)</td>
+              <td class="p-3">58 in / 147 cm</td>
+              <td class="p-3">46 in</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-bold text-charcoal">Size 60</td>
+              <td class="p-3">5'9"+ (175+ cm)</td>
+              <td class="p-3">60 in / 152 cm</td>
+              <td class="p-3">48 in</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bg-ivory p-4 rounded-xl border border-subtleBorder text-xs text-mutedText">
+        <p class="font-semibold text-charcoal mb-1">💡 Boutique Fit Advice:</p>
+        <p>If you plan to wear high heels, consider sizing up by one length (e.g. from 54 to 56) to ensure the abaya gracefully brushes the shoe without breaking the silhouette.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. PRODUCT QUICK-VIEW MODAL -->
+  <div id="quickViewModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl border border-subtleBorder relative my-8">
+      <button onclick="closeQuickViewModal()" class="absolute top-6 right-6 p-2 text-mutedText hover:text-charcoal z-10">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div id="quickViewContent" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <!-- Content injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. CHECKOUT & SECURE PAYMENT MODAL -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-subtleBorder relative my-8">
+      <button onclick="closeCheckoutModal()" class="absolute top-6 right-6 p-2 text-mutedText hover:text-charcoal">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="text-center mb-6">
+        <span class="text-xs uppercase tracking-[0.2em] text-antiqueGold font-semibold">SECURE CHECKOUT</span>
+        <h3 class="font-serif text-2xl font-bold text-charcoal">Delivery & Payment</h3>
+        <p class="text-xs text-mutedText mt-1">Review your order and enter shipping details below.</p>
+      </div>
+
+      <form id="checkoutForm" onsubmit="handlePlaceOrder(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Full Name</label>
+          <input type="text" id="custName" required placeholder="Sara Al-Mansoor" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Email Address</label>
+            <input type="email" id="custEmail" required placeholder="sara@example.com" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Contact Phone</label>
+            <input type="tel" id="custPhone" required placeholder="+91 9876543210" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Shipping Address</label>
+          <textarea id="custAddress" rows="2" required placeholder="Flat/House No., Street Name, City, State, Postal Code" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none"></textarea>
+        </div>
+
+        <!-- Payment Method Choice -->
+        <div>
+          <label class="block text-xs font-semibold uppercase text-charcoal mb-2">Payment Method</label>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <label class="cursor-pointer">
+              <input type="radio" name="paymentMethod" value="razorpay" checked class="hidden peer">
+              <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3 text-center transition-all">
+                <span class="font-bold block text-charcoal">Razorpay Secure</span>
+                <span class="text-[10px] text-mutedText">UPI, Cards, NetBanking</span>
+              </div>
+            </label>
+
+            <label class="cursor-pointer">
+              <input type="radio" name="paymentMethod" value="cod" class="hidden peer">
+              <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3 text-center transition-all">
+                <span class="font-bold block text-charcoal">Cash on Delivery</span>
+                <span class="text-[10px] text-mutedText">Pay upon receipt</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Order Total Preview -->
+        <div class="bg-ivory p-4 rounded-xl border border-subtleBorder flex items-center justify-between text-xs">
+          <span class="font-semibold text-charcoal">Amount Payable:</span>
+          <span class="font-bold text-base text-dustyRose" id="checkoutPayableTotal">₹0</span>
+        </div>
+
+        <button type="submit" id="checkoutSubmitBtn" class="w-full bg-dustyRose hover:bg-deepRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md gold-sheen-hover">
+          Confirm & Pay
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. ORDER TRACKING MODAL -->
+  <div id="orderTrackModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-subtleBorder relative my-8">
+      <button onclick="closeOrderTrackModal()" class="absolute top-6 right-6 p-2 text-mutedText hover:text-charcoal">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="text-center mb-6">
+        <span class="text-xs uppercase tracking-[0.2em] text-antiqueGold font-semibold">BOUTIQUE DISPATCH</span>
+        <h3 class="font-serif text-2xl font-bold text-charcoal">Track Your Order</h3>
+        <p class="text-xs text-mutedText mt-1">Enter your Meher Mahel order number below.</p>
+      </div>
+
+      <div class="flex gap-2 mb-6">
+        <input type="text" id="trackInput" placeholder="MM-YYYYMMDD-XXXX" class="w-full text-xs uppercase p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none font-mono">
+        <button onclick="handleTrackOrder()" class="bg-charcoal hover:bg-dustyRose text-white text-xs uppercase tracking-wider font-semibold px-5 py-3 rounded-lg transition-colors">Search</button>
+      </div>
+
+      <div id="trackResultContainer" class="hidden">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. FLOATING WHATSAPP SUPPORT CONCIERGE -->
+  <a id="whatsappFloatBtn" href="https://wa.me/919876543210?text=Hi%20Meher%20Mahel%2C%20I%20have%20an%20inquiry%20regarding%20your%20luxury%20collection." target="_blank" aria-label="Contact WhatsApp concierge" class="fixed bottom-6 right-6 z-40 bg-[#25D366] hover:bg-[#20ba5a] text-white p-3.5 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110">
+    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.997.564 1.874.879 3.018.88 3.181 0 5.767-2.587 5.768-5.766.001-3.182-2.585-5.767-5.99-5.767zm3.393 8.163c-.145.407-.743.771-1.032.812-.289.041-.663.064-2.148-.553-1.897-.79-3.119-2.731-3.214-2.859-.096-.128-.772-1.026-.772-1.956 0-.931.488-1.388.662-1.579.175-.192.381-.239.508-.239.127 0 .254.002.366.007.118.005.275-.044.431.33.16.384.549 1.341.597 1.439.048.098.08.213.016.342-.064.128-.096.208-.192.32-.096.112-.202.25-.289.336-.096.096-.197.2-.085.393.112.193.498.822 1.069 1.332.735.656 1.355.859 1.547.955.192.096.304.08.416-.048.112-.128.48-.56.608-.752.128-.192.256-.16.432-.096.176.064 1.118.528 1.31.624.192.096.32.144.368.224.048.08.048.464-.097.871z"/></svg>
+  </a>
+
+  <!-- Storefront JavaScript Bundle -->
+  <script src="/app.js"></script>
+</body>
+</html>

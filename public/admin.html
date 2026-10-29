@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meher Mahel — Administrator Atelier Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dustyRose: '#C88F91',
+            deepRose: '#A9676C',
+            antiqueGold: '#C6A15B',
+            champagneGold: '#E4CC9A',
+            ivory: '#FAF7F2',
+            charcoal: '#292526',
+            mutedText: '#777071',
+            subtleBorder: '#E9DFD9',
+          },
+          fontFamily: {
+            serif: ['Cormorant Garamond', 'Playfair Display', 'Georgia', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-slate-50 text-charcoal font-sans min-h-screen flex flex-col">
+
+  <!-- Admin Top Bar -->
+  <header class="bg-white border-b border-subtleBorder sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <div class="flex items-center gap-3">
+          <img src="/images/logo.jpg" alt="Meher Mahel" class="h-10 w-auto">
+          <div>
+            <h1 class="font-serif text-lg font-bold text-charcoal leading-none">Meher Mahel</h1>
+            <span class="text-[9px] uppercase tracking-widest text-antiqueGold font-bold">Atelier Admin Portal</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <a href="/" target="_blank" class="text-xs uppercase tracking-wider font-semibold text-charcoal hover:text-dustyRose flex items-center gap-1 border border-subtleBorder px-3 py-1.5 rounded-lg transition-colors">
+            <span>View Storefront</span>
+            <span>↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Admin Navigation Tabs -->
+  <div class="bg-white border-b border-subtleBorder">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex space-x-6 text-xs uppercase tracking-wider font-semibold overflow-x-auto">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="admin-tab active py-4 border-b-2 border-dustyRose text-dustyRose flex items-center gap-2">
+          <span>Overview</span>
+        </button>
+        <button onclick="switchTab('orders')" id="tab-orders" class="admin-tab py-4 border-b-2 border-transparent text-mutedText hover:text-charcoal flex items-center gap-2">
+          <span>Orders</span>
+          <span id="badgeOrdersCount" class="bg-slate-100 text-charcoal px-2 py-0.5 rounded-full text-[10px]">0</span>
+        </button>
+        <button onclick="switchTab('custom-queue')" id="tab-custom-queue" class="admin-tab py-4 border-b-2 border-transparent text-mutedText hover:text-charcoal flex items-center gap-2">
+          <span>Custom Abaya Atelier</span>
+          <span id="badgeCustomQueue" class="bg-deepRose/10 text-deepRose px-2 py-0.5 rounded-full text-[10px] font-bold">0</span>
+        </button>
+        <button onclick="switchTab('products')" id="tab-products" class="admin-tab py-4 border-b-2 border-transparent text-mutedText hover:text-charcoal flex items-center gap-2">
+          <span>Products</span>
+        </button>
+        <button onclick="switchTab('hero')" id="tab-hero" class="admin-tab py-4 border-b-2 border-transparent text-mutedText hover:text-charcoal flex items-center gap-2">
+          <span>Hero Carousel</span>
+        </button>
+        <button onclick="switchTab('settings')" id="tab-settings" class="admin-tab py-4 border-b-2 border-transparent text-mutedText hover:text-charcoal flex items-center gap-2">
+          <span>Store Settings</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Content Sections -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+    <!-- 1. TAB: OVERVIEW / DASHBOARD -->
+    <div id="section-dashboard" class="tab-content space-y-8">
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="bg-white p-5 rounded-2xl border border-subtleBorder shadow-sm">
+          <span class="text-[10px] uppercase tracking-wider font-bold text-mutedText block mb-1">Paid Revenue</span>
+          <h3 id="statRevenue" class="font-serif text-2xl font-bold text-charcoal">₹0</h3>
+          <span class="text-[10px] text-emerald-700 font-semibold mt-1 block">Verified Payments</span>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-subtleBorder shadow-sm">
+          <span class="text-[10px] uppercase tracking-wider font-bold text-mutedText block mb-1">Total Orders</span>
+          <h3 id="statOrders" class="font-serif text-2xl font-bold text-charcoal">0</h3>
+          <span class="text-[10px] text-mutedText font-semibold mt-1 block">Lifetime volume</span>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-subtleBorder shadow-sm">
+          <span class="text-[10px] uppercase tracking-wider font-bold text-mutedText block mb-1">Pending Orders</span>
+          <h3 id="statPending" class="font-serif text-2xl font-bold text-amber-600">0</h3>
+          <span class="text-[10px] text-amber-700 font-semibold mt-1 block">Requires dispatch</span>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-subtleBorder shadow-sm">
+          <span class="text-[10px] uppercase tracking-wider font-bold text-mutedText block mb-1">Custom Queue</span>
+          <h3 id="statCustomQueue" class="font-serif text-2xl font-bold text-deepRose">0</h3>
+          <span class="text-[10px] text-deepRose font-semibold mt-1 block">Atelier queue</span>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-subtleBorder shadow-sm">
+          <span class="text-[10px] uppercase tracking-wider font-bold text-mutedText block mb-1">Active Products</span>
+          <h3 id="statProducts" class="font-serif text-2xl font-bold text-charcoal">0</h3>
+          <span class="text-[10px] text-mutedText font-semibold mt-1 block">Live in store</span>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-subtleBorder shadow-sm">
+          <span class="text-[10px] uppercase tracking-wider font-bold text-mutedText block mb-1">Low Stock Alerts</span>
+          <h3 id="statLowStock" class="font-serif text-2xl font-bold text-rose-600">0</h3>
+          <span class="text-[10px] text-rose-600 font-semibold mt-1 block">≤ 5 units left</span>
+        </div>
+      </div>
+
+      <!-- Recent Orders Table -->
+      <div class="bg-white rounded-2xl border border-subtleBorder shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-subtleBorder flex items-center justify-between">
+          <div>
+            <h3 class="font-serif text-xl font-bold text-charcoal">Recent Store Orders</h3>
+            <p class="text-xs text-mutedText">Latest purchases and bespoke abaya commissions</p>
+          </div>
+          <button onclick="switchTab('orders')" class="text-xs uppercase tracking-wider font-semibold text-dustyRose hover:underline">View All →</button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-ivory border-b border-subtleBorder text-charcoal uppercase tracking-wider">
+              <tr>
+                <th class="p-4">Order Ref</th>
+                <th class="p-4">Customer</th>
+                <th class="p-4">Total</th>
+                <th class="p-4">Payment</th>
+                <th class="p-4">Status</th>
+                <th class="p-4">Date</th>
+                <th class="p-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrdersTable" class="divide-y divide-subtleBorder text-mutedText">
+              <tr><td colspan="7" class="p-8 text-center">Loading recent orders...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TAB: ORDERS MANAGEMENT -->
+    <div id="section-orders" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-subtleBorder">
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <input type="text" id="orderSearchInput" placeholder="Search order ref, customer name, email..." class="text-xs p-2.5 rounded-lg border border-subtleBorder w-full sm:w-80 focus:outline-none focus:border-dustyRose">
+          <button onclick="loadAdminOrders()" class="bg-charcoal hover:bg-dustyRose text-white text-xs px-4 py-2.5 rounded-lg uppercase tracking-wider font-semibold transition-colors">Search</button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs">
+          <label class="text-mutedText">Filter Status:</label>
+          <select id="orderStatusFilter" onchange="loadAdminOrders()" class="text-xs p-2 rounded-lg border border-subtleBorder focus:outline-none">
+            <option value="all">All Orders</option>
+            <option value="Order Placed">Order Placed</option>
+            <option value="Payment Confirmed">Payment Confirmed</option>
+            <option value="In Production">In Production</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-subtleBorder shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-ivory border-b border-subtleBorder text-charcoal uppercase tracking-wider">
+              <tr>
+                <th class="p-4">Order Ref</th>
+                <th class="p-4">Customer Details</th>
+                <th class="p-4">Items</th>
+                <th class="p-4">Total</th>
+                <th class="p-4">Payment</th>
+                <th class="p-4">Status</th>
+                <th class="p-4">Courier Tracking</th>
+                <th class="p-4 text-right">Update</th>
+              </tr>
+            </thead>
+            <tbody id="allOrdersTable" class="divide-y divide-subtleBorder text-mutedText">
+              <tr><td colspan="8" class="p-8 text-center">Loading orders...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. TAB: CUSTOM ABAYA ATELIER QUEUE -->
+    <div id="section-custom-queue" class="tab-content hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-subtleBorder">
+        <h3 class="font-serif text-2xl font-bold text-charcoal">Bespoke Abaya Atelier Queue</h3>
+        <p class="text-xs text-mutedText mt-1">Review client measurements, fabric specifications, and update tailoring milestones.</p>
+      </div>
+
+      <div id="customAbayaCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+
+    <!-- 4. TAB: PRODUCTS MANAGEMENT -->
+    <div id="section-products" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between bg-white p-5 rounded-2xl border border-subtleBorder">
+        <div>
+          <h3 class="font-serif text-xl font-bold text-charcoal">Product Catalog Management</h3>
+          <p class="text-xs text-mutedText">Add, edit pricing, manage variant inventory, and feature items.</p>
+        </div>
+        <button onclick="openAddProductModal()" class="bg-dustyRose hover:bg-deepRose text-white text-xs uppercase tracking-wider font-semibold px-5 py-2.5 rounded-xl transition-all shadow-md">
+          + Add New Product
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-subtleBorder shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-ivory border-b border-subtleBorder text-charcoal uppercase tracking-wider">
+              <tr>
+                <th class="p-4">Piece</th>
+                <th class="p-4">Category</th>
+                <th class="p-4">Price</th>
+                <th class="p-4">Stock</th>
+                <th class="p-4">Badges</th>
+                <th class="p-4">Status</th>
+                <th class="p-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsTable" class="divide-y divide-subtleBorder text-mutedText">
+              <tr><td colspan="7" class="p-8 text-center">Loading products...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. TAB: HERO CAROUSEL CMS -->
+    <div id="section-hero" class="tab-content hidden space-y-6">
+      <div class="flex items-center justify-between bg-white p-5 rounded-2xl border border-subtleBorder">
+        <div>
+          <h3 class="font-serif text-xl font-bold text-charcoal">Homepage Hero Carousel Management</h3>
+          <p class="text-xs text-mutedText">Customize editorial slides, imagery, and promotional CTA destinations.</p>
+        </div>
+        <button onclick="openHeroSlideModal()" class="bg-charcoal hover:bg-dustyRose text-white text-xs uppercase tracking-wider font-semibold px-5 py-2.5 rounded-xl transition-all">
+          + Add Slide
+        </button>
+      </div>
+
+      <div id="heroSlidesList" class="space-y-4">
+        <!-- Hero slides list injected dynamically -->
+      </div>
+    </div>
+
+    <!-- 6. TAB: STORE SETTINGS -->
+    <div id="section-settings" class="tab-content hidden space-y-6">
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-subtleBorder max-w-3xl">
+        <h3 class="font-serif text-2xl font-bold text-charcoal mb-4">Boutique Configuration</h3>
+        
+        <form id="settingsForm" onsubmit="handleSaveSettings(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-semibold uppercase text-charcoal mb-1">Top Announcement Bar Text</label>
+            <input type="text" id="settingAnnouncement" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none focus:border-dustyRose">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-semibold uppercase text-charcoal mb-1">WhatsApp Concierge Phone Number</label>
+              <input type="text" id="settingWhatsApp" placeholder="+91 9876543210" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none focus:border-dustyRose">
+            </div>
+            <div>
+              <label class="block font-semibold uppercase text-charcoal mb-1">Store Currency</label>
+              <input type="text" id="settingCurrency" value="INR" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none focus:border-dustyRose">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block font-semibold uppercase text-charcoal mb-1">Flat Rate Shipping (₹)</label>
+              <input type="number" id="settingShippingRate" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none focus:border-dustyRose">
+            </div>
+            <div>
+              <label class="block font-semibold uppercase text-charcoal mb-1">Free Shipping Threshold (₹)</label>
+              <input type="number" id="settingFreeThreshold" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none focus:border-dustyRose">
+            </div>
+            <div>
+              <label class="block font-semibold uppercase text-charcoal mb-1">Estimated Tax (%)</label>
+              <input type="number" id="settingTaxPercent" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none focus:border-dustyRose">
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-subtleBorder flex justify-end">
+            <button type="submit" class="bg-dustyRose hover:bg-deepRose text-white font-semibold py-2.5 px-6 rounded-xl uppercase tracking-wider text-xs transition-colors">
+              Save Boutique Settings
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ADD / EDIT PRODUCT MODAL -->
+  <div id="productModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-subtleBorder relative my-8">
+      <button onclick="closeProductModal()" class="absolute top-6 right-6 p-2 text-mutedText hover:text-charcoal">✕</button>
+      
+      <h3 id="productModalTitle" class="font-serif text-2xl font-bold text-charcoal mb-4">Add New Luxury Piece</h3>
+      
+      <form id="productForm" onsubmit="handleProductSubmit(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="pmId">
+        
+        <div>
+          <label class="block font-semibold uppercase text-charcoal mb-1">Product Title</label>
+          <input type="text" id="pmTitle" required placeholder="e.g. Royal Silk Open-Front Abaya" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none focus:border-dustyRose">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-semibold uppercase text-charcoal mb-1">Category</label>
+            <select id="pmCategory" required class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none">
+              <option value="1">Abayas</option>
+              <option value="2">Traditional Wear</option>
+              <option value="3">Handbags</option>
+              <option value="4">Watches</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold uppercase text-charcoal mb-1">Price (₹)</label>
+            <input type="number" id="pmPrice" required placeholder="4999" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-semibold uppercase text-charcoal mb-1">Compare Price (₹)</label>
+            <input type="number" id="pmComparePrice" placeholder="5999" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase text-charcoal mb-1">Short Summary</label>
+          <input type="text" id="pmShortDesc" placeholder="Brief one-line highlight" class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase text-charcoal mb-1">Full Description</label>
+          <textarea id="pmDescription" rows="3" placeholder="Full fabric drape description, silhouette details..." class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase text-charcoal mb-1">Image URL (or comma-separated URLs)</label>
+          <input type="text" id="pmImages" placeholder="https://... or /images/products/..." class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block font-semibold uppercase text-charcoal mb-1">Fabric & Care</label>
+          <input type="text" id="pmFabricCare" placeholder="Fabric: Korean Georgette. Care: Dry clean only." class="w-full p-2.5 rounded-lg border border-subtleBorder focus:outline-none">
+        </div>
+
+        <div class="flex items-center gap-6 pt-2">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="pmNewArrival" class="rounded text-dustyRose">
+            <span class="font-medium">Mark as New Arrival</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="pmBestSeller" class="rounded text-dustyRose">
+            <span class="font-medium">Mark as Best Seller</span>
+          </label>
+        </div>
+
+        <div class="pt-4 border-t border-subtleBorder flex justify-end gap-3">
+          <button type="button" onclick="closeProductModal()" class="px-4 py-2 border border-subtleBorder rounded-lg">Cancel</button>
+          <button type="submit" class="bg-dustyRose hover:bg-deepRose text-white font-semibold py-2 px-6 rounded-lg uppercase tracking-wider">
+            Save Product
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/admin.js"></script>
+</body>
+</html>

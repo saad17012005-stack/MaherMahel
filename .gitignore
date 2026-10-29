@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+meher_mahel.db
+meher_mahel.db-journal
+meher_mahel.db-wal
+meher_mahel.db-shm
+.DS_Store
+Thumbs.db
