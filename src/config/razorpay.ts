@@ -3,25 +3,26 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
-export const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
-export const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || '';
+export const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder';
+export const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || 'placeholder_secret';
+export const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || 'placeholder_webhook';
 export const DEFAULT_CURRENCY = process.env.CURRENCY || 'INR';
 
 export const isConfigured = (): boolean => {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
   return (
-    Boolean(RAZORPAY_KEY_ID) &&
-    Boolean(RAZORPAY_KEY_SECRET) &&
-    !RAZORPAY_KEY_ID.includes('placeholder') &&
-    !RAZORPAY_KEY_SECRET.includes('placeholder')
+    Boolean(keyId) &&
+    Boolean(keySecret) &&
+    !keyId?.includes('placeholder') &&
+    !keySecret?.includes('placeholder')
   );
 };
 
 export const getRazorpayClient = (): Razorpay => {
   if (!isConfigured()) {
     console.warn(
-      '\x1b[33m%s\x1b[0m',
-      '[Warning] Razorpay keys are not configured or are using placeholder values. Update your .env file with valid credentials from your Razorpay Dashboard.'
+      '[Warning] Razorpay keys are not configured or are using placeholder values. Update your environment variables with valid credentials from your Razorpay Dashboard.'
     );
   }
 

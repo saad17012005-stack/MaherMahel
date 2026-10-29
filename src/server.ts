@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
+import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import paymentRoutes from './routes/paymentRoutes.js';
@@ -33,8 +34,23 @@ app.use(
 
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static assets from public
-app.use(express.static(path.join(__dirname, '../public')));
+// Helper to reliably find public assets across local and Vercel environments
+const resolvePublicFile = (fileName: string): string => {
+  const candidates = [
+    path.join(__dirname, '../public', fileName),
+    path.join(process.cwd(), 'public', fileName),
+    path.join(process.cwd(), fileName),
+  ];
+  return candidates.find(p => fs.existsSync(p)) || candidates[0];
+};
+
+// Serve static assets from public folder
+const publicDir = [
+  path.join(__dirname, '../public'),
+  path.join(process.cwd(), 'public'),
+].find(d => fs.existsSync(d)) || path.join(__dirname, '../public');
+
+app.use(express.static(publicDir));
 
 // Mount API Routes
 app.use('/api', apiRoutes);
@@ -53,13 +69,17 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// Single Page Application route fallbacks for friendly client-side routing
+// Explicit frontend routes
+app.get('/', (_req, res) => {
+  res.sendFile(resolvePublicFile('index.html'));
+});
+
 app.get('/admin', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../public/admin.html'));
+  res.sendFile(resolvePublicFile('admin.html'));
 });
 
 app.get('/admin/:path', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../public/admin.html'));
+  res.sendFile(resolvePublicFile('admin.html'));
 });
 
 // Start Server if not running in serverless environment (e.g. Vercel)
