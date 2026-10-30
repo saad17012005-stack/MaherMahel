@@ -272,7 +272,7 @@ let state = {
   settings: {
     announcement_bar: '✨ Discover Timeless Modest Luxury — Free Custom Bespoke Consultations Available',
     currency: 'INR',
-    whatsapp_number: '+919876543210',
+    whatsapp_number: '+91 76098 74187',
     shipping_flat_rate: '150',
     free_shipping_threshold: '5000',
   },
@@ -663,7 +663,7 @@ async function quickViewProduct(slug) {
             Add to Shopping Bag
           </button>
 
-          <a href="https://wa.me/919876543210?text=Hi%20Meher%20Mahel%2C%20I%20am%20interested%20in%20the%20${encodeURIComponent(p.title)}%20(SKU:%20${p.sku})." target="_blank" class="w-full border border-subtleBorder hover:border-dustyRose text-charcoal py-3 rounded-xl uppercase tracking-wider text-xs font-semibold transition-colors flex items-center justify-center gap-2">
+          <a href="https://wa.me/917609874187?text=Hi%20Meher%20Mahel%2C%20I%20am%20interested%20in%20the%20${encodeURIComponent(p.title)}%20(SKU:%20${p.sku})." target="_blank" class="w-full border border-subtleBorder hover:border-dustyRose text-charcoal py-3 rounded-xl uppercase tracking-wider text-xs font-semibold transition-colors flex items-center justify-center gap-2">
             <span>WhatsApp Atelier Inquiry</span>
           </a>
         </div>
@@ -1023,14 +1023,18 @@ function handleCustomAbayaSubmit(e) {
 }
 
 // --------------------------------------------------------
-// 7. CHECKOUT & SECURE PAYMENT CONTROLLER
+// 7. CHECKOUT & SECURE UPI PAYMENT CONTROLLER (LMBH STYLE)
 // --------------------------------------------------------
+state.checkoutCustomer = null;
+state.checkoutTotal = 0;
+
 function openCheckoutModal() {
   if (state.cart.length === 0) {
     alert('Your shopping bag is empty.');
     return;
   }
   closeCartDrawer();
+  
   const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const freeThreshold = Number(state.settings.free_shipping_threshold) || 5000;
   const shipping = subtotal >= freeThreshold ? 0 : (Number(state.settings.shipping_flat_rate) || 150);
@@ -1038,38 +1042,146 @@ function openCheckoutModal() {
   const tax = Math.round(Math.max(0, subtotal - discount) * 0.05);
   const total = Math.max(0, subtotal - discount + shipping + tax);
 
-  document.getElementById('checkoutPayableTotal').textContent = `₹${total.toLocaleString()}`;
-  document.getElementById('checkoutModal').classList.remove('hidden');
+  state.checkoutTotal = total;
+
+  const payableEl = document.getElementById('checkoutPayableTotal');
+  if (payableEl) payableEl.textContent = `₹${total.toLocaleString()}`;
+
+  const grandTotalEl = document.getElementById('paymentGrandTotal');
+  if (grandTotalEl) grandTotalEl.textContent = `₹${total.toLocaleString()}`;
+
+  // Reset steps to step 1 (details)
+  const step1 = document.getElementById('checkoutStepDetails');
+  const step2 = document.getElementById('checkoutStepPayment');
+  const step3 = document.getElementById('checkoutStepSuccess');
+
+  if (step1) step1.classList.remove('hidden');
+  if (step2) step2.classList.add('hidden');
+  if (step3) step3.classList.add('hidden');
+
+  const utrInput = document.getElementById('utrInput');
+  if (utrInput) utrInput.value = '';
+
+  const confirmBtn = document.getElementById('confirmUtrBtn');
+  if (confirmBtn) {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Confirm Order ✓';
+  }
+
+  const modal = document.getElementById('checkoutModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.scrollTop = 0;
+  }
 }
 
 function closeCheckoutModal() {
-  document.getElementById('checkoutModal').classList.add('hidden');
+  const modal = document.getElementById('checkoutModal');
+  if (modal) modal.classList.add('hidden');
 }
 
-async function handlePlaceOrder(e) {
-  e.preventDefault();
-  const submitBtn = document.getElementById('checkoutSubmitBtn');
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Processing Order...';
+function handleProceedToPayment(e) {
+  if (e) e.preventDefault();
 
-  const customer_name = document.getElementById('custName').value.trim();
-  const customer_email = document.getElementById('custEmail').value.trim();
-  const customer_phone = document.getElementById('custPhone').value.trim();
-  const shipping_address = document.getElementById('custAddress').value.trim();
-  const payment_method = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'razorpay';
+  const customer_name = document.getElementById('custName')?.value.trim();
+  const customer_email = document.getElementById('custEmail')?.value.trim();
+  const customer_phone = document.getElementById('custPhone')?.value.trim();
+  const shipping_address = document.getElementById('custAddress')?.value.trim();
+
+  if (!customer_name || !customer_email || !customer_phone || !shipping_address) {
+    alert('Please fill out all required delivery fields.');
+    return;
+  }
+
+  state.checkoutCustomer = {
+    customer_name,
+    customer_email,
+    customer_phone,
+    shipping_address,
+  };
+
+  const grandTotalEl = document.getElementById('paymentGrandTotal');
+  if (grandTotalEl) grandTotalEl.textContent = `₹${state.checkoutTotal.toLocaleString()}`;
+
+  // Advance to Step 2
+  const step1 = document.getElementById('checkoutStepDetails');
+  const step2 = document.getElementById('checkoutStepPayment');
+  const step3 = document.getElementById('checkoutStepSuccess');
+
+  if (step1) step1.classList.add('hidden');
+  if (step2) step2.classList.remove('hidden');
+  if (step3) step3.classList.add('hidden');
+
+  const modal = document.getElementById('checkoutModal');
+  if (modal) modal.scrollTop = 0;
+}
+
+function backToCheckoutDetails() {
+  const step1 = document.getElementById('checkoutStepDetails');
+  const step2 = document.getElementById('checkoutStepPayment');
+  const step3 = document.getElementById('checkoutStepSuccess');
+
+  if (step1) step1.classList.remove('hidden');
+  if (step2) step2.classList.add('hidden');
+  if (step3) step3.classList.add('hidden');
+
+  const modal = document.getElementById('checkoutModal');
+  if (modal) modal.scrollTop = 0;
+}
+
+function handleDirectUPI(app) {
+  const upiId = '7609874187@ibl';
+  const pn = encodeURIComponent('Meher Mahel');
+  const am = state.checkoutTotal || 0;
+  const tn = encodeURIComponent('MeherMahel_Order');
+
+  let upiUrl = '';
+  if (app === 'phonepe') {
+    upiUrl = `phonepe://pay?pa=${upiId}&pn=${pn}&am=${am}&cu=INR&tn=${tn}`;
+  } else {
+    // Standard UPI intent (Google Pay / Paytm / Default UPI)
+    upiUrl = `upi://pay?pa=${upiId}&pn=${pn}&am=${am}&cu=INR&tn=${tn}`;
+  }
+
+  // Attempt opening the native app
+  window.location.href = upiUrl;
+}
+
+async function handleConfirmUPIOrder() {
+  const utrInput = document.getElementById('utrInput');
+  const utr = utrInput?.value.trim() || '';
+
+  if (!utr || utr.length < 6) {
+    alert('Please enter a valid 12-digit UTR or Transaction ID from your payment receipt to complete your order.');
+    utrInput?.focus();
+    return;
+  }
+
+  if (!state.checkoutCustomer) {
+    alert('Please provide shipping details first.');
+    backToCheckoutDetails();
+    return;
+  }
+
+  const confirmBtn = document.getElementById('confirmUtrBtn');
+  if (confirmBtn) {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Recording Order...';
+  }
 
   try {
     const res = await fetch('/api/orders/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        customer_name,
-        customer_email,
-        customer_phone,
-        shipping_address,
+        customer_name: state.checkoutCustomer.customer_name,
+        customer_email: state.checkoutCustomer.customer_email,
+        customer_phone: state.checkoutCustomer.customer_phone,
+        shipping_address: state.checkoutCustomer.shipping_address,
         items: state.cart,
         coupon_code: state.appliedCoupon?.code || null,
-        payment_method,
+        payment_method: 'upi_scanner',
+        utr_id: utr,
       }),
     });
 
@@ -1080,68 +1192,51 @@ async function handlePlaceOrder(e) {
 
     const { order } = data;
 
-    // Handle Razorpay Payment flow
-    if (payment_method === 'razorpay' && order.razorpay_order_id && typeof Razorpay !== 'undefined') {
-      const options = {
-        key: state.settings.razorpay_key_id || 'rzp_test_placeholder',
-        amount: Math.round(order.total * 100),
-        currency: state.settings.currency || 'INR',
-        name: 'Meher Mahel',
-        description: `Order ${order.order_number}`,
-        order_id: order.razorpay_order_id,
-        prefill: {
-          name: customer_name,
-          email: customer_email,
-          contact: customer_phone,
-        },
-        theme: { color: '#C88F91' },
-        handler: async function (response) {
-          // Verify on backend
-          await fetch('/api/payments/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            }),
-          });
-          completeOrderSuccess(order.order_number);
-        },
-        modal: {
-          ondismiss: function () {
-            completeOrderSuccess(order.order_number, true);
-          },
-        },
-      };
+    // Clear cart immediately
+    state.cart = [];
+    state.appliedCoupon = null;
+    saveCart();
+    updateCartUI();
 
-      const rzp = new Razorpay(options);
-      rzp.open();
-    } else {
-      // Direct success (Cash on Delivery or Test Mode)
-      completeOrderSuccess(order.order_number);
-    }
+    // Advance to Step 3 (Success)
+    const step1 = document.getElementById('checkoutStepDetails');
+    const step2 = document.getElementById('checkoutStepPayment');
+    const step3 = document.getElementById('checkoutStepSuccess');
+
+    if (step1) step1.classList.add('hidden');
+    if (step2) step2.classList.add('hidden');
+    if (step3) step3.classList.remove('hidden');
+
+    const orderNumEl = document.getElementById('successOrderNumber');
+    if (orderNumEl) orderNumEl.textContent = order.order_number;
+
+    const utrEl = document.getElementById('successUtrId');
+    if (utrEl) utrEl.textContent = utr;
+
+    // Pre-fill WhatsApp verification message
+    const waPhone = '917609874187';
+    const waText = encodeURIComponent(
+      `Hello Meher Mahel, I have placed Order #${order.order_number} for ₹${Number(order.total).toLocaleString()} and completed the payment via UPI (UTR: ${utr}).\n\nCustomer: ${state.checkoutCustomer.customer_name}\nPhone: ${state.checkoutCustomer.customer_phone}\n\nHere is my payment screenshot for priority verification.`
+    );
+    const waUrl = `https://wa.me/${waPhone}?text=${waText}`;
+
+    const waBtn = document.getElementById('successWhatsAppBtn');
+    if (waBtn) waBtn.href = waUrl;
+
+    const modal = document.getElementById('checkoutModal');
+    if (modal) modal.scrollTop = 0;
   } catch (err) {
-    alert(err.message || 'Payment initiation failed.');
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Confirm & Pay';
+    alert(err.message || 'Payment submission failed. Please try again.');
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirm Order ✓';
+    }
   }
 }
 
-function completeOrderSuccess(orderNumber, isPendingPayment = false) {
-  // Clear cart
-  state.cart = [];
-  state.appliedCoupon = null;
-  saveCart();
-  updateCartUI();
-  closeCheckoutModal();
-
-  alert(`✨ Order Confirmed!\n\nYour Meher Mahel order number is: ${orderNumber}\n${isPendingPayment ? 'Status: Awaiting Payment' : 'Status: Placed & Confirmed'}\n\nYou can track this purchase anytime using the Track Order button.`);
-  
-  // Open order track modal to show timeline
-  openOrderTrackModal();
-  document.getElementById('trackInput').value = orderNumber;
-  handleTrackOrder();
+// Backward-compatibility alias
+function handlePlaceOrder(e) {
+  handleProceedToPayment(e);
 }
 
 // --------------------------------------------------------

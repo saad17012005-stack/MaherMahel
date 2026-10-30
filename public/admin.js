@@ -85,7 +85,11 @@ function renderRecentOrders(orders) {
 
   table.innerHTML = orders.map(o => `
     <tr class="hover:bg-slate-50">
-      <td class="p-4 font-mono font-bold text-charcoal">${o.order_number}</td>
+      <td class="p-4 font-mono font-bold text-charcoal">
+        ${o.order_number}
+        ${o.utr_id ? `<span class="block text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded mt-1 border border-emerald-200">UTR: ${o.utr_id}</span>` : ''}
+        ${o.payment_method ? `<span class="block text-[9px] uppercase tracking-wider text-mutedText mt-0.5">${o.payment_method}</span>` : ''}
+      </td>
       <td class="p-4">
         <span class="font-semibold text-charcoal block">${o.customer_name}</span>
         <span class="text-[10px] text-mutedText">${o.customer_email}</span>
@@ -140,7 +144,11 @@ function renderAdminOrders(orders) {
 
   table.innerHTML = orders.map(o => `
     <tr class="hover:bg-slate-50">
-      <td class="p-4 font-mono font-bold text-charcoal">${o.order_number}</td>
+      <td class="p-4 font-mono font-bold text-charcoal">
+        ${o.order_number}
+        ${o.utr_id ? `<span class="block text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded mt-1 border border-emerald-200">UTR: ${o.utr_id}</span>` : ''}
+        ${o.payment_method ? `<span class="block text-[9px] uppercase tracking-wider text-mutedText mt-0.5">${o.payment_method}</span>` : ''}
+      </td>
       <td class="p-4">
         <span class="font-bold text-charcoal block">${o.customer_name}</span>
         <span class="text-[10px] text-mutedText block">${o.customer_phone}</span>
@@ -180,7 +188,7 @@ function renderAdminOrders(orders) {
           onblur="updateOrderTracking(${o.id}, this.value)" class="text-xs p-1.5 rounded border border-subtleBorder w-28">
       </td>
       <td class="p-4 text-right">
-        <button onclick="alert('Order Reference: ${o.order_number}\\nCustomer: ${o.customer_name}\\nPhone: ${o.customer_phone}\\nShipping: ${o.shipping_address}\\nTotal: ₹${o.total}')" class="text-dustyRose font-semibold hover:underline">View</button>
+        <button onclick="alert('Order Reference: ${o.order_number}\\nUTR / Trans ID: ${o.utr_id || 'N/A'}\\nCustomer: ${o.customer_name}\\nPhone: ${o.customer_phone}\\nShipping: ${o.shipping_address}\\nTotal: ₹${o.total}')" class="text-dustyRose font-semibold hover:underline">View</button>
       </td>
     </tr>
   `).join('');

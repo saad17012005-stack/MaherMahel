@@ -258,7 +258,7 @@ export const applyCoupon = (req, res) => {
 };
 export const createStoreOrder = async (req, res) => {
     try {
-        const { customer_name, customer_email, customer_phone, shipping_address, billing_address, items, coupon_code, payment_method, notes, } = req.body;
+        const { customer_name, customer_email, customer_phone, shipping_address, billing_address, items, coupon_code, payment_method, utr_id, notes, } = req.body;
         if (!customer_name || !customer_email || !customer_phone || !shipping_address) {
             return res.status(400).json({ success: false, message: 'Missing required customer details.' });
         }
@@ -326,11 +326,11 @@ export const createStoreOrder = async (req, res) => {
           order_number, customer_name, customer_email, customer_phone,
           shipping_address, billing_address, subtotal, discount,
           shipping_fee, tax, total, payment_method, payment_status,
-          razorpay_order_id, order_status, notes
+          razorpay_order_id, utr_id, order_status, notes
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-            const orderResult = insertOrderStmt.run(order_number, customer_name, customer_email, customer_phone, typeof shipping_address === 'object' ? JSON.stringify(shipping_address) : shipping_address, billing_address ? (typeof billing_address === 'object' ? JSON.stringify(billing_address) : billing_address) : null, subtotal, discount, shipping_fee, tax, total, payment_method || 'razorpay', initialPaymentStatus, razorpay_order_id, payment_method === 'cod' ? 'Order Placed' : 'Awaiting Payment', notes || '');
+            const orderResult = insertOrderStmt.run(order_number, customer_name, customer_email, customer_phone, typeof shipping_address === 'object' ? JSON.stringify(shipping_address) : shipping_address, billing_address ? (typeof billing_address === 'object' ? JSON.stringify(billing_address) : billing_address) : null, subtotal, discount, shipping_fee, tax, total, payment_method || 'upi_scanner', initialPaymentStatus, razorpay_order_id, utr_id || null, payment_method === 'cod' ? 'Order Placed' : (payment_method === 'upi_scanner' ? 'Payment Submitted (UTR Verification)' : 'Awaiting Payment'), notes || '');
             const orderId = orderResult.lastInsertRowid;
             // Insert line items
             const insertItemStmt = db.prepare(`

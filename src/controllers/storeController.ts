@@ -289,6 +289,7 @@ export const createStoreOrder = async (req: Request, res: Response) => {
       items,
       coupon_code,
       payment_method,
+      utr_id,
       notes,
     } = req.body;
 
@@ -369,9 +370,9 @@ export const createStoreOrder = async (req: Request, res: Response) => {
           order_number, customer_name, customer_email, customer_phone,
           shipping_address, billing_address, subtotal, discount,
           shipping_fee, tax, total, payment_method, payment_status,
-          razorpay_order_id, order_status, notes
+          razorpay_order_id, utr_id, order_status, notes
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       const orderResult = insertOrderStmt.run(
@@ -386,10 +387,11 @@ export const createStoreOrder = async (req: Request, res: Response) => {
         shipping_fee,
         tax,
         total,
-        payment_method || 'razorpay',
+        payment_method || 'upi_scanner',
         initialPaymentStatus,
         razorpay_order_id,
-        payment_method === 'cod' ? 'Order Placed' : 'Awaiting Payment',
+        utr_id || null,
+        payment_method === 'cod' ? 'Order Placed' : (payment_method === 'upi_scanner' ? 'Payment Submitted (UTR Verification)' : 'Awaiting Payment'),
         notes || ''
       );
 

@@ -108,6 +108,7 @@ export function initDatabase() {
       razorpay_order_id TEXT,
       razorpay_payment_id TEXT,
       razorpay_signature TEXT,
+      utr_id TEXT,
       order_status TEXT NOT NULL DEFAULT 'Order Placed',
       tracking_number TEXT,
       notes TEXT,
@@ -316,7 +317,7 @@ function createMemoryStore() {
           } else if (normalized.includes('INSERT INTO product_variants')) {
             tables.product_variants.push({ id, product_id: params[0], size: params[1], color: params[2], color_code: params[3], sku: params[4], stock: params[5] });
           } else if (normalized.includes('INSERT INTO orders')) {
-            tables.orders.push({ id, order_number: params[0], customer_name: params[1], customer_email: params[2], customer_phone: params[3], shipping_address: params[4], billing_address: params[5], subtotal: params[6], discount: params[7], shipping_fee: params[8], tax: params[9], total: params[10], payment_method: params[11], payment_status: params[12], razorpay_order_id: params[13], order_status: params[14], notes: params[15], created_at: new Date().toISOString() });
+            tables.orders.push({ id, order_number: params[0], customer_name: params[1], customer_email: params[2], customer_phone: params[3], shipping_address: params[4], billing_address: params[5], subtotal: params[6], discount: params[7], shipping_fee: params[8], tax: params[9], total: params[10], payment_method: params[11], payment_status: params[12], razorpay_order_id: params[13], utr_id: params[14], order_status: params[15], notes: params[16], created_at: new Date().toISOString() });
           } else if (normalized.includes('INSERT INTO order_items')) {
             tables.order_items.push({ id, order_id: params[0], product_id: params[1], product_title: params[2], variant_id: params[3], size: params[4], color: params[5], price: params[6], quantity: params[7], custom_config: params[8] });
           } else if (normalized.includes('INSERT INTO custom_abaya_orders')) {

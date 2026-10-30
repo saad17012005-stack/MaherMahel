@@ -515,7 +515,7 @@
             Meher Mahel was created for women who value modesty without compromising on beauty. Every abaya, dress, bag and watch is chosen or crafted with care, with attention to fabric, fit and finish.
           </p>
           <div class="text-xs text-charcoal font-medium space-y-1">
-            <p>Atelier WhatsApp: <a href="https://wa.me/919876543210" target="_blank" class="text-dustyRose hover:underline">+91 98765 43210</a></p>
+            <p>Atelier WhatsApp: <a href="https://wa.me/917609874187" target="_blank" class="text-dustyRose hover:underline">+91 76098 74187</a></p>
             <p>Concierge Email: <span class="text-mutedText">concierge@mehermahel.com</span></p>
           </div>
         </div>
@@ -960,66 +960,160 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
 
-      <div class="text-center mb-6">
-        <span class="text-xs uppercase tracking-[0.2em] text-antiqueGold font-semibold">SECURE CHECKOUT</span>
-        <h3 class="font-serif text-2xl font-bold text-charcoal">Delivery & Payment</h3>
-        <p class="text-xs text-mutedText mt-1">Review your order and enter shipping details below.</p>
+      <!-- STEP 1: Delivery Details -->
+      <div id="checkoutStepDetails">
+        <div class="text-center mb-6">
+          <span class="text-xs uppercase tracking-[0.2em] text-antiqueGold font-semibold">SECURE CHECKOUT</span>
+          <h3 class="font-serif text-2xl font-bold text-charcoal">Delivery & Shipping</h3>
+          <p class="text-xs text-mutedText mt-1">Review your order and enter shipping details below.</p>
+        </div>
+
+        <form id="checkoutForm" onsubmit="handleProceedToPayment(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Full Name *</label>
+            <input type="text" id="custName" required placeholder="Sara Al-Mansoor" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Email Address *</label>
+              <input type="email" id="custEmail" required placeholder="sara@example.com" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Contact Phone *</label>
+              <input type="tel" id="custPhone" required placeholder="+91 76098 74187" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Shipping Address *</label>
+            <textarea id="custAddress" rows="2" required placeholder="Flat/House No., Street Name, City, State, Postal Code" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none"></textarea>
+          </div>
+
+          <!-- Order Total Preview -->
+          <div class="bg-ivory p-4 rounded-xl border border-subtleBorder flex items-center justify-between text-xs">
+            <span class="font-semibold text-charcoal">Amount Payable:</span>
+            <span class="font-bold text-base text-dustyRose" id="checkoutPayableTotal">₹0</span>
+          </div>
+
+          <button type="submit" id="checkoutProceedBtn" class="w-full bg-dustyRose hover:bg-deepRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md gold-sheen-hover">
+            Proceed to Payment →
+          </button>
+        </form>
       </div>
 
-      <form id="checkoutForm" onsubmit="handlePlaceOrder(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Full Name</label>
-          <input type="text" id="custName" required placeholder="Sara Al-Mansoor" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+      <!-- STEP 2: UPI Scanner & Payment Pane (LMBH style) -->
+      <div id="checkoutStepPayment" class="hidden space-y-6">
+        <div class="text-center">
+          <span class="text-xs uppercase tracking-[0.2em] text-antiqueGold font-semibold">PAYMENT VERIFICATION</span>
+          <h3 class="font-serif text-2xl font-bold text-charcoal">Scan & Pay via UPI</h3>
+          <p class="text-xs text-mutedText mt-1">Scan the QR code or use direct UPI apps below.</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="bg-ivory/60 p-4 rounded-2xl border border-subtleBorder flex items-center justify-between text-xs">
           <div>
-            <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Email Address</label>
-            <input type="email" id="custEmail" required placeholder="sara@example.com" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            <span class="text-mutedText block text-[11px] uppercase tracking-wider">Total Amount</span>
+            <span class="font-bold text-2xl text-charcoal" id="paymentGrandTotal">₹0</span>
           </div>
+          <div class="text-right">
+            <span class="text-[10px] bg-champagneGold/30 text-charcoal font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Instant UPI</span>
+          </div>
+        </div>
+
+        <!-- QR SCANNER -->
+        <div class="w-full bg-[#1B2A4A] p-5 rounded-2xl flex flex-col items-center gap-3 shadow-lg">
+          <p class="text-white text-xs uppercase tracking-widest font-semibold flex items-center gap-1.5">
+            <span>📷 Scan with Any UPI App</span>
+          </p>
+          <div class="bg-white p-3 rounded-xl shadow-inner">
+            <img src="/images/qr-code.jpg" alt="UPI QR Code Scanner" class="w-56 h-56 object-contain rounded-lg">
+          </div>
+          <div class="text-center text-white/90 text-xs">
+            <p class="font-mono text-champagneGold font-bold text-sm select-all">7609874187@ibl</p>
+            <p class="text-[11px] text-white/70 mt-0.5">Meher Mahel Official • +91 76098 74187</p>
+          </div>
+        </div>
+
+        <!-- 1-CLICK UPI PAYMENT BUTTONS -->
+        <div class="space-y-2.5">
+          <p class="text-[11px] uppercase tracking-widest text-mutedText text-center font-semibold">Or Pay Directly on Mobile</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <!-- Google Pay -->
+            <button type="button" onclick="handleDirectUPI('gpay')" class="flex items-center justify-between p-3.5 rounded-xl border-2 border-subtleBorder hover:border-antiqueGold bg-white transition-all text-xs font-semibold text-charcoal group">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-xs">G</span>
+                <span>Google Pay</span>
+              </div>
+              <span class="text-antiqueGold group-hover:translate-x-0.5 transition-transform">Pay →</span>
+            </button>
+
+            <!-- PhonePe -->
+            <button type="button" onclick="handleDirectUPI('phonepe')" class="flex items-center justify-between p-3.5 rounded-xl border-2 border-subtleBorder hover:border-antiqueGold bg-white transition-all text-xs font-semibold text-charcoal group">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-purple-500/10 text-purple-600 flex items-center justify-center font-bold text-xs">पे</span>
+                <span>PhonePe</span>
+              </div>
+              <span class="text-antiqueGold group-hover:translate-x-0.5 transition-transform">Pay →</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- UTR / TRANSACTION ID INPUT -->
+        <div class="pt-4 border-t border-subtleBorder space-y-3">
           <div>
-            <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Contact Phone</label>
-            <input type="tel" id="custPhone" required placeholder="+91 9876543210" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            <label class="block text-xs font-bold text-charcoal uppercase tracking-wider mb-1">
+              Enter UTR / 12-Digit Transaction ID *
+            </label>
+            <input type="text" id="utrInput" placeholder="e.g. 425689012347 (from your UPI receipt)" class="w-full text-sm p-3.5 rounded-xl border-2 border-subtleBorder focus:border-dustyRose focus:outline-none font-mono">
+            <span class="text-[10px] text-mutedText block mt-1">Found in your Google Pay, PhonePe, or Paytm payment details.</span>
+          </div>
+
+          <div class="flex items-center gap-2 pt-2">
+            <button type="button" onclick="backToCheckoutDetails()" class="text-xs uppercase tracking-wider font-semibold text-mutedText hover:text-charcoal px-4 py-3 border border-subtleBorder rounded-xl">
+              ← Back
+            </button>
+            <button type="button" id="confirmUtrBtn" onclick="handleConfirmUPIOrder()" class="flex-grow bg-dustyRose hover:bg-deepRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md gold-sheen-hover">
+              Confirm Order ✓
+            </button>
           </div>
         </div>
+      </div>
 
-        <div>
-          <label class="block text-xs font-semibold uppercase text-charcoal mb-1">Shipping Address</label>
-          <textarea id="custAddress" rows="2" required placeholder="Flat/House No., Street Name, City, State, Postal Code" class="w-full text-xs p-3 rounded-lg border border-subtleBorder focus:border-dustyRose focus:outline-none"></textarea>
+      <!-- STEP 3: ORDER SUCCESS & WHATSAPP SCREENSHOT PANE (LMBH style) -->
+      <div id="checkoutStepSuccess" class="hidden flex flex-col items-center text-center p-4 space-y-5">
+        <div class="text-5xl">🎉</div>
+        <h3 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">Order Placed!</h3>
+        
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 w-full">
+          <p class="text-emerald-800 font-bold text-sm">✅ Your order has been recorded successfully</p>
+          <p class="text-xs text-mutedText mt-1">
+            Order Reference: <span id="successOrderNumber" class="font-mono font-bold text-charcoal">MM-XXXX</span>
+          </p>
+          <p class="text-xs text-mutedText mt-0.5">
+            UTR Recorded: <span id="successUtrId" class="font-mono text-charcoal font-semibold"></span>
+          </p>
         </div>
 
-        <!-- Payment Method Choice -->
-        <div>
-          <label class="block text-xs font-semibold uppercase text-charcoal mb-2">Payment Method</label>
-          <div class="grid grid-cols-2 gap-3 text-xs">
-            <label class="cursor-pointer">
-              <input type="radio" name="paymentMethod" value="razorpay" checked class="hidden peer">
-              <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3 text-center transition-all">
-                <span class="font-bold block text-charcoal">Razorpay Secure</span>
-                <span class="text-[10px] text-mutedText">UPI, Cards, NetBanking</span>
-              </div>
-            </label>
-
-            <label class="cursor-pointer">
-              <input type="radio" name="paymentMethod" value="cod" class="hidden peer">
-              <div class="border-2 border-subtleBorder peer-checked:border-dustyRose peer-checked:bg-dustyRose/5 rounded-xl p-3 text-center transition-all">
-                <span class="font-bold block text-charcoal">Cash on Delivery</span>
-                <span class="text-[10px] text-mutedText">Pay upon receipt</span>
-              </div>
-            </label>
-          </div>
+        <div class="bg-[#1B2A4A] text-white rounded-2xl p-5 w-full text-left space-y-2">
+          <p class="text-champagneGold font-bold text-xs uppercase tracking-wider">
+            📋 Important Next Step — Share Screenshot
+          </p>
+          <p class="text-xs text-white/85 leading-relaxed font-light">
+            Please share your payment screenshot on WhatsApp for priority verification. Our atelier team will verify and confirm your order dispatch.
+          </p>
         </div>
 
-        <!-- Order Total Preview -->
-        <div class="bg-ivory p-4 rounded-xl border border-subtleBorder flex items-center justify-between text-xs">
-          <span class="font-semibold text-charcoal">Amount Payable:</span>
-          <span class="font-bold text-base text-dustyRose" id="checkoutPayableTotal">₹0</span>
-        </div>
+        <a id="successWhatsAppBtn" href="#" target="_blank" class="w-full flex items-center justify-center gap-2.5 py-4 px-6 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full font-bold text-sm shadow-xl transition-transform active:scale-95">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.997.564 1.874.879 3.018.88 3.181 0 5.767-2.587 5.768-5.766.001-3.182-2.585-5.767-5.99-5.767zm3.393 8.163c-.145.407-.743.771-1.032.812-.289.041-.663.064-2.148-.553-1.897-.79-3.119-2.731-3.214-2.859-.096-.128-.772-1.026-.772-1.956 0-.931.488-1.388.662-1.579.175-.192.381-.239.508-.239.127 0 .254.002.366.007.118.005.275-.044.431.33.16.384.549 1.341.597 1.439.048.098.08.213.016.342-.064.128-.096.208-.192.32-.096.112-.202.25-.289.336-.096.096-.197.2-.085.393.112.193.498.822 1.069 1.332.735.656 1.355.859 1.547.955.192.096.304.08.416-.048.112-.128.48-.56.608-.752.128-.192.256-.16.432-.096.176.064 1.118.528 1.31.624.192.096.32.144.368.224.048.08.048.464-.097.871z"/></svg>
+          <span>Share Screenshot on WhatsApp</span>
+        </a>
 
-        <button type="submit" id="checkoutSubmitBtn" class="w-full bg-dustyRose hover:bg-deepRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md gold-sheen-hover">
-          Confirm & Pay
+        <button type="button" onclick="closeCheckoutModal()" class="text-xs text-mutedText hover:text-charcoal underline">
+          Close & Continue Browsing
         </button>
-      </form>
+      </div>
+
     </div>
   </div>
 
@@ -1048,7 +1142,7 @@
   </div>
 
   <!-- 7. FLOATING WHATSAPP SUPPORT CONCIERGE -->
-  <a id="whatsappFloatBtn" href="https://wa.me/919876543210?text=Hi%20Meher%20Mahel%2C%20I%20have%20an%20inquiry%20regarding%20your%20luxury%20collection." target="_blank" aria-label="Contact WhatsApp concierge" class="fixed bottom-6 right-6 z-40 bg-[#25D366] hover:bg-[#20ba5a] text-white p-3.5 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110">
+  <a id="whatsappFloatBtn" href="https://wa.me/917609874187?text=Hi%20Meher%20Mahel%2C%20I%20have%20an%20inquiry%20regarding%20your%20luxury%20collection." target="_blank" aria-label="Contact WhatsApp concierge" class="fixed bottom-6 right-6 z-40 bg-[#25D366] hover:bg-[#20ba5a] text-white p-3.5 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110">
     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.997.564 1.874.879 3.018.88 3.181 0 5.767-2.587 5.768-5.766.001-3.182-2.585-5.767-5.99-5.767zm3.393 8.163c-.145.407-.743.771-1.032.812-.289.041-.663.064-2.148-.553-1.897-.79-3.119-2.731-3.214-2.859-.096-.128-.772-1.026-.772-1.956 0-.931.488-1.388.662-1.579.175-.192.381-.239.508-.239.127 0 .254.002.366.007.118.005.275-.044.431.33.16.384.549 1.341.597 1.439.048.098.08.213.016.342-.064.128-.096.208-.192.32-.096.112-.202.25-.289.336-.096.096-.197.2-.085.393.112.193.498.822 1.069 1.332.735.656 1.355.859 1.547.955.192.096.304.08.416-.048.112-.128.48-.56.608-.752.128-.192.256-.16.432-.096.176.064 1.118.528 1.31.624.192.096.32.144.368.224.048.08.048.464-.097.871z"/></svg>
   </a>
 

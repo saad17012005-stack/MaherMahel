@@ -95,7 +95,8 @@ export function seedDatabase() {
     const insertSetting = db.prepare('INSERT OR REPLACE INTO store_settings (key, value) VALUES (?, ?)');
     insertSetting.run('announcement_bar', '✨ Discover Timeless Modest Luxury — Free Custom Bespoke Consultations Available');
     insertSetting.run('currency', 'INR');
-    insertSetting.run('whatsapp_number', '+919876543210');
+    insertSetting.run('whatsapp_number', '+91 76098 74187');
+    insertSetting.run('upi_id', '7609874187@ibl');
     insertSetting.run('contact_email', 'concierge@mehermahel.com');
     insertSetting.run('shipping_flat_rate', '150');
     insertSetting.run('free_shipping_threshold', '5000');
