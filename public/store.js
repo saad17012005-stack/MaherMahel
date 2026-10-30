@@ -326,6 +326,53 @@ const DEFAULT_PRODUCTS = [
       { id: 32, size: 'L', color: 'Royal Navy' },
       { id: 33, size: 'XL', color: 'Royal Navy' }
     ]
+  },
+  {
+    id: 13,
+    title: 'Amaryllis Blue Floral Toile Sharara Set',
+    slug: 'amaryllis-blue-floral-toile-sharara-set',
+    category_id: 2,
+    category_name: 'Traditional Wear',
+    category_slug: 'traditional-wear',
+    price: 7999,
+    compare_at_price: 9499,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'French blue botanical Toile de Jouy printed sharara with sweetheart neckline and bell sleeves.',
+    description: 'A breathtaking couture ensemble featuring classic French blue botanical Toile de Jouy tapestry print on pure ivory modal satin. Includes a fitted flared bell-sleeve peplum tunic, wide-leg tiered sharara pants, and a scalloped corded lace dupatta.',
+    images: ['/images/hero/look-toile-suit.jpg'],
+    fabric_care: 'Fabric: Modal Satin Silk with Scalloped Lace Dupatta. Care: Professional dry clean only.',
+    tags: ['traditional', 'toile-de-jouy', 'sharara', 'blue-white', 'festive'],
+    variants: [
+      { id: 34, size: 'XS', color: 'French Blue' },
+      { id: 35, size: 'S', color: 'French Blue' },
+      { id: 36, size: 'M', color: 'French Blue' },
+      { id: 37, size: 'L', color: 'French Blue' },
+      { id: 38, size: 'XL', color: 'French Blue' }
+    ]
+  },
+  {
+    id: 14,
+    title: 'Zunaira Dusty Taupe Embroidered Royal Abaya',
+    slug: 'zunaira-dusty-taupe-embroidered-royal-abaya',
+    category_id: 1,
+    category_name: 'Abayas',
+    category_slug: 'abayas',
+    price: 6799,
+    compare_at_price: 8299,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'Elegantly tailored dusty taupe open-front abaya with hand-guided ivory floral embroidery.',
+    description: 'An ethereal open-front abaya tailored in fluid dusty taupe crepe, accented with intricate ivory and champagne gold vine embroidery running along the front placket and sweeping flared sleeves. Designed with an inner slip gown for effortless modesty.',
+    images: ['/images/hero/look-taupe-abaya.jpg'],
+    fabric_care: 'Fabric: Premium Nida & Crepe Silk. Care: Gentle dry clean or cold hand wash. Steam iron.',
+    tags: ['abaya', 'taupe', 'embroidered', 'open-front', 'royal'],
+    variants: [
+      { id: 39, size: '52', color: 'Dusty Taupe' },
+      { id: 40, size: '54', color: 'Dusty Taupe' },
+      { id: 41, size: '56', color: 'Dusty Taupe' },
+      { id: 42, size: '58', color: 'Dusty Taupe' }
+    ]
   }
 ];
 
@@ -454,6 +501,26 @@ const CYLINDER_HERO_ITEMS = [
   },
   {
     id: 2,
+    title: 'Amaryllis Blue Floral Toile Sharara Set',
+    category: 'Traditional Wear',
+    category_slug: 'traditional',
+    price: '₹7,999',
+    tag: 'French Floral Toile',
+    image: '/images/hero/look-toile-suit.jpg',
+    productId: 13
+  },
+  {
+    id: 3,
+    title: 'Zunaira Dusty Taupe Embroidered Royal Abaya',
+    category: 'Abayas',
+    category_slug: 'abayas',
+    price: '₹6,799',
+    tag: 'Taupe Silk Embroidery',
+    image: '/images/hero/look-taupe-abaya.jpg',
+    productId: 14
+  },
+  {
+    id: 4,
     title: 'Toile de Jouy Structured Ribbon Tote',
     category: 'Handbags & Clutches',
     category_slug: 'handbags',
@@ -463,7 +530,7 @@ const CYLINDER_HERO_ITEMS = [
     productId: 6
   },
   {
-    id: 3,
+    id: 5,
     title: 'Blossom & Fawn Embroidered Handbag',
     category: 'Handbags & Clutches',
     category_slug: 'handbags',
@@ -473,7 +540,7 @@ const CYLINDER_HERO_ITEMS = [
     productId: 10
   },
   {
-    id: 4,
+    id: 6,
     title: 'Midnight Lace Regal Kurta & Jhumka Set',
     category: 'Traditional Wear',
     category_slug: 'traditional',
@@ -483,7 +550,7 @@ const CYLINDER_HERO_ITEMS = [
     productId: 11
   },
   {
-    id: 5,
+    id: 7,
     title: 'Navy Pearl-Hemmed Couturier Set',
     category: 'Modest Couture',
     category_slug: 'abayas',
@@ -493,7 +560,7 @@ const CYLINDER_HERO_ITEMS = [
     productId: 12
   },
   {
-    id: 6,
+    id: 8,
     title: 'Royal Blue Anarkali Corded Lace Ensemble',
     category: 'Traditional Wear',
     category_slug: 'traditional',
@@ -503,7 +570,7 @@ const CYLINDER_HERO_ITEMS = [
     productId: 4
   },
   {
-    id: 7,
+    id: 9,
     title: 'French Monogrammed Ribbon Handbag',
     category: 'Handbags & Clutches',
     category_slug: 'handbags',
@@ -513,7 +580,7 @@ const CYLINDER_HERO_ITEMS = [
     productId: 6
   },
   {
-    id: 8,
+    id: 10,
     title: 'Noor Black Crepe Open-Front Abaya',
     category: 'Abayas',
     category_slug: 'abayas',
@@ -521,26 +588,6 @@ const CYLINDER_HERO_ITEMS = [
     tag: 'Silk Crepe Abaya',
     image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop',
     productId: 1
-  },
-  {
-    id: 9,
-    title: 'Zahra Rose Pearl Velvet Abaya',
-    category: 'Abayas',
-    category_slug: 'abayas',
-    price: '₹6,499',
-    tag: 'Dusty Rose Velvet',
-    image: 'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=800&auto=format&fit=crop',
-    productId: 2
-  },
-  {
-    id: 10,
-    title: 'Heritage Rose Gold Milanese Mesh Watch',
-    category: 'Watches',
-    category_slug: 'handbags',
-    price: '₹5,299',
-    tag: 'Rose Gold Timepiece',
-    image: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=800&auto=format&fit=crop',
-    productId: 8
   }
 ];
 
@@ -548,7 +595,7 @@ let cylinderState = {
   NUM_CARDS: 10,
   PITCH: 196,
   TOTAL_TRACK: 10 * 196,
-  AUTO_SPEED: 46,
+  AUTO_SPEED: 52, // 52u/s smooth continuous auto-scroll
   CENTER_X: 720,
   RADIUS_NORM: 706,
   scrollPos: 0,
@@ -557,17 +604,23 @@ let cylinderState = {
   dragStartX: 0,
   lastDragX: 0,
   lastDragTime: 0,
-  lastFrameTime: performance.now(),
+  lastFrameTime: 0,
   currentMode: 'fashion', // 'fashion' or 'video'
   currentFilter: 'all',
   cards: [],
   initialized: false,
+  dragListenersAttached: false,
 };
 
 function initCylinderHeroCarousel() {
   const stage = document.getElementById('heroCylinderStage');
   const track = document.getElementById('heroCylinderTrack');
   if (!stage || !track) return;
+
+  // If already built cards and initialized, do not tear down DOM
+  if (cylinderState.cards.length === CYLINDER_HERO_ITEMS.length && cylinderState.initialized) {
+    return;
+  }
 
   track.innerHTML = '';
   cylinderState.cards = [];
@@ -656,8 +709,11 @@ function initCylinderHeroCarousel() {
     });
   });
 
-  // Attach pointer & touch dragging
-  setupCylinderDragging(stage);
+  // Attach pointer & touch dragging (once only)
+  if (!cylinderState.dragListenersAttached) {
+    cylinderState.dragListenersAttached = true;
+    setupCylinderDragging(stage);
+  }
 
   // Setup Arrow Buttons
   const prevBtn = document.getElementById('heroPrevBtn');
@@ -678,34 +734,28 @@ function initCylinderHeroCarousel() {
   // Start Animation Frame Loop
   if (!cylinderState.initialized) {
     cylinderState.initialized = true;
+    cylinderState.lastFrameTime = performance.now();
     requestAnimationFrame(renderCylinderLoop);
   }
 }
 
 function setupCylinderDragging(stage) {
-  let hasMoved = false;
-
   function onPointerDown(e) {
     cylinderState.isDragging = true;
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
     cylinderState.dragStartX = clientX;
     cylinderState.lastDragX = clientX;
     cylinderState.lastDragTime = performance.now();
     cylinderState.velocity = 0;
-    hasMoved = false;
     stage.classList.add('grabbing');
   }
 
   function onPointerMove(e) {
     if (!cylinderState.isDragging) return;
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
     const now = performance.now();
     const dt = (now - cylinderState.lastDragTime) / 1000;
     const dx = clientX - cylinderState.lastDragX;
-
-    if (Math.abs(clientX - cylinderState.dragStartX) > 4) {
-      hasMoved = true;
-    }
 
     const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stage.clientWidth / 1440);
     const deltaU = dx / Math.max(u, 0.4);
@@ -720,7 +770,6 @@ function setupCylinderDragging(stage) {
   }
 
   function onPointerUp() {
-    if (!cylinderState.isDragging) return;
     cylinderState.isDragging = false;
     stage.classList.remove('grabbing');
   }
@@ -732,11 +781,22 @@ function setupCylinderDragging(stage) {
   stage.addEventListener('touchstart', onPointerDown, { passive: true });
   window.addEventListener('touchmove', onPointerMove, { passive: true });
   window.addEventListener('touchend', onPointerUp);
+  window.addEventListener('touchcancel', onPointerUp);
+  window.addEventListener('blur', onPointerUp);
 }
 
 function renderCylinderLoop(time) {
-  const dt = Math.min((time - cylinderState.lastFrameTime) / 1000, 0.1);
-  cylinderState.lastFrameTime = time;
+  const now = (typeof time === 'number' && !isNaN(time)) ? time : performance.now();
+  if (!cylinderState.lastFrameTime || isNaN(cylinderState.lastFrameTime)) {
+    cylinderState.lastFrameTime = now;
+  }
+  let dt = (now - cylinderState.lastFrameTime) / 1000;
+  cylinderState.lastFrameTime = now;
+
+  // Bound dt safely
+  if (isNaN(dt) || dt <= 0 || dt > 0.1) {
+    dt = 0.016;
+  }
 
   const stage = document.getElementById('heroCylinderStage');
   if (!stage) {
@@ -748,13 +808,18 @@ function renderCylinderLoop(time) {
   const stageHeight = stage.clientHeight;
   const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stageWidth / 1440);
 
-  // Coasting physics
+  // Safety checks against NaN
+  if (isNaN(cylinderState.scrollPos)) cylinderState.scrollPos = 0;
+  if (isNaN(cylinderState.velocity)) cylinderState.velocity = 0;
+
+  // Continuous Auto-Scroll & Coasting physics
   if (!cylinderState.isDragging) {
     if (Math.abs(cylinderState.velocity) > 0.5) {
       cylinderState.scrollPos += cylinderState.velocity * dt;
       cylinderState.velocity *= Math.pow(0.05, dt); // 95% decay per second
     } else {
-      cylinderState.scrollPos += cylinderState.AUTO_SPEED * dt;
+      // Unconditional smooth right->left autoscroll
+      cylinderState.scrollPos += (cylinderState.AUTO_SPEED || 52) * dt;
     }
   }
 
@@ -1833,12 +1898,6 @@ function setupEventListeners() {
     nextHeroSlide();
     startHeroAutoplay();
   });
-
-  const heroSection = document.getElementById('heroCarousel');
-  if (heroSection) {
-    heroSection.addEventListener('mouseenter', () => { cylinderState.AUTO_SPEED = 0; });
-    heroSection.addEventListener('mouseleave', () => { cylinderState.AUTO_SPEED = 46; });
-  }
 
   // Keyboard navigation for hero carousel
   window.addEventListener('keydown', (e) => {
