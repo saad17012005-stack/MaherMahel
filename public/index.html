@@ -6,6 +6,9 @@
   <title>Meher Mahel — Draped in Grace | Premium Women's Modest Boutique</title>
   <meta name="description" content="Discover graceful abayas, custom made-to-measure abayas, traditional dresses, luxury handbags and watches at Meher Mahel. Modest luxury tailored for you.">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter+Tight:wght@700;800&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
@@ -204,25 +207,111 @@
   <!-- MAIN CONTENT -->
   <main class="flex-grow">
 
-    <!-- 3. SECTION 1: HOMEPAGE HERO CAROUSEL (Highest Priority Feature) -->
-    <section id="heroCarousel" class="relative w-full bg-charcoal overflow-hidden group">
-      <!-- Slides Container (injected dynamically from database) -->
-      <div id="heroSlidesContainer" class="relative w-full h-full">
-        <!-- Slides will be rendered dynamically via store.js -->
+    <!-- 3. SECTION 1: HOMEPAGE HERO CAROUSEL (Cylindrical 3D Curved Fashion Stage) -->
+    <section id="heroCarousel" class="hero-cylinder-section relative w-full overflow-hidden pt-8 pb-14 sm:pt-12 sm:pb-20">
+      
+      <!-- Ambient Lighting & Soft Silk Glow -->
+      <div class="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(200,143,145,0.25),transparent_70%)]"></div>
+
+      <!-- Center Container for Badges, Typography & Hand-drawn Notes -->
+      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-20">
+        
+        <!-- Trusted / Curator Badge -->
+        <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/80 border border-dustyRose/30 shadow-sm backdrop-blur-md mb-4 sm:mb-6 transition-transform hover:scale-105">
+          <span class="w-2 h-2 rounded-full bg-deepRose animate-ping"></span>
+          <span class="text-xs sm:text-sm font-medium tracking-wide text-charcoal">Trusted by 12,000+ Modest Fashion Lovers</span>
+        </div>
+
+        <!-- Hand-drawn Note: Left Top Doodle (Desktop only) -->
+        <div class="hidden lg:block absolute left-12 top-10 pointer-events-none select-none">
+          <svg width="45" height="45" viewBox="0 0 50 50" fill="none" stroke="#C6A15B" stroke-width="2.5" stroke-linecap="round">
+            <line x1="12" y1="38" x2="32" y2="10" />
+            <line x1="22" y1="38" x2="42" y2="10" />
+          </svg>
+        </div>
+
+        <!-- Hand-drawn Note: Right Top Callout (Desktop only) -->
+        <div class="hidden lg:block absolute right-16 top-4 pointer-events-none select-none text-left rotate-12 z-20">
+          <span class="font-['Caveat'] text-2xl text-deepRose font-bold block leading-none">Artisanal looks<br>with pure grace</span>
+          <svg class="w-16 h-14 mt-1 text-deepRose" viewBox="0 0 100 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 10 10 Q 75 25 60 70 M 60 70 L 52 56 M 60 70 L 72 62" />
+          </svg>
+        </div>
+
+        <!-- Editorial Main Headline -->
+        <h1 class="hero-cylinder-headline font-extrabold text-charcoal tracking-tight text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.08]">
+          Captivate Crowds
+          <span class="block font-serif font-normal italic text-deepRose mt-1 sm:mt-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">with Draped Grace</span>
+        </h1>
+
+        <!-- Balanced Subline -->
+        <p class="hero-cylinder-subline max-w-2xl mx-auto mt-4 sm:mt-5 text-mutedText text-sm sm:text-base md:text-lg leading-relaxed font-light">
+          Discover handcrafted abayas, tailored bell-sleeve silhouettes, and coordinated luxury accessories crafted by our master artisans for timeless modesty.
+        </p>
+
+        <!-- Dynamic Carousel Sub-Controls / Filter Pills -->
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs sm:text-sm font-medium">
+          <button onclick="setHeroFilter('all')" id="heroTabAll" class="hero-filter-pill active px-3.5 py-1 rounded-full bg-charcoal text-white transition-all shadow-sm">All Looks</button>
+          <button onclick="setHeroFilter('abayas')" id="heroTabAbayas" class="hero-filter-pill px-3.5 py-1 rounded-full bg-white/80 hover:bg-white text-charcoal border border-subtleBorder transition-all">Abayas</button>
+          <button onclick="setHeroFilter('traditional')" id="heroTabTrad" class="hero-filter-pill px-3.5 py-1 rounded-full bg-white/80 hover:bg-white text-charcoal border border-subtleBorder transition-all">Traditional Wear</button>
+          <button onclick="setHeroFilter('handbags')" id="heroTabBags" class="hero-filter-pill px-3.5 py-1 rounded-full bg-white/80 hover:bg-white text-charcoal border border-subtleBorder transition-all">Bags & Watches</button>
+        </div>
       </div>
 
-      <!-- Carousel Navigation Arrows -->
-      <button id="heroPrevBtn" aria-label="Previous Slide" class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-white text-white hover:text-charcoal backdrop-blur-md border border-white/30 flex items-center justify-center transition-all shadow-lg active:scale-95 cursor-pointer">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-      </button>
-      <button id="heroNextBtn" aria-label="Next Slide" class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-white text-white hover:text-charcoal backdrop-blur-md border border-white/30 flex items-center justify-center transition-all shadow-lg active:scale-95 cursor-pointer">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <!-- 3D CYLINDRICAL CAROUSEL STAGE -->
+      <div id="heroCylinderStage" class="cylinder-stage relative w-full my-6 sm:my-8 overflow-hidden select-none" style="cursor: grab;">
+        
+        <!-- Continuous Cylinder Track (10 curved interactive cards) -->
+        <div id="heroCylinderTrack" class="cylinder-track relative w-full h-full">
+          <!-- Dynamically positioned via cylindrical math loop -->
+        </div>
+
+        <!-- Left / Right Manual Navigation Buttons -->
+        <button id="heroPrevBtn" aria-label="Scroll left" class="absolute left-3 sm:left-8 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white/85 hover:bg-white text-charcoal hover:text-deepRose backdrop-blur-md border border-subtleBorder shadow-xl flex items-center justify-center transition-all active:scale-95 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button id="heroNextBtn" aria-label="Scroll right" class="absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white/85 hover:bg-white text-charcoal hover:text-deepRose backdrop-blur-md border border-subtleBorder shadow-xl flex items-center justify-center transition-all active:scale-95 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+
+        <!-- Hidden legacy container for backwards compatibility -->
+        <div id="heroSlidesContainer" class="hidden"></div>
+        <div id="heroDots" class="hidden"></div>
+      </div>
+
+      <!-- ACTION BUTTONS & CALLOUTS -->
+      <div class="relative max-w-xl mx-auto px-4 text-center z-20 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-2">
+        
+        <!-- Primary CTA with Spinning Dashed Ring -->
+        <div class="relative inline-flex items-center justify-center">
+          <div class="hero-cta-ring"></div>
+          <a href="#shop-section" class="relative z-10 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-deepRose hover:bg-[#8e4f54] text-white font-semibold text-sm sm:text-base tracking-wide shadow-xl shadow-deepRose/25 hover:shadow-2xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
+            <span>Explore Collection</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+        </div>
+
+        <!-- Secondary CTA: Custom Atelier -->
+        <button onclick="openCustomAbayaModal()" class="px-7 sm:px-9 py-3.5 sm:py-4 rounded-full bg-white/95 hover:bg-white text-charcoal border border-subtleBorder font-semibold text-sm sm:text-base tracking-wide shadow-md hover:shadow-lg transition-all flex items-center gap-2.5">
+          <span>Design Custom Abaya</span>
+          <span class="text-[11px] uppercase tracking-wider font-bold bg-dustyRose/15 text-deepRose px-2 py-0.5 rounded-full">Atelier</span>
+        </button>
+
+        <!-- Hand-drawn Note: Zero Cost Annotation (Desktop) -->
+        <div class="hidden sm:block absolute -left-28 -bottom-3 pointer-events-none select-none text-left -rotate-12">
+          <span class="font-['Caveat'] text-2xl text-antiqueGold font-bold block leading-none">Bespoke fitting<br>zero extra fee</span>
+          <svg class="w-10 h-8 ml-6 text-antiqueGold" viewBox="0 0 50 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 5 10 Q 25 5 40 28 M 40 28 L 30 24 M 40 28 L 38 16" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Mode Switch Pill (Boutique Looks vs Snackable Video Clips) -->
+      <button onclick="toggleHeroMediaMode()" id="heroMediaModeBtn" class="mt-8 mx-auto flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 hover:bg-white text-xs font-semibold text-charcoal border border-subtleBorder shadow-sm backdrop-blur-md transition-all">
+        <span id="heroMediaModeIcon">🎬</span>
+        <span id="heroMediaModeLabel">Switch to Video Reels Mode</span>
       </button>
 
-      <!-- Carousel Progress Dots -->
-      <div id="heroDots" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center space-x-2.5">
-        <!-- Injected dynamically -->
-      </div>
     </section>
 
     <!-- 4. SECTION 2: SHOP BY CATEGORY (4 Elegant Tiles) -->

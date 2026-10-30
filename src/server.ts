@@ -80,6 +80,10 @@ app.get('/account', (_req, res) => {
   res.sendFile(resolvePublicFile('account.html'));
 });
 
+app.get('/reelmark', (_req, res) => {
+  res.sendFile(resolvePublicFile('reelmark.html'));
+});
+
 app.get(['/login', '/register', '/forgot-password', '/reset-password'], (_req, res) => {
   res.sendFile(resolvePublicFile('auth.html'));
 });

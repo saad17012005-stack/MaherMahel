@@ -262,6 +262,70 @@ const DEFAULT_PRODUCTS = [
     variants: [
       { id: 24, size: '34mm', color: 'Champagne & Blush' }
     ]
+  },
+  {
+    id: 10,
+    title: 'Blossom & Fawn Embroidered Handbag',
+    slug: 'blossom-fawn-embroidered-handbag',
+    category_id: 3,
+    category_name: 'Handbags',
+    category_slug: 'handbags',
+    price: 4799,
+    compare_at_price: 5999,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'Blush pink vegan leather with handcrafted deer and wildflower embroidery.',
+    description: 'A charming structured handbag crafted in premium pastel rose vegan leather with intricate pastoral floral and fawn embroidery. Finished with antique gold clasp, soft-touch handles, and protective base studs.',
+    images: ['/images/hero/bag-pink-deer.jpg'],
+    fabric_care: 'Material: Vegan Calfskin Leather & Silk Thread Embroidery. Care: Wipe with clean dry cloth.',
+    tags: ['handbag', 'embroidered', 'deer', 'pastoral', 'blush'],
+    variants: [{ id: 25, size: 'One Size', color: 'Pastel Rose' }]
+  },
+  {
+    id: 11,
+    title: 'Midnight Lace Regal Kurta & Jhumka Set',
+    slug: 'midnight-lace-regal-kurta-jhumka-set',
+    category_id: 2,
+    category_name: 'Traditional Wear',
+    category_slug: 'traditional-wear',
+    price: 6899,
+    compare_at_price: 8499,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'Midnight navy corded lace straight suit with matching antique silver accents.',
+    description: 'Regal navy blue lace kurta featuring bell cuffs, paired with straight trousers and matching silver statement jhumkas. Elegantly suited for intimate gatherings, celebrations, and evening occasions.',
+    images: ['/images/hero/look-navy-lace.jpg'],
+    fabric_care: 'Fabric: French Corded Lace with Santoon Silk Lining. Care: Dry clean only.',
+    tags: ['traditional', 'navy', 'lace', 'jhumka', 'kurta'],
+    variants: [
+      { id: 26, size: 'S', color: 'Midnight Navy' },
+      { id: 27, size: 'M', color: 'Midnight Navy' },
+      { id: 28, size: 'L', color: 'Midnight Navy' },
+      { id: 29, size: 'XL', color: 'Midnight Navy' }
+    ]
+  },
+  {
+    id: 12,
+    title: 'Navy Pearl-Hemmed Couturier Set',
+    slug: 'navy-pearl-hemmed-couturier-set',
+    category_id: 1,
+    category_name: 'Abayas',
+    category_slug: 'abayas',
+    price: 5999,
+    compare_at_price: 7499,
+    is_new_arrival: 1,
+    is_best_seller: 1,
+    short_description: 'Structured navy silhouette with delicate pearl droplet hemline and palazzo trousers.',
+    description: 'An architectural modest set with tailored cap-sleeves, scalloped cutout details, and dangling pearl droplets along the tunic hem. Accompanied by wide-leg flowing trousers for supreme comfort.',
+    images: ['/images/hero/look-navy-cutout.jpg'],
+    fabric_care: 'Fabric: Structured Crepe Silk with genuine faux-pearl droplets. Care: Dry clean only.',
+    tags: ['abaya', 'couture', 'pearls', 'navy', 'co-ord'],
+    variants: [
+      { id: 30, size: 'S', color: 'Royal Navy' },
+      { id: 31, size: 'M', color: 'Royal Navy' },
+      { id: 32, size: 'L', color: 'Royal Navy' },
+      { id: 33, size: 'XL', color: 'Royal Navy' }
+    ]
   }
 ];
 
@@ -293,8 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (y2) y2.textContent = new Date().getFullYear();
 
   // 1. Instant UI Render (Zero delay, works immediately on any network)
-  renderHeroSlides();
-  startHeroAutoplay();
+  initCylinderHeroCarousel();
   renderProducts(state.products);
   updateCartUI();
   updateWishlistUI();
@@ -372,130 +435,456 @@ async function loadSettings() {
 }
 
 // --------------------------------------------------------
-// 1. HERO CAROUSEL CONTROLLER
+// 1. CYLINDRICAL 3D HERO CAROUSEL ENGINE (REELMARK ARCHITECTURE)
 // --------------------------------------------------------
-async function loadHeroSlides() {
-  try {
-    const res = await fetch('/api/hero-slides');
-    const data = await res.json();
-    if (data.success && data.slides.length > 0) {
-      state.heroSlides = data.slides;
-      renderHeroSlides();
-      startHeroAutoplay();
-    }
-  } catch (err) {
-    console.warn('Failed to load hero slides:', err);
+
+const VIDEO_SRC = 'https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/04fd3d5f-99d7-476e-98a4-46c08518ffb3.mp4';
+const POSTER_SRC = 'https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/b7ebb74a-8c8a-4f7e-8f80-55e2d74ecd05.webp';
+
+const CYLINDER_HERO_ITEMS = [
+  {
+    id: 1,
+    title: 'Ayla Pastel Blue Bell-Sleeve Lace Set',
+    category: 'Traditional Wear',
+    category_slug: 'traditional',
+    price: '₹7,299',
+    tag: 'Sky Blue Lace',
+    image: '/images/hero/look-sky-lace.jpg',
+    productId: 4
+  },
+  {
+    id: 2,
+    title: 'Toile de Jouy Structured Ribbon Tote',
+    category: 'Handbags & Clutches',
+    category_slug: 'handbags',
+    price: '₹4,499',
+    tag: 'French Toile Bag',
+    image: '/images/hero/bag-toile-blue.jpg',
+    productId: 6
+  },
+  {
+    id: 3,
+    title: 'Blossom & Fawn Embroidered Handbag',
+    category: 'Handbags & Clutches',
+    category_slug: 'handbags',
+    price: '₹4,799',
+    tag: 'Pastel Fawn Bag',
+    image: '/images/hero/bag-pink-deer.jpg',
+    productId: 10
+  },
+  {
+    id: 4,
+    title: 'Midnight Lace Regal Kurta & Jhumka Set',
+    category: 'Traditional Wear',
+    category_slug: 'traditional',
+    price: '₹6,899',
+    tag: 'Midnight Blue Lace',
+    image: '/images/hero/look-navy-lace.jpg',
+    productId: 11
+  },
+  {
+    id: 5,
+    title: 'Navy Pearl-Hemmed Couturier Set',
+    category: 'Modest Couture',
+    category_slug: 'abayas',
+    price: '₹5,999',
+    tag: 'Pearl Hemmed Set',
+    image: '/images/hero/look-navy-cutout.jpg',
+    productId: 12
+  },
+  {
+    id: 6,
+    title: 'Royal Blue Anarkali Corded Lace Ensemble',
+    category: 'Traditional Wear',
+    category_slug: 'traditional',
+    price: '₹8,499',
+    tag: 'Royal Lace Suit',
+    image: '/images/products/traditional-blue-lace.jpg',
+    productId: 4
+  },
+  {
+    id: 7,
+    title: 'French Monogrammed Ribbon Handbag',
+    category: 'Handbags & Clutches',
+    category_slug: 'handbags',
+    price: '₹4,499',
+    tag: 'Toile Monogram',
+    image: '/images/products/handbag-toile.jpg',
+    productId: 6
+  },
+  {
+    id: 8,
+    title: 'Noor Black Crepe Open-Front Abaya',
+    category: 'Abayas',
+    category_slug: 'abayas',
+    price: '₹4,999',
+    tag: 'Silk Crepe Abaya',
+    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop',
+    productId: 1
+  },
+  {
+    id: 9,
+    title: 'Zahra Rose Pearl Velvet Abaya',
+    category: 'Abayas',
+    category_slug: 'abayas',
+    price: '₹6,499',
+    tag: 'Dusty Rose Velvet',
+    image: 'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=800&auto=format&fit=crop',
+    productId: 2
+  },
+  {
+    id: 10,
+    title: 'Heritage Rose Gold Milanese Mesh Watch',
+    category: 'Watches',
+    category_slug: 'handbags',
+    price: '₹5,299',
+    tag: 'Rose Gold Timepiece',
+    image: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=800&auto=format&fit=crop',
+    productId: 8
   }
-}
+];
 
-function renderHeroSlides() {
-  const container = document.getElementById('heroSlidesContainer');
-  const dotsContainer = document.getElementById('heroDots');
-  if (!container || !dotsContainer) return;
+let cylinderState = {
+  NUM_CARDS: 10,
+  PITCH: 196,
+  TOTAL_TRACK: 10 * 196,
+  AUTO_SPEED: 46,
+  CENTER_X: 720,
+  RADIUS_NORM: 706,
+  scrollPos: 0,
+  velocity: 0,
+  isDragging: false,
+  dragStartX: 0,
+  lastDragX: 0,
+  lastDragTime: 0,
+  lastFrameTime: performance.now(),
+  currentMode: 'fashion', // 'fashion' or 'video'
+  currentFilter: 'all',
+  cards: [],
+  initialized: false,
+};
 
-  container.innerHTML = '';
-  dotsContainer.innerHTML = '';
+function initCylinderHeroCarousel() {
+  const stage = document.getElementById('heroCylinderStage');
+  const track = document.getElementById('heroCylinderTrack');
+  if (!stage || !track) return;
 
-  state.heroSlides.forEach((slide, idx) => {
-    const slideEl = document.createElement('div');
-    slideEl.className = `hero-slide ${idx === 0 ? 'active' : ''}`;
-    
-    // Deliberate focal positioning for desktop and mobile per slide
-    const desktopPos = slide.focal_position_desktop || slide.focal_position || (idx === 0 ? 'center 38%' : 'center center');
-    const mobilePos = slide.focal_position_mobile || slide.focal_position || (idx === 0 ? 'center 45%' : 'center center');
+  track.innerHTML = '';
+  cylinderState.cards = [];
 
-    slideEl.innerHTML = `
-      <picture class="w-full h-full block">
-        <source media="(max-width: 768px)" srcset="${slide.mobile_image || slide.desktop_image}">
-        <img src="${slide.desktop_image}" alt="${slide.heading}" class="hero-image" style="--desktop-pos: ${desktopPos}; --mobile-pos: ${mobilePos}; object-position: ${desktopPos};">
-      </picture>
-      <div class="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-charcoal/45 to-charcoal/30"></div>
-      <div class="absolute inset-0 flex items-center justify-center text-center p-6 sm:p-10 md:p-12 z-20">
-        <div class="max-w-3xl text-white px-4 flex flex-col items-center">
-          <span class="text-[11px] sm:text-xs uppercase tracking-[0.3em] text-champagneGold font-semibold mb-3 block drop-shadow-sm">${slide.eyebrow || 'MEHER MAHEL ATELIER'}</span>
-          <h1 class="hero-heading text-white mb-4 drop-shadow-md">${slide.heading}</h1>
-          <p class="hero-description text-ivory/95 mb-8 max-w-xl mx-auto drop-shadow">${slide.description || ''}</p>
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto">
-            ${slide.cta_primary_text ? `
-              <a href="${slide.cta_primary_link || '#shop-section'}" class="hero-cta-btn bg-dustyRose hover:bg-deepRose text-white shadow-xl shadow-dustyRose/30 gold-sheen-hover active:scale-95">
-                ${slide.cta_primary_text}
-              </a>
-            ` : ''}
-            ${slide.cta_secondary_text ? `
-              <button onclick="handleSlideSecondaryCTA('${slide.cta_secondary_link}')" class="hero-cta-btn border border-white/80 hover:bg-white hover:text-charcoal text-white backdrop-blur-sm active:scale-95">
-                ${slide.cta_secondary_text}
-              </button>
-            ` : ''}
-          </div>
-        </div>
-      </div>
+  CYLINDER_HERO_ITEMS.forEach((item, idx) => {
+    const cardEl = document.createElement('div');
+    cardEl.className = 'cylinder-card';
+    cardEl.dataset.index = idx;
+    cardEl.dataset.category = item.category_slug;
+    cardEl.setAttribute('role', 'button');
+    cardEl.setAttribute('aria-label', `View ${item.title}`);
+
+    const inner = document.createElement('div');
+    inner.className = 'cylinder-card-inner';
+
+    const mediaWrapper = document.createElement('div');
+    mediaWrapper.className = 'cylinder-card-media';
+
+    // Image Element (User Uploaded Look)
+    const img = document.createElement('img');
+    img.src = item.image;
+    img.alt = item.title;
+    img.className = 'cylinder-card-img';
+    img.loading = idx < 4 ? 'eager' : 'lazy';
+
+    // Video Element (5x2 Grid Synchronized Clips)
+    const video = document.createElement('video');
+    video.src = VIDEO_SRC;
+    video.poster = POSTER_SRC;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.className = 'cylinder-card-video';
+
+    // Position video tile within 5x2 grid
+    const col = idx % 5;
+    const row = Math.floor(idx / 5);
+    video.style.transform = `translate(-${col * 20}%, -${row * 50}%)`;
+
+    mediaWrapper.appendChild(img);
+    mediaWrapper.appendChild(video);
+
+    // Overlay Details
+    const overlay = document.createElement('div');
+    overlay.className = 'cylinder-card-overlay';
+    overlay.innerHTML = `
+      <span class="cylinder-card-tag">${item.tag}</span>
+      <h3 class="cylinder-card-title">${item.title}</h3>
+      <span class="cylinder-card-price">${item.price}</span>
     `;
-    container.appendChild(slideEl);
 
-    const dot = document.createElement('button');
-    dot.setAttribute('aria-label', `Go to slide ${idx + 1}`);
-    dot.className = `w-2.5 h-2.5 rounded-full transition-all ${idx === 0 ? 'bg-champagneGold w-8' : 'bg-white/40 hover:bg-white'}`;
-    dot.onclick = () => goToHeroSlide(idx);
-    dotsContainer.appendChild(dot);
+    // Action Quick-View Button
+    const actionBtn = document.createElement('button');
+    actionBtn.className = 'cylinder-card-action';
+    actionBtn.title = 'Quick View';
+    actionBtn.innerHTML = `
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+      </svg>
+    `;
+
+    inner.appendChild(mediaWrapper);
+    inner.appendChild(overlay);
+    inner.appendChild(actionBtn);
+    cardEl.appendChild(inner);
+    track.appendChild(cardEl);
+
+    // Click handler: Open product quick view modal
+    cardEl.addEventListener('click', (e) => {
+      // If was dragging significantly, ignore click
+      if (Math.abs(cylinderState.dragStartX - cylinderState.lastDragX) > 8) return;
+      if (item.productId) {
+        openProductModal(item.productId);
+      }
+    });
+
+    cylinderState.cards.push({
+      el: cardEl,
+      inner,
+      img,
+      video,
+      item,
+      index: idx
+    });
   });
-}
 
-function handleSlideSecondaryCTA(link) {
-  if (link === '#custom-abaya-section' || link === '/custom-abaya') {
-    openCustomAbayaModal();
-  } else if (link === '#size-guide-modal') {
-    openSizeGuideModal();
-  } else {
-    window.location.hash = link || 'shop-section';
+  // Attach pointer & touch dragging
+  setupCylinderDragging(stage);
+
+  // Setup Arrow Buttons
+  const prevBtn = document.getElementById('heroPrevBtn');
+  const nextBtn = document.getElementById('heroNextBtn');
+  if (prevBtn) {
+    prevBtn.onclick = (e) => {
+      e.preventDefault();
+      cylinderState.velocity = -480;
+    };
+  }
+  if (nextBtn) {
+    nextBtn.onclick = (e) => {
+      e.preventDefault();
+      cylinderState.velocity = 480;
+    };
+  }
+
+  // Start Animation Frame Loop
+  if (!cylinderState.initialized) {
+    cylinderState.initialized = true;
+    requestAnimationFrame(renderCylinderLoop);
   }
 }
 
-function startHeroAutoplay() {
-  stopHeroAutoplay();
-  state.heroTimer = setInterval(() => {
-    nextHeroSlide();
-  }, 5500);
-}
+function setupCylinderDragging(stage) {
+  let hasMoved = false;
 
-function stopHeroAutoplay() {
-  if (state.heroTimer) {
-    clearInterval(state.heroTimer);
-    state.heroTimer = null;
+  function onPointerDown(e) {
+    cylinderState.isDragging = true;
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    cylinderState.dragStartX = clientX;
+    cylinderState.lastDragX = clientX;
+    cylinderState.lastDragTime = performance.now();
+    cylinderState.velocity = 0;
+    hasMoved = false;
+    stage.classList.add('grabbing');
   }
+
+  function onPointerMove(e) {
+    if (!cylinderState.isDragging) return;
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const now = performance.now();
+    const dt = (now - cylinderState.lastDragTime) / 1000;
+    const dx = clientX - cylinderState.lastDragX;
+
+    if (Math.abs(clientX - cylinderState.dragStartX) > 4) {
+      hasMoved = true;
+    }
+
+    const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stage.clientWidth / 1440);
+    const deltaU = dx / Math.max(u, 0.4);
+
+    cylinderState.scrollPos -= deltaU;
+
+    if (dt > 0.008) {
+      cylinderState.velocity = -deltaU / dt;
+      cylinderState.lastDragTime = now;
+      cylinderState.lastDragX = clientX;
+    }
+  }
+
+  function onPointerUp() {
+    if (!cylinderState.isDragging) return;
+    cylinderState.isDragging = false;
+    stage.classList.remove('grabbing');
+  }
+
+  stage.addEventListener('mousedown', onPointerDown);
+  window.addEventListener('mousemove', onPointerMove);
+  window.addEventListener('mouseup', onPointerUp);
+
+  stage.addEventListener('touchstart', onPointerDown, { passive: true });
+  window.addEventListener('touchmove', onPointerMove, { passive: true });
+  window.addEventListener('touchend', onPointerUp);
 }
 
-function goToHeroSlide(index) {
-  const slides = document.querySelectorAll('.hero-slide');
-  const dots = document.querySelectorAll('#heroDots button');
-  if (slides.length === 0) return;
+function renderCylinderLoop(time) {
+  const dt = Math.min((time - cylinderState.lastFrameTime) / 1000, 0.1);
+  cylinderState.lastFrameTime = time;
 
-  slides.forEach((s, idx) => {
-    s.classList.toggle('active', idx === index);
-  });
+  const stage = document.getElementById('heroCylinderStage');
+  if (!stage) {
+    requestAnimationFrame(renderCylinderLoop);
+    return;
+  }
 
-  dots.forEach((d, idx) => {
-    if (idx === index) {
-      d.className = 'w-8 h-2.5 rounded-full bg-champagneGold transition-all';
+  const stageWidth = stage.clientWidth;
+  const stageHeight = stage.clientHeight;
+  const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stageWidth / 1440);
+
+  // Coasting physics
+  if (!cylinderState.isDragging) {
+    if (Math.abs(cylinderState.velocity) > 0.5) {
+      cylinderState.scrollPos += cylinderState.velocity * dt;
+      cylinderState.velocity *= Math.pow(0.05, dt); // 95% decay per second
     } else {
-      d.className = 'w-2.5 h-2.5 rounded-full bg-white/40 hover:bg-white transition-all';
+      cylinderState.scrollPos += cylinderState.AUTO_SPEED * dt;
+    }
+  }
+
+  // Seamless track wrap
+  cylinderState.scrollPos = ((cylinderState.scrollPos % cylinderState.TOTAL_TRACK) + cylinderState.TOTAL_TRACK) % cylinderState.TOTAL_TRACK;
+
+  // Render each card according to cylindrical geometry specification
+  cylinderState.cards.forEach((cardObj, i) => {
+    let rawX = (i * cylinderState.PITCH - cylinderState.scrollPos) % cylinderState.TOTAL_TRACK;
+    if (rawX < -cylinderState.PITCH * 2) rawX += cylinderState.TOTAL_TRACK;
+    if (rawX > cylinderState.TOTAL_TRACK - cylinderState.PITCH * 2) rawX -= cylinderState.TOTAL_TRACK;
+
+    // Unpushed offset from center
+    const t = rawX + (cylinderState.PITCH / 2) - cylinderState.CENTER_X;
+
+    // Cylinder Push: x = 720 + t·(1 + 0.083·(t/706)²)
+    const tRatio = t / cylinderState.RADIUS_NORM;
+    const pushedX = cylinderState.CENTER_X + t * (1 + 0.083 * tRatio * tRatio);
+
+    // Normalized distance d = |x - 720| / 706
+    const d = Math.abs(pushedX - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
+
+    // Width = (170 + 48·d²)u
+    const width = (170 + 48 * d * d);
+
+    // Edge normalized distances
+    const xLeft = pushedX - width / 2;
+    const xRight = pushedX + width / 2;
+    const qLeft = Math.abs(xLeft - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
+    const qRight = Math.abs(xRight - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
+
+    // Heights = (280 + 92·q^2.6)u
+    const hLeft = 280 + 92 * Math.pow(qLeft, 2.6);
+    const hRight = 280 + 92 * Math.pow(qRight, 2.6);
+
+    // Vertical centre = (687 - 12·d²)u
+    const yCenterOffset = (687 - 12 * d * d) - 687;
+
+    // Screen pixel conversion (perfect center alignment for mobile & desktop)
+    const pxX = (stageWidth / 2) + (pushedX - cylinderState.CENTER_X) * u - (width * u) / 2;
+    const maxH = Math.max(hLeft, hRight);
+    const pxY = (stageHeight / 2) + (yCenterOffset * u) - (maxH * u) / 2;
+
+    const el = cardObj.el;
+    el.style.width = `${width * u}px`;
+    el.style.height = `${maxH * u}px`;
+    el.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
+
+    // Rounded quad clip path
+    const wPx = width * u;
+    const rPx = Math.max(8, 14 * u);
+    const yTopLeft = ((maxH - hLeft) / 2) * u;
+    const yBottomLeft = yTopLeft + hLeft * u;
+    const yTopRight = ((maxH - hRight) / 2) * u;
+    const yBottomRight = yTopRight + hRight * u;
+
+    const path = `M 0,${yTopLeft + rPx} Q 0,${yTopLeft} ${rPx},${yTopLeft} L ${wPx - rPx},${yTopRight} Q ${wPx},${yTopRight} ${wPx},${yTopRight + rPx} L ${wPx},${yBottomRight - rPx} Q ${wPx},${yBottomRight} ${wPx - rPx},${yBottomRight} L ${rPx},${yBottomLeft} Q 0,${yBottomLeft} 0,${yBottomLeft - rPx} Z`;
+    el.style.clipPath = `path('${path}')`;
+    el.style.webkitClipPath = `path('${path}')`;
+
+    // Z-index depth layering
+    el.style.zIndex = Math.round(100 - d * 30);
+
+    // Filter dimming / highlighting
+    if (cylinderState.currentFilter === 'all' || cardObj.item.category_slug === cylinderState.currentFilter) {
+      el.style.opacity = '1';
+      el.style.pointerEvents = 'auto';
+    } else {
+      el.style.opacity = '0.35';
     }
   });
 
-  state.currentSlideIndex = index;
+  requestAnimationFrame(renderCylinderLoop);
 }
 
+// Filter Hero Cards by Category
+function setHeroFilter(category) {
+  cylinderState.currentFilter = category;
+  const pills = document.querySelectorAll('.hero-filter-pill');
+  pills.forEach(p => p.classList.remove('active'));
+
+  if (category === 'all') document.getElementById('heroTabAll')?.classList.add('active');
+  if (category === 'abayas') document.getElementById('heroTabAbayas')?.classList.add('active');
+  if (category === 'traditional') document.getElementById('heroTabTrad')?.classList.add('active');
+  if (category === 'handbags') document.getElementById('heroTabBags')?.classList.add('active');
+}
+
+// Toggle between Boutique Looks and Video Reels
+function toggleHeroMediaMode() {
+  cylinderState.currentMode = cylinderState.currentMode === 'fashion' ? 'video' : 'fashion';
+  const label = document.getElementById('heroMediaModeLabel');
+  const icon = document.getElementById('heroMediaModeIcon');
+
+  cylinderState.cards.forEach(c => {
+    if (cylinderState.currentMode === 'video') {
+      c.img.style.display = 'none';
+      c.video.style.display = 'block';
+      c.video.play().catch(() => {});
+    } else {
+      c.img.style.display = 'block';
+      c.video.style.display = 'none';
+    }
+  });
+
+  if (cylinderState.currentMode === 'video') {
+    if (label) label.textContent = 'Switch to Boutique Looks Mode';
+    if (icon) icon.textContent = '✨';
+  } else {
+    if (label) label.textContent = 'Switch to Video Reels Mode';
+    if (icon) icon.textContent = '🎬';
+  }
+}
+
+// Legacy Slide Helpers for backward compatibility
+function loadHeroSlides() {
+  initCylinderHeroCarousel();
+}
+function renderHeroSlides() {
+  initCylinderHeroCarousel();
+}
+function startHeroAutoplay() {}
+function stopHeroAutoplay() {}
+function goToHeroSlide(index) {
+  cylinderState.scrollPos = index * cylinderState.PITCH;
+}
 function nextHeroSlide() {
-  const total = state.heroSlides.length;
-  if (total === 0) return;
-  const next = (state.currentSlideIndex + 1) % total;
-  goToHeroSlide(next);
+  cylinderState.velocity = 450;
 }
-
 function prevHeroSlide() {
-  const total = state.heroSlides.length;
-  if (total === 0) return;
-  const prev = (state.currentSlideIndex - 1 + total) % total;
-  goToHeroSlide(prev);
+  cylinderState.velocity = -450;
 }
 
 // --------------------------------------------------------
@@ -1447,35 +1836,8 @@ function setupEventListeners() {
 
   const heroSection = document.getElementById('heroCarousel');
   if (heroSection) {
-    heroSection.addEventListener('mouseenter', stopHeroAutoplay);
-    heroSection.addEventListener('mouseleave', startHeroAutoplay);
-
-    // Touch & Swipe gestures for mobile / touch devices
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
-
-    heroSection.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-      touchStartY = e.changedTouches[0].screenY;
-      stopHeroAutoplay();
-    }, { passive: true });
-
-    heroSection.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      touchEndY = e.changedTouches[0].screenY;
-      const diffX = touchEndX - touchStartX;
-      const diffY = touchEndY - touchStartY;
-      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
-        if (diffX < 0) {
-          nextHeroSlide();
-        } else {
-          prevHeroSlide();
-        }
-      }
-      startHeroAutoplay();
-    }, { passive: true });
+    heroSection.addEventListener('mouseenter', () => { cylinderState.AUTO_SPEED = 0; });
+    heroSection.addEventListener('mouseleave', () => { cylinderState.AUTO_SPEED = 46; });
   }
 
   // Keyboard navigation for hero carousel

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reelmark — Captivate Crowds with Snackable Reels</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter+Tight:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F5F8EF;
+      --forest: #08482D;
+      --forest-dark: #053320;
+      --mint-badge: #DAE7C7;
+      --ink: #101410;
+      --subline: #5E5E61;
+      --white: #FFFFFF;
+      --u: min(100vw / 1440, 100vh / 1080);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 1440x1080 Frame (Centered & Contained) */
+    .viewport-frame {
+      position: relative;
+      width: calc(1440 * var(--u));
+      height: calc(1080 * var(--u));
+      background-color: var(--bg);
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(8, 72, 45, 0.05);
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: calc(100 * var(--u));
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .top-bar > * {
+      pointer-events: auto;
+    }
+
+    .logo {
+      position: absolute;
+      left: calc(37 * var(--u));
+      top: calc(36 * var(--u));
+      display: flex;
+      align-items: center;
+      gap: calc(9 * var(--u));
+      text-decoration: none;
+      color: var(--forest);
+    }
+
+    .logo-leaf {
+      width: calc(26 * var(--u));
+      height: calc(26 * var(--u));
+      fill: var(--forest);
+    }
+
+    .logo-text {
+      font-family: 'Inter Tight', 'Inter', sans-serif;
+      font-size: calc(22 * var(--u));
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--forest);
+    }
+
+    .nav-links {
+      position: absolute;
+      left: calc(505 * var(--u));
+      top: calc(38 * var(--u));
+      display: flex;
+      align-items: center;
+      gap: calc(31 * var(--u));
+    }
+
+    .nav-link {
+      font-size: calc(16.4 * var(--u));
+      font-weight: 500;
+      color: var(--ink);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--forest);
+    }
+
+    .auth-buttons {
+      position: absolute;
+      right: calc(39 * var(--u));
+      top: calc(29 * var(--u));
+      display: flex;
+      align-items: center;
+      gap: calc(12 * var(--u));
+    }
+
+    .btn-login {
+      width: calc(92 * var(--u));
+      height: calc(40 * var(--u));
+      background: var(--white);
+      color: var(--ink);
+      border: 1px solid rgba(8, 72, 45, 0.15);
+      border-radius: 9999px;
+      font-size: calc(14 * var(--u));
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: all 0.2s;
+    }
+
+    .btn-login:hover {
+      background: #fafafa;
+      border-color: rgba(8, 72, 45, 0.3);
+    }
+
+    .btn-signup {
+      width: calc(97 * var(--u));
+      height: calc(40 * var(--u));
+      background: var(--forest);
+      color: var(--white);
+      border-radius: 9999px;
+      font-size: calc(14 * var(--u));
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-signup:hover {
+      background: var(--forest-dark);
+    }
+
+    /* BADGE */
+    .badge-pill {
+      position: absolute;
+      left: calc(575 * var(--u));
+      top: calc(115 * var(--u));
+      width: calc(292 * var(--u));
+      height: calc(37 * var(--u));
+      background: var(--mint-badge);
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: calc(8 * var(--u));
+      font-size: calc(16.6 * var(--u));
+      font-weight: 500;
+      color: var(--forest);
+      z-index: 20;
+    }
+
+    .badge-dot {
+      width: calc(7 * var(--u));
+      height: calc(7 * var(--u));
+      border-radius: 50%;
+      background: var(--forest);
+      display: inline-block;
+    }
+
+    /* HEADLINE */
+    .headline {
+      position: absolute;
+      top: calc(176 * var(--u));
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-family: 'Inter Tight', sans-serif;
+      font-weight: 700;
+      font-size: calc(88 * var(--u));
+      line-height: calc(92 * var(--u));
+      color: var(--ink);
+      z-index: 20;
+      letter-spacing: -0.035em;
+    }
+
+    .headline span.line2 {
+      display: block;
+      letter-spacing: -0.022em;
+    }
+
+    /* SUBLINE */
+    .subline {
+      position: absolute;
+      top: calc(394 * var(--u));
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-size: calc(20.8 * var(--u));
+      line-height: calc(32 * var(--u));
+      color: var(--subline);
+      z-index: 20;
+    }
+
+    /* HAND-DRAWN NOTES & ARROWS */
+    .notes-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 25;
+    }
+
+    .note-text {
+      font-family: 'Caveat', cursive;
+      font-weight: 600;
+      color: var(--forest);
+      position: absolute;
+      line-height: 1.1;
+      user-select: none;
+    }
+
+    .note-doodle {
+      left: calc(263 * var(--u));
+      top: calc(377 * var(--u));
+      font-size: calc(36 * var(--u));
+      letter-spacing: calc(4 * var(--u));
+    }
+
+    .note-be-seen {
+      left: calc(1212 * var(--u));
+      top: calc(310 * var(--u));
+      font-size: calc(34 * var(--u));
+      transform: rotate(16deg);
+    }
+
+    .note-zero-cost {
+      left: calc(521 * var(--u));
+      top: calc(937 * var(--u));
+      font-size: calc(32 * var(--u));
+      transform: rotate(-12deg);
+    }
+
+    /* SVG DOODLE PATHS */
+    .doodle-arrow {
+      stroke: var(--forest);
+      stroke-width: calc(2.2 * var(--u));
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    /* CAROUSEL TRACK & CARDS */
+    .carousel-stage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .carousel-stage.grabbing {
+      cursor: grabbing;
+    }
+
+    .cards-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .card-item {
+      position: absolute;
+      pointer-events: auto;
+      will-change: transform, clip-path;
+      overflow: hidden;
+      background: #DAE7C7;
+      transition: filter 0.2s;
+    }
+
+    .card-media-wrapper {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .card-tile-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 500%;
+      height: 200%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    /* Play Icon Indicator */
+    .card-play-icon {
+      position: absolute;
+      bottom: calc(14 * var(--u));
+      left: calc(14 * var(--u));
+      width: calc(34 * var(--u));
+      height: calc(34 * var(--u));
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      z-index: 2;
+    }
+
+    .card-play-icon svg {
+      width: calc(13 * var(--u));
+      height: calc(13 * var(--u));
+      fill: var(--forest);
+      margin-left: calc(2 * var(--u));
+    }
+
+    /* PRIMARY CTA BUTTON */
+    .cta-container {
+      position: absolute;
+      left: calc(626 * var(--u));
+      top: calc(901 * var(--u));
+      width: calc(190 * var(--u));
+      height: calc(74 * var(--u));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+    }
+
+    /* Dashed Outer Ring (190x74) */
+    .cta-ring {
+      position: absolute;
+      inset: 0;
+      border: 2px dashed rgba(8, 72, 45, 0.4);
+      border-radius: 9999px;
+      pointer-events: none;
+      animation: spinDashed 25s linear infinite;
+    }
+
+    @keyframes spinDashed {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .btn-make-reel {
+      position: relative;
+      width: calc(172 * var(--u));
+      height: calc(58 * var(--u));
+      background: var(--forest);
+      color: var(--white);
+      border-radius: 9999px;
+      font-size: calc(16 * var(--u));
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 10px 25px -4px rgba(8, 72, 45, 0.35);
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .btn-make-reel:hover {
+      background: var(--forest-dark);
+      transform: scale(1.03);
+      box-shadow: 0 14px 28px -4px rgba(8, 72, 45, 0.45);
+    }
+
+    /* Switch Mode Pill (Toggle Video Clips vs Fashion Products) */
+    .mode-switch-pill {
+      position: absolute;
+      bottom: calc(20 * var(--u));
+      right: calc(30 * var(--u));
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(8, 72, 45, 0.2);
+      border-radius: 9999px;
+      padding: calc(6 * var(--u)) calc(14 * var(--u));
+      font-size: calc(12 * var(--u));
+      font-weight: 600;
+      color: var(--forest);
+      display: flex;
+      align-items: center;
+      gap: calc(8 * var(--u));
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .mode-switch-pill:hover {
+      background: var(--white);
+      border-color: var(--forest);
+    }
+
+    /* RESPONSIVE (≤ 820px) */
+    @media (max-width: 820px) {
+      :root {
+        --u: 1px;
+      }
+      body {
+        align-items: flex-start;
+      }
+      .viewport-frame {
+        width: 100vw;
+        height: auto;
+        min-height: 100vh;
+        padding-bottom: 60px;
+        box-shadow: none;
+      }
+      .nav-links, .btn-login, .note-doodle, .note-be-seen {
+        display: none !important;
+      }
+      .top-bar {
+        position: relative;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+      }
+      .logo {
+        position: static;
+      }
+      .auth-buttons {
+        position: static;
+      }
+      .badge-pill {
+        position: relative;
+        left: auto;
+        top: auto;
+        margin: 20px auto 16px auto;
+        font-size: 13px;
+        width: 250px;
+        height: 32px;
+      }
+      .headline {
+        position: relative;
+        top: auto;
+        font-size: clamp(38px, 9vw, 56px);
+        line-height: 1.05;
+        padding: 0 16px;
+      }
+      .subline {
+        position: relative;
+        top: auto;
+        font-size: 15px;
+        line-height: 22px;
+        margin-top: 16px;
+        padding: 0 20px;
+      }
+      .carousel-stage {
+        position: relative;
+        height: 300px;
+        margin-top: 24px;
+      }
+      .cta-container {
+        position: relative;
+        left: auto;
+        top: auto;
+        margin: 30px auto 0 auto;
+        transform: none;
+      }
+      .note-zero-cost {
+        position: relative;
+        left: auto;
+        top: auto;
+        margin-top: 12px;
+        text-align: center;
+        transform: none;
+        display: block;
+      }
+      .mode-switch-pill {
+        position: fixed;
+        bottom: 15px;
+        right: 15px;
+        font-size: 11px;
+        padding: 5px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Viewport Frame (1440x1080 Container) -->
+  <div class="viewport-frame" id="frame">
+
+    <!-- TOP BAR -->
+    <header class="top-bar">
+      <a href="/" class="logo">
+        <svg class="logo-leaf" viewBox="0 0 24 24">
+          <path d="M17 8C8 10 5 19 5 19s7-1 11-6c2.5-3.1 2.3-5.5 1-5z"/>
+          <path d="M17 8c-3 4-8 7-12 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">Reelmark</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#brands" class="nav-link">Brands</a>
+        <a href="#creators" class="nav-link">Creators</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="#use-cases" class="nav-link">Use Cases</a>
+        <a href="#contact" class="nav-link">Contact</a>
+      </nav>
+
+      <div class="auth-buttons">
+        <a href="/login" class="btn-login">Log in</a>
+        <a href="/register" class="btn-signup">Sign up</a>
+      </div>
+    </header>
+
+    <!-- TRUSTED BADGE -->
+    <div class="badge-pill">
+      <span class="badge-dot"></span>
+      <span>Trusted by 120,000+ indie makers</span>
+    </div>
+
+    <!-- MAIN HEADLINE -->
+    <h1 class="headline">
+      Captivate Crowds
+      <span class="line2">with Snackable Reels</span>
+    </h1>
+
+    <!-- SUBLINE -->
+    <p class="subline">
+      Grow your brand with short, snappy product clips by<br>
+      our handpicked video makers. Our crew is ready to<br>
+      lift your next launch higher.
+    </p>
+
+    <!-- HAND-DRAWN NOTES & ARROWS LAYER -->
+    <div class="notes-layer">
+      <!-- // Doodle at (263, 377) -->
+      <div class="note-text note-doodle">//</div>
+
+      <!-- Handwritten "Be seen / with clips" at (1212, 310) -->
+      <div class="note-text note-be-seen">
+        Be seen<br>with clips
+      </div>
+
+      <!-- Handwritten "Zero cost" at (521, 937) -->
+      <div class="note-text note-zero-cost">
+        Zero cost
+      </div>
+
+      <!-- SVG Arrows -->
+      <svg class="notes-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;" viewBox="0 0 1440 1080">
+        <!-- Curving arrow from "Be seen" note curling down to cards -->
+        <path id="arrowBeSeen" class="doodle-arrow" d="M 1245 400 C 1270 470, 1260 520, 1180 580" />
+        <path class="doodle-arrow" d="M 1195 565 L 1180 580 L 1198 588" />
+
+        <!-- Small arrow from "Zero cost" pointing to button -->
+        <path id="arrowZeroCost" class="doodle-arrow" d="M 585 960 Q 615 950 635 940" />
+        <path class="doodle-arrow" d="M 622 935 L 635 940 L 626 952" />
+      </svg>
+    </div>
+
+    <!-- CURVED CAROUSEL STAGE -->
+    <div class="carousel-stage" id="carouselStage">
+      <div class="cards-container" id="cardsContainer">
+        <!-- 10 Curved Cards Injected via JS -->
+      </div>
+    </div>
+
+    <!-- PRIMARY CTA BUTTON (626, 901) -->
+    <div class="cta-container">
+      <div class="cta-ring"></div>
+      <a href="/register" class="btn-make-reel">Make a Reel</a>
+    </div>
+
+    <!-- Interactive Mode Toggle Pill -->
+    <button class="mode-switch-pill" id="modeToggleBtn" onclick="toggleCardMode()">
+      <span id="modeIcon">✨</span>
+      <span id="modeLabel">Switch to Boutique Looks</span>
+    </button>
+
+  </div>
+
+  <script>
+    // ========================================================
+    // REELMARK CYLINDRICAL CAROUSEL ENGINE
+    // ========================================================
+
+    const VIDEO_SRC = 'https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/04fd3d5f-99d7-476e-98a4-46c08518ffb3.mp4';
+    const POSTER_SRC = 'https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/b7ebb74a-8c8a-4f7e-8f80-55e2d74ecd05.webp';
+
+    // User-uploaded boutique fashion assets
+    const BOUTIQUE_IMAGES = [
+      '/images/hero/look-sky-lace.jpg',
+      '/images/hero/bag-toile-blue.jpg',
+      '/images/hero/bag-pink-deer.jpg',
+      '/images/hero/look-navy-lace.jpg',
+      '/images/hero/look-navy-cutout.jpg',
+      '/images/products/traditional-blue-lace.jpg',
+      '/images/products/handbag-toile.jpg',
+      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1590507673164-6c6d319f9b84?q=80&w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1559563458-527698bf5295?q=80&w=800&auto=format&fit=crop'
+    ];
+
+    let currentMode = 'video'; // 'video' or 'fashion'
+
+    const NUM_CARDS = 10;
+    const PITCH = 196; // cards sit on an even 196u pitch
+    const TOTAL_TRACK = NUM_CARDS * PITCH; // 1960u
+    const AUTO_SPEED = 50; // about 50u per second right -> left
+    const CENTER_X = 720;
+    const RADIUS_NORM = 706;
+
+    let scrollPos = 0;
+    let velocity = 0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let lastDragX = 0;
+    let lastDragTime = 0;
+    let lastFrameTime = performance.now();
+
+    const stage = document.getElementById('carouselStage');
+    const container = document.getElementById('cardsContainer');
+    const cards = [];
+
+    // Create 10 card DOM elements
+    for (let i = 0; i < NUM_CARDS; i++) {
+      const card = document.createElement('div');
+      card.className = 'card-item';
+
+      const mediaWrapper = document.createElement('div');
+      mediaWrapper.className = 'card-media-wrapper';
+
+      // 5x2 Grid Tile Video element
+      const video = document.createElement('video');
+      video.className = 'card-tile-layer';
+      video.src = VIDEO_SRC;
+      video.poster = POSTER_SRC;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.autoplay = true;
+
+      // Fashion image element
+      const img = document.createElement('img');
+      img.className = 'card-tile-layer';
+      img.src = BOUTIQUE_IMAGES[i];
+      img.style.display = 'none';
+      img.style.objectFit = 'cover';
+      img.style.width = '100%';
+      img.style.height = '100%';
+
+      // Tile offset calculation for 5x2 grid
+      const col = i % 5;
+      const row = Math.floor(i / 5);
+      video.style.transform = `translate(-${col * 20}%, -${row * 50}%)`;
+
+      mediaWrapper.appendChild(video);
+      mediaWrapper.appendChild(img);
+
+      // Play icon button
+      const playIcon = document.createElement('div');
+      playIcon.className = 'card-play-icon';
+      playIcon.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+
+      card.appendChild(mediaWrapper);
+      card.appendChild(playIcon);
+      container.appendChild(card);
+
+      cards.push({ el: card, video, img, index: i });
+    }
+
+    // Toggle Mode Button
+    function toggleCardMode() {
+      currentMode = currentMode === 'video' ? 'fashion' : 'video';
+      const label = document.getElementById('modeLabel');
+      const icon = document.getElementById('modeIcon');
+
+      cards.forEach(c => {
+        if (currentMode === 'fashion') {
+          c.video.style.display = 'none';
+          c.img.style.display = 'block';
+        } else {
+          c.video.style.display = 'block';
+          c.img.style.display = 'none';
+          c.video.play().catch(() => {});
+        }
+      });
+
+      if (currentMode === 'fashion') {
+        label.textContent = 'Switch to Snackable Reels';
+        icon.textContent = '🎬';
+      } else {
+        label.textContent = 'Switch to Boutique Looks';
+        icon.textContent = '✨';
+      }
+    }
+
+    // Drag event handlers (pointer & touch)
+    function onPointerDown(e) {
+      isDragging = true;
+      dragStartX = e.clientX || (e.touches && e.touches[0].clientX);
+      lastDragX = dragStartX;
+      lastDragTime = performance.now();
+      velocity = 0;
+      stage.classList.add('grabbing');
+    }
+
+    function onPointerMove(e) {
+      if (!isDragging) return;
+      const currentX = e.clientX || (e.touches && e.touches[0].clientX);
+      const now = performance.now();
+      const dt = (now - lastDragTime) / 1000;
+      const dx = currentX - lastDragX;
+
+      // Convert px to frame unit
+      const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--u')) || 1;
+      const deltaU = dx / u;
+
+      scrollPos -= deltaU; // follows drag 1:1
+      if (dt > 0.008) {
+        velocity = -deltaU / dt;
+        lastDragTime = now;
+        lastDragX = currentX;
+      }
+    }
+
+    function onPointerUp() {
+      if (!isDragging) return;
+      isDragging = false;
+      stage.classList.remove('grabbing');
+    }
+
+    stage.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+
+    stage.addEventListener('touchstart', onPointerDown, { passive: true });
+    window.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('touchend', onPointerUp);
+
+    // Main animation loop
+    function animate(time) {
+      const dt = Math.min((time - lastFrameTime) / 1000, 0.1);
+      lastFrameTime = time;
+
+      const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--u')) || 1;
+
+      if (!isDragging) {
+        // Coasting momentum with 95% decay per second
+        if (Math.abs(velocity) > 0.5) {
+          scrollPos += velocity * dt;
+          velocity *= Math.pow(0.05, dt);
+        } else {
+          // Slow continuous auto-scroll
+          scrollPos += AUTO_SPEED * dt;
+        }
+      }
+
+      // Wrap scrollPos seamlessly
+      scrollPos = ((scrollPos % TOTAL_TRACK) + TOTAL_TRACK) % TOTAL_TRACK;
+
+      // Update geometry for each card according to specification
+      cards.forEach((cardObj, i) => {
+        // Unpushed position
+        let rawX = (i * PITCH - scrollPos) % TOTAL_TRACK;
+        if (rawX < -PITCH * 2) rawX += TOTAL_TRACK;
+        if (rawX > TOTAL_TRACK - PITCH * 2) rawX -= TOTAL_TRACK;
+
+        // Unpushed offset from center 720
+        const t = rawX + (PITCH / 2) - CENTER_X;
+
+        // Formula: x = 720 + t·(1 + 0.083·(t/706)²)
+        const tRatio = t / RADIUS_NORM;
+        const pushedX = CENTER_X + t * (1 + 0.083 * tRatio * tRatio);
+
+        // Normalized distance d = |x - 720| / 706
+        const d = Math.abs(pushedX - CENTER_X) / RADIUS_NORM;
+
+        // Formula: Width = (170 + 48·d²)u
+        const width = (170 + 48 * d * d);
+
+        // Edge normalized distances
+        const xLeft = pushedX - width / 2;
+        const xRight = pushedX + width / 2;
+        const qLeft = Math.abs(xLeft - CENTER_X) / RADIUS_NORM;
+        const qRight = Math.abs(xRight - CENTER_X) / RADIUS_NORM;
+
+        // Formula: Height = (280 + 92·q^2.6)u
+        const hLeft = 280 + 92 * Math.pow(qLeft, 2.6);
+        const hRight = 280 + 92 * Math.pow(qRight, 2.6);
+
+        // Formula: Vertical centre = (687 - 12·d²)u
+        const yCenter = 687 - 12 * d * d;
+
+        // Compute local bounding box
+        const maxH = Math.max(hLeft, hRight);
+        const topY = yCenter - maxH / 2;
+
+        const el = cardObj.el;
+        el.style.width = `${width * u}px`;
+        el.style.height = `${maxH * u}px`;
+        el.style.transform = `translate3d(${xLeft * u}px, ${topY * u}px, 0)`;
+
+        // Calculate quad corners relative to top-left of this card
+        const yTopLeft = (yCenter - hLeft / 2 - topY) * u;
+        const yBottomLeft = (yCenter + hLeft / 2 - topY) * u;
+        const yTopRight = (yCenter - hRight / 2 - topY) * u;
+        const yBottomRight = (yCenter + hRight / 2 - topY) * u;
+        const wPx = width * u;
+        const rPx = 15 * u;
+
+        // Smooth rounded quad clip path
+        const path = `M 0,${yTopLeft + rPx} Q 0,${yTopLeft} ${rPx},${yTopLeft} L ${wPx - rPx},${yTopRight} Q ${wPx},${yTopRight} ${wPx},${yTopRight + rPx} L ${wPx},${yBottomRight - rPx} Q ${wPx},${yBottomRight} ${wPx - rPx},${yBottomRight} L ${rPx},${yBottomLeft} Q 0,${yBottomLeft} 0,${yBottomLeft - rPx} Z`;
+        el.style.clipPath = `path('${path}')`;
+        el.style.webkitClipPath = `path('${path}')`;
+
+        // Scale tile cover inside
+        const tileH = Math.max(maxH, width / 0.7111);
+        cardObj.video.style.height = `${tileH * 2 * u}px`;
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
