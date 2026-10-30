@@ -291,7 +291,10 @@ export const createStoreOrder = async (req: Request, res: Response) => {
       payment_method,
       utr_id,
       notes,
+      user_id,
     } = req.body;
+
+    const resolvedUserId = user_id || (req as any).user?.id || null;
 
     if (!customer_name || !customer_email || !customer_phone || !shipping_address) {
       return res.status(400).json({ success: false, message: 'Missing required customer details.' });
@@ -370,9 +373,9 @@ export const createStoreOrder = async (req: Request, res: Response) => {
           order_number, customer_name, customer_email, customer_phone,
           shipping_address, billing_address, subtotal, discount,
           shipping_fee, tax, total, payment_method, payment_status,
-          razorpay_order_id, utr_id, order_status, notes
+          razorpay_order_id, utr_id, order_status, notes, user_id
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       const orderResult = insertOrderStmt.run(
@@ -392,7 +395,8 @@ export const createStoreOrder = async (req: Request, res: Response) => {
         razorpay_order_id,
         utr_id || null,
         payment_method === 'cod' ? 'Order Placed' : (payment_method === 'upi_scanner' ? 'Payment Submitted (UTR Verification)' : 'Awaiting Payment'),
-        notes || ''
+        notes || '',
+        resolvedUserId
       );
 
       const orderId = orderResult.lastInsertRowid;
@@ -409,9 +413,9 @@ export const createStoreOrder = async (req: Request, res: Response) => {
         INSERT INTO custom_abaya_orders (
           order_id, customer_name, customer_email, customer_phone,
           silhouette, fabric, color, sleeve_style, cuffs, embroidery, details,
-          measurements, special_instructions, reference_image, estimated_price, production_status
+          measurements, special_instructions, reference_image, estimated_price, production_status, user_id
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Awaiting Review')
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Awaiting Review', ?)
       `);
 
       for (const item of items) {
@@ -445,7 +449,8 @@ export const createStoreOrder = async (req: Request, res: Response) => {
             JSON.stringify(cfg.measurements || {}),
             cfg.special_instructions || '',
             cfg.reference_image || null,
-            item.price
+            item.price,
+            resolvedUserId
           );
         }
       }

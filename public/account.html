@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client Portal — Meher Mahel | Modest Luxury</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dustyRose: '#C88F91',
+            deepRose: '#A9676C',
+            antiqueGold: '#C6A15B',
+            champagneGold: '#E4CC9A',
+            ivory: '#FAF7F2',
+            charcoal: '#292526',
+            mutedText: '#777071',
+            subtleBorder: '#E9DFD9',
+          },
+          fontFamily: {
+            serif: ['Cormorant Garamond', 'Playfair Display', 'Georgia', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#FAF7F2] text-charcoal font-sans min-h-screen flex flex-col selection:bg-dustyRose/20">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-subtleBorder py-4 px-4 sm:px-8">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group">
+        <img src="/images/logo.jpg" alt="Meher Mahel" class="h-10 sm:h-12 w-auto rounded-full shadow-sm">
+        <div>
+          <span class="font-serif text-xl sm:text-2xl font-bold tracking-wider text-charcoal block group-hover:text-dustyRose transition-colors">Meher Mahel</span>
+          <span class="block text-[9px] sm:text-[10px] tracking-[0.25em] text-antiqueGold uppercase font-semibold">Draped in Grace</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-4 sm:gap-6">
+        <a href="/" class="text-xs uppercase tracking-wider font-semibold text-charcoal hover:text-dustyRose transition-colors flex items-center gap-1.5">
+          <span>Explore Boutique</span>
+        </a>
+        <button onclick="handleLogout()" class="text-xs uppercase tracking-wider font-semibold text-mutedText hover:text-red-600 transition-colors border border-subtleBorder px-3 py-1.5 rounded-lg">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Account Dashboard Container -->
+  <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-grow">
+    
+    <!-- User Banner -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 border border-subtleBorder shadow-sm mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div class="flex items-center gap-4 sm:gap-5">
+        <div id="userAvatarInitial" class="w-16 h-16 rounded-full bg-gradient-to-tr from-dustyRose to-antiqueGold text-white font-serif text-2xl font-bold flex items-center justify-center shadow-md shrink-0">
+          M
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 id="userGreetingName" class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">Loading...</h1>
+            <span id="userVerifyBadge" class="text-[10px] px-2.5 py-0.5 rounded-full font-semibold border hidden"></span>
+          </div>
+          <p id="userEmailSub" class="text-xs text-mutedText mt-0.5 font-mono"></p>
+          <p id="userJoinedSub" class="text-[11px] text-mutedText mt-1"></p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="switchTab('orders')" class="bg-ivory hover:bg-subtleBorder/40 text-charcoal text-xs uppercase tracking-wider font-semibold px-4 py-2.5 rounded-xl border border-subtleBorder transition-colors flex items-center gap-1.5">
+          <span>🛍️ View Orders</span>
+        </button>
+        <button onclick="openCustomAbayaModal()" class="bg-dustyRose hover:bg-deepRose text-white text-xs uppercase tracking-wider font-semibold px-4 py-2.5 rounded-xl transition-all shadow-sm">
+          <span>+ Bespoke Atelier</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Grid: Tabs Sidebar + Content Panel -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+      
+      <!-- Navigation Sidebar -->
+      <aside class="lg:col-span-1 bg-white rounded-3xl p-4 sm:p-6 border border-subtleBorder shadow-sm space-y-1.5">
+        <button onclick="switchTab('profile')" id="nav-profile" class="tab-nav-btn w-full text-left px-4 py-3 rounded-2xl text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-3 text-white bg-charcoal shadow-sm">
+          <span>👤</span>
+          <span>My Profile</span>
+        </button>
+        <button onclick="switchTab('orders')" id="nav-orders" class="tab-nav-btn w-full text-left px-4 py-3 rounded-2xl text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-3 text-charcoal hover:bg-ivory">
+          <span>🛍️</span>
+          <span>My Orders</span>
+        </button>
+        <button onclick="switchTab('custom')" id="nav-custom" class="tab-nav-btn w-full text-left px-4 py-3 rounded-2xl text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-3 text-charcoal hover:bg-ivory">
+          <span>✂️</span>
+          <span>Custom Abayas</span>
+        </button>
+        <button onclick="switchTab('addresses')" id="nav-addresses" class="tab-nav-btn w-full text-left px-4 py-3 rounded-2xl text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-3 text-charcoal hover:bg-ivory">
+          <span>📍</span>
+          <span>Saved Addresses</span>
+        </button>
+        <button onclick="switchTab('wishlist')" id="nav-wishlist" class="tab-nav-btn w-full text-left px-4 py-3 rounded-2xl text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-3 text-charcoal hover:bg-ivory">
+          <span>❤️</span>
+          <span>My Wishlist</span>
+        </button>
+        <button onclick="switchTab('security')" id="nav-security" class="tab-nav-btn w-full text-left px-4 py-3 rounded-2xl text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-3 text-charcoal hover:bg-ivory">
+          <span>🔐</span>
+          <span>Security & Passwords</span>
+        </button>
+      </aside>
+
+      <!-- Content Panels -->
+      <section class="lg:col-span-3">
+        
+        <!-- Feedback Banner -->
+        <div id="accountFeedback" class="hidden mb-6 p-4 rounded-2xl text-xs font-semibold border flex items-center justify-between"></div>
+
+        <!-- 1. PROFILE TAB -->
+        <div id="tab-profile" class="tab-content bg-white rounded-3xl p-6 sm:p-8 border border-subtleBorder shadow-sm space-y-6">
+          <div class="border-b border-subtleBorder pb-4">
+            <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">PERSONAL DIRECTORY</span>
+            <h2 class="font-serif text-2xl font-bold text-charcoal mt-1">Client Profile</h2>
+            <p class="text-xs text-mutedText mt-0.5">Manage your personal credentials, contact numbers, and preferences.</p>
+          </div>
+
+          <form onsubmit="handleUpdateProfile(event)" class="space-y-4 max-w-xl">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Full Name *</label>
+              <input type="text" id="profFullName" required class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Registered Email</label>
+              <input type="email" id="profEmail" disabled class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder bg-gray-50 text-mutedText cursor-not-allowed">
+              <span class="text-[10px] text-mutedText block mt-1">To change your primary email, please contact atelier concierge for security verification.</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Contact Phone / WhatsApp</label>
+              <input type="tel" id="profPhone" placeholder="+91 76098 74187" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+
+            <button type="submit" id="profSaveBtn" class="bg-dustyRose hover:bg-deepRose text-white font-semibold py-3 px-6 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md gold-sheen-hover">
+              Save Profile Changes
+            </button>
+          </form>
+        </div>
+
+        <!-- 2. MY ORDERS TAB -->
+        <div id="tab-orders" class="tab-content hidden bg-white rounded-3xl p-6 sm:p-8 border border-subtleBorder shadow-sm space-y-6">
+          <div class="border-b border-subtleBorder pb-4 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">PURCHASE HISTORY</span>
+              <h2 class="font-serif text-2xl font-bold text-charcoal mt-1">My Orders</h2>
+              <p class="text-xs text-mutedText mt-0.5">Real-time status of your luxury purchases and boutique dispatches.</p>
+            </div>
+            <span id="orderTotalCountBadge" class="text-xs bg-ivory px-3 py-1 rounded-full font-bold border border-subtleBorder">0 Orders</span>
+          </div>
+
+          <div id="ordersListContainer" class="space-y-4">
+            <!-- Injected via JavaScript -->
+            <p class="text-xs text-mutedText py-8 text-center">Loading orders...</p>
+          </div>
+        </div>
+
+        <!-- 3. CUSTOM ABAYA ORDERS TAB -->
+        <div id="tab-custom" class="tab-content hidden bg-white rounded-3xl p-6 sm:p-8 border border-subtleBorder shadow-sm space-y-6">
+          <div class="border-b border-subtleBorder pb-4 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">HAUTE COUTURE</span>
+              <h2 class="font-serif text-2xl font-bold text-charcoal mt-1">Custom Abaya Atelier</h2>
+              <p class="text-xs text-mutedText mt-0.5">Bespoke commissions handcrafted to your personal measurements.</p>
+            </div>
+            <button onclick="openCustomAbayaModal()" class="text-xs bg-dustyRose text-white font-semibold px-4 py-2 rounded-xl hover:bg-deepRose">
+              + New Commission
+            </button>
+          </div>
+
+          <div id="customOrdersListContainer" class="space-y-4">
+            <p class="text-xs text-mutedText py-8 text-center">Loading custom abaya queue...</p>
+          </div>
+        </div>
+
+        <!-- 4. SAVED ADDRESSES TAB -->
+        <div id="tab-addresses" class="tab-content hidden bg-white rounded-3xl p-6 sm:p-8 border border-subtleBorder shadow-sm space-y-6">
+          <div class="border-b border-subtleBorder pb-4 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">DESTINATIONS</span>
+              <h2 class="font-serif text-2xl font-bold text-charcoal mt-1">Saved Addresses</h2>
+              <p class="text-xs text-mutedText mt-0.5">Manage delivery addresses for seamless 1-click checkout.</p>
+            </div>
+            <button onclick="openAddressModal()" class="bg-charcoal hover:bg-dustyRose text-white text-xs uppercase tracking-wider font-semibold px-4 py-2.5 rounded-xl transition-colors">
+              + Add Address
+            </button>
+          </div>
+
+          <div id="addressesListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <p class="text-xs text-mutedText py-8 text-center col-span-2">Loading addresses...</p>
+          </div>
+        </div>
+
+        <!-- 5. MY WISHLIST TAB -->
+        <div id="tab-wishlist" class="tab-content hidden bg-white rounded-3xl p-6 sm:p-8 border border-subtleBorder shadow-sm space-y-6">
+          <div class="border-b border-subtleBorder pb-4 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">CURATED FAVORITES</span>
+              <h2 class="font-serif text-2xl font-bold text-charcoal mt-1">My Wishlist</h2>
+              <p class="text-xs text-mutedText mt-0.5">Saved pieces synced to your account across devices.</p>
+            </div>
+            <span id="wishlistCountBadge" class="text-xs bg-ivory px-3 py-1 rounded-full font-bold border border-subtleBorder">0 Items</span>
+          </div>
+
+          <div id="wishlistGridContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <p class="text-xs text-mutedText py-8 text-center col-span-full">Loading wishlist...</p>
+          </div>
+        </div>
+
+        <!-- 6. SECURITY & PASSWORDS TAB -->
+        <div id="tab-security" class="tab-content hidden bg-white rounded-3xl p-6 sm:p-8 border border-subtleBorder shadow-sm space-y-8">
+          <div class="border-b border-subtleBorder pb-4">
+            <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">AUTHENTICATION</span>
+            <h2 class="font-serif text-2xl font-bold text-charcoal mt-1">Security & Passwords</h2>
+            <p class="text-xs text-mutedText mt-0.5">Ensure your account remains safe with strong credentials.</p>
+          </div>
+
+          <!-- Change Password Form -->
+          <form onsubmit="handleChangePassword(event)" class="space-y-4 max-w-xl">
+            <h3 class="font-serif text-lg font-bold text-charcoal">Update Password</h3>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Current Password *</label>
+              <input type="password" id="secCurrentPassword" required class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">New Password *</label>
+              <input type="password" id="secNewPassword" required placeholder="Minimum 8 characters" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Confirm New Password *</label>
+              <input type="password" id="secConfirmPassword" required class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+            </div>
+
+            <button type="submit" id="changePasswordBtn" class="bg-charcoal hover:bg-dustyRose text-white font-semibold py-3 px-6 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md">
+              Update Password
+            </button>
+          </form>
+
+          <!-- Danger Zone: Account Deletion -->
+          <div class="pt-8 border-t border-red-100">
+            <div class="bg-red-50/60 border border-red-200 rounded-2xl p-6">
+              <h3 class="font-serif text-lg font-bold text-red-900">Close Client Account</h3>
+              <p class="text-xs text-red-700 mt-1 leading-relaxed max-w-xl">
+                Permanently remove your account, saved addresses, and active wishlist entries. Past completed orders are retained for legal and tax compliance.
+              </p>
+              <button onclick="handleDeleteAccountPrompt()" class="mt-4 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs uppercase tracking-wider px-5 py-2.5 rounded-xl transition-colors">
+                Request Account Deletion
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ADD / EDIT ADDRESS MODAL -->
+  <div id="addressModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-subtleBorder relative my-8">
+      <button onclick="closeAddressModal()" class="absolute top-6 right-6 p-2 text-mutedText hover:text-charcoal">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+
+      <div class="text-center mb-6">
+        <span class="text-[10px] uppercase tracking-[0.2em] text-antiqueGold font-bold">DELIVERY DESTINATION</span>
+        <h3 id="addressModalTitle" class="font-serif text-2xl font-bold text-charcoal">Add New Address</h3>
+      </div>
+
+      <form id="addressForm" onsubmit="handleSaveAddress(event)" class="space-y-3.5">
+        <input type="hidden" id="editAddressId">
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Recipient Name *</label>
+          <input type="text" id="addrRecipient" required placeholder="Sara Al-Mansoor" class="w-full text-xs p-3 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Contact Phone *</label>
+          <input type="tel" id="addrPhone" required placeholder="+91 76098 74187" class="w-full text-xs p-3 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Address Line 1 *</label>
+          <input type="text" id="addrLine1" required placeholder="Flat / Villa / House No., Building Name" class="w-full text-xs p-3 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Address Line 2 (Optional)</label>
+          <input type="text" id="addrLine2" placeholder="Street Name, Landmark" class="w-full text-xs p-3 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">City *</label>
+            <input type="text" id="addrCity" required placeholder="Mumbai" class="w-full text-xs p-3 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">State *</label>
+            <input type="text" id="addrState" required placeholder="Maharashtra" class="w-full text-xs p-3 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Postal Code *</label>
+            <input type="text" id="addrPostal" required placeholder="400050" class="w-full text-xs p-3 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Country</label>
+            <input type="text" id="addrCountry" value="India" class="w-full text-xs p-3 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-charcoal select-none">
+            <input type="checkbox" id="addrDefault" class="rounded border-subtleBorder text-dustyRose focus:ring-dustyRose">
+            <span>Set as primary default shipping address</span>
+          </label>
+        </div>
+
+        <button type="submit" id="saveAddressBtn" class="w-full bg-dustyRose hover:bg-deepRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md mt-4 gold-sheen-hover">
+          Save Address
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="py-6 text-center text-xs text-mutedText border-t border-subtleBorder bg-white/40 mt-12">
+    <p>© <span id="portalYear"></span> Meher Mahel. Modest luxury, tailored for grace.</p>
+  </footer>
+
+  <!-- Store client script for Account Portal -->
+  <script src="/account.js"></script>
+</body>
+</html>

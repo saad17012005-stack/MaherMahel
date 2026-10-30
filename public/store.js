@@ -305,8 +305,47 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings(),
     loadHeroSlides(),
     loadProducts('all'),
+    initAuthSession(),
   ]).catch(err => console.debug('Background hydration notice:', err));
 });
+
+// Initialize Client Auth State in Navigation
+async function initAuthSession() {
+  const token = localStorage.getItem('mm_token');
+  if (!token) return;
+
+  try {
+    const res = await fetch('/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.success && data.user) {
+      state.currentUser = data.user;
+      const nameEl = document.getElementById('headerAccountName');
+      if (nameEl) nameEl.textContent = (data.user.full_name || 'Account').split(' ')[0];
+      const avatarEl = document.getElementById('headerAccountAvatar');
+      if (avatarEl) {
+        avatarEl.innerHTML = `<span>${(data.user.full_name || 'M').charAt(0).toUpperCase()}</span>`;
+        avatarEl.className = 'w-7 h-7 rounded-full bg-dustyRose text-white text-xs font-serif font-bold flex items-center justify-center shadow-sm';
+      }
+      const mobileBadge = document.getElementById('mobileAccountBadge');
+      if (mobileBadge) mobileBadge.textContent = 'Portal';
+
+      // Sync local wishlist to database
+      const localWishlist = JSON.parse(localStorage.getItem('mm_wishlist') || '[]');
+      if (localWishlist.length > 0) {
+        fetch('/api/user/wishlist/sync', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ product_ids: localWishlist })
+        }).catch(() => {});
+      }
+    }
+  } catch (e) {}
+}
 
 // Load Settings from API
 async function loadSettings() {
@@ -1073,6 +1112,31 @@ function openCheckoutModal() {
     modal.classList.remove('hidden');
     modal.scrollTop = 0;
   }
+
+  // Auto-fill logged in user info & default address
+  if (state.currentUser) {
+    const nameInput = document.getElementById('custName');
+    const emailInput = document.getElementById('custEmail');
+    const phoneInput = document.getElementById('custPhone');
+    if (nameInput && !nameInput.value) nameInput.value = state.currentUser.full_name || '';
+    if (emailInput && !emailInput.value) emailInput.value = state.currentUser.email || '';
+    if (phoneInput && !phoneInput.value && state.currentUser.phone) phoneInput.value = state.currentUser.phone;
+
+    const token = localStorage.getItem('mm_token');
+    if (token) {
+      fetch('/api/user/addresses', { headers: { 'Authorization': `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.addresses && data.addresses.length > 0) {
+            const def = data.addresses.find(a => a.is_default) || data.addresses[0];
+            const addrInput = document.getElementById('custAddress');
+            if (addrInput && !addrInput.value) {
+              addrInput.value = `${def.address_line_1}${def.address_line_2 ? ', ' + def.address_line_2 : ''}, ${def.city}, ${def.state} - ${def.postal_code}`;
+            }
+          }
+        }).catch(() => {});
+    }
+  }
 }
 
 function closeCheckoutModal() {
@@ -1182,6 +1246,7 @@ async function handleConfirmUPIOrder() {
         coupon_code: state.appliedCoupon?.code || null,
         payment_method: 'upi_scanner',
         utr_id: utr,
+        user_id: state.currentUser?.id || null,
       }),
     });
 

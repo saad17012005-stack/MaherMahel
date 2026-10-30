@@ -1,6 +1,63 @@
 import { db, initDatabase } from './db.js';
+import bcrypt from 'bcryptjs';
+export function seedAuthUsers() {
+    try {
+        const adminEmail = (process.env.ADMIN_EMAIL || 'admin@mehermahel.com').toLowerCase();
+        const adminPassword = process.env.ADMIN_PASSWORD || 'admin12345';
+        const existingAdmin = db.prepare('SELECT id FROM auth_users WHERE email = ?').get(adminEmail);
+        if (!existingAdmin) {
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(adminPassword, salt);
+            const adminId = 'usr_admin_mehermahel_root';
+            db.prepare(`
+        INSERT INTO auth_users (id, email, password_hash, role, is_verified, verification_token)
+        VALUES (?, ?, ?, 'admin', 1, NULL)
+      `).run(adminId, adminEmail, hash);
+            db.prepare(`
+        INSERT INTO profiles (id, email, full_name, phone, avatar_url, role, is_verified)
+        VALUES (?, ?, 'Meher Mahel Administrator', '+91 76098 74187', NULL, 'admin', 1)
+      `).run(adminId, adminEmail);
+            console.log(`[Seed] Bootstrap Administrator created: ${adminEmail}`);
+        }
+        // Sample Customer Account
+        const sampleCustomerEmail = 'customer@mehermahel.com';
+        const existingCustomer = db.prepare('SELECT id FROM auth_users WHERE email = ?').get(sampleCustomerEmail);
+        if (!existingCustomer) {
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync('customer12345', salt);
+            const custId = 'usr_customer_sample_01';
+            db.prepare(`
+        INSERT INTO auth_users (id, email, password_hash, role, is_verified, verification_token)
+        VALUES (?, ?, ?, 'customer', 1, NULL)
+      `).run(custId, sampleCustomerEmail, hash);
+            db.prepare(`
+        INSERT INTO profiles (id, email, full_name, phone, avatar_url, role, is_verified)
+        VALUES (?, ?, 'Sara Al-Mansoor', '+91 76098 74187', NULL, 'customer', 1)
+      `).run(custId, sampleCustomerEmail);
+            try {
+                db.prepare(`
+          INSERT INTO user_addresses (id, user_id, recipient_name, phone, address_line_1, address_line_2, city, state, postal_code, country, is_default)
+          VALUES (?, ?, 'Sara Al-Mansoor', '+91 76098 74187', 'Flat 402, Royale Heritage Crest', 'Waterfield Road, Bandra West', 'Mumbai', 'Maharashtra', '400050', 'India', 1)
+        `).run('addr_sample_01', custId);
+            }
+            catch { }
+            try {
+                db.prepare(`
+          INSERT INTO user_wishlists (user_id, product_id)
+          VALUES (?, ?)
+        `).run(custId, 1);
+            }
+            catch { }
+            console.log(`[Seed] Sample Customer created: ${sampleCustomerEmail}`);
+        }
+    }
+    catch (err) {
+        console.warn('[Seed Auth Users Warning]:', err.message);
+    }
+}
 export function seedDatabase() {
     initDatabase();
+    seedAuthUsers();
     const countCategories = db.prepare('SELECT count(*) as count FROM categories').get();
     if (countCategories.count > 0) {
         console.log('[Seed] Database already seeded. Skipping initial seeding.');

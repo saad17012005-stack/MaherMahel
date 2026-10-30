@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Access — Meher Mahel | Draped in Grace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dustyRose: '#C88F91',
+            deepRose: '#A9676C',
+            antiqueGold: '#C6A15B',
+            champagneGold: '#E4CC9A',
+            ivory: '#FAF7F2',
+            charcoal: '#292526',
+            mutedText: '#777071',
+            subtleBorder: '#E9DFD9',
+          },
+          fontFamily: {
+            serif: ['Cormorant Garamond', 'Playfair Display', 'Georgia', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-ivory text-charcoal font-sans min-h-screen flex flex-col justify-between selection:bg-dustyRose/20">
+
+  <!-- Top Navigation -->
+  <header class="py-5 px-6 border-b border-subtleBorder/70 bg-white/80 backdrop-blur-sm">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group">
+        <img src="/images/logo.jpg" alt="Meher Mahel" class="h-10 w-auto rounded-full shadow-sm">
+        <div>
+          <span class="font-serif text-xl sm:text-2xl font-bold tracking-wider text-charcoal block group-hover:text-dustyRose transition-colors">Meher Mahel</span>
+          <span class="block text-[9px] tracking-[0.25em] text-antiqueGold uppercase font-semibold">Draped in Grace</span>
+        </div>
+      </a>
+      <a href="/" class="text-xs uppercase tracking-widest font-semibold text-mutedText hover:text-charcoal flex items-center gap-1.5 transition-colors">
+        <span>← Return to Boutique</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Auth Container -->
+  <main class="flex-grow flex items-center justify-center p-4 sm:p-8 my-6">
+    <div class="bg-white rounded-3xl max-w-md w-full p-7 sm:p-10 shadow-xl border border-subtleBorder relative overflow-hidden">
+      <div class="absolute -top-16 -right-16 w-36 h-36 bg-dustyRose/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -left-16 w-36 h-36 bg-antiqueGold/10 rounded-full blur-2xl pointer-events-none"></div>
+
+      <!-- Notification Banner -->
+      <div id="authAlert" class="hidden mb-6 p-3.5 rounded-xl text-xs font-medium border flex items-center gap-2.5 transition-all"></div>
+
+      <!-- 1. LOGIN VIEW -->
+      <div id="loginView">
+        <div class="text-center mb-7">
+          <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">CLIENT PRIVILEGE</span>
+          <h1 class="font-serif text-3xl font-bold text-charcoal mt-1">Welcome Back</h1>
+          <p class="text-xs text-mutedText mt-1.5">Sign in to access your boutique orders, saved addresses, and wishlist.</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1.5">Email Address *</label>
+            <input type="email" id="loginEmail" required placeholder="sara@example.com" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors">
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal">Password *</label>
+              <button type="button" onclick="switchView('forgot')" class="text-[11px] text-dustyRose hover:underline font-medium">Forgot Password?</button>
+            </div>
+            <div class="relative">
+              <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors pr-10">
+              <button type="button" onclick="togglePasswordVisibility('loginPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-mutedText hover:text-charcoal p-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <label class="flex items-center gap-2 cursor-pointer text-xs text-mutedText select-none">
+              <input type="checkbox" id="loginRemember" checked class="rounded border-subtleBorder text-dustyRose focus:ring-dustyRose">
+              <span>Remember this session</span>
+            </label>
+          </div>
+
+          <button type="submit" id="loginSubmitBtn" class="w-full bg-dustyRose hover:bg-deepRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md mt-2 gold-sheen-hover">
+            Sign In to Boutique
+          </button>
+        </form>
+
+        <div class="pt-6 mt-6 border-t border-subtleBorder text-center">
+          <p class="text-xs text-mutedText">
+            New to Meher Mahel?
+            <button onclick="switchView('register')" class="text-dustyRose font-bold hover:underline ml-1">Create an Account</button>
+          </p>
+        </div>
+      </div>
+
+      <!-- 2. REGISTER VIEW -->
+      <div id="registerView" class="hidden">
+        <div class="text-center mb-6">
+          <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">JOIN THE ATELIER</span>
+          <h1 class="font-serif text-3xl font-bold text-charcoal mt-1">Create Account</h1>
+          <p class="text-xs text-mutedText mt-1.5">Enjoy curated modest luxury, bespoke abaya tailoring, and priority delivery.</p>
+        </div>
+
+        <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Full Name *</label>
+            <input type="text" id="regFullName" required placeholder="Sara Al-Mansoor" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Email Address *</label>
+            <input type="email" id="regEmail" required placeholder="sara@example.com" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">WhatsApp / Phone (Optional)</label>
+            <input type="tel" id="regPhone" placeholder="+91 76098 74187" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Password *</label>
+            <div class="relative">
+              <input type="password" id="regPassword" required placeholder="Minimum 8 characters" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors pr-10">
+              <button type="button" onclick="togglePasswordVisibility('regPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-mutedText hover:text-charcoal p-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1">Confirm Password *</label>
+            <div class="relative">
+              <input type="password" id="regConfirmPassword" required placeholder="Re-enter password" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors pr-10">
+              <button type="button" onclick="togglePasswordVisibility('regConfirmPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-mutedText hover:text-charcoal p-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="pt-1">
+            <label class="flex items-start gap-2.5 cursor-pointer text-[11px] text-mutedText leading-relaxed select-none">
+              <input type="checkbox" id="regConsent" required class="mt-0.5 rounded border-subtleBorder text-dustyRose focus:ring-dustyRose">
+              <span>I consent to the <a href="#" onclick="alert('Meher Mahel Terms of Service: Modest luxury crafted with care.')" class="text-charcoal underline">Terms of Service</a> and <a href="#" onclick="alert('Meher Mahel Privacy Policy: Your personal information is kept private and secure.')" class="text-charcoal underline">Privacy Policy</a>.</span>
+            </label>
+          </div>
+
+          <button type="submit" id="regSubmitBtn" class="w-full bg-dustyRose hover:bg-deepRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md mt-2 gold-sheen-hover">
+            Create Client Account
+          </button>
+        </form>
+
+        <div class="pt-5 mt-5 border-t border-subtleBorder text-center">
+          <p class="text-xs text-mutedText">
+            Already registered?
+            <button onclick="switchView('login')" class="text-dustyRose font-bold hover:underline ml-1">Sign In</button>
+          </p>
+        </div>
+      </div>
+
+      <!-- 3. FORGOT PASSWORD VIEW -->
+      <div id="forgotView" class="hidden">
+        <div class="text-center mb-6">
+          <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">RECOVER ACCESS</span>
+          <h1 class="font-serif text-3xl font-bold text-charcoal mt-1">Reset Password</h1>
+          <p class="text-xs text-mutedText mt-1.5">Enter your registered email address and we will dispatch a secure reset link.</p>
+        </div>
+
+        <form id="forgotForm" onsubmit="handleForgotPassword(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1.5">Email Address *</label>
+            <input type="email" id="forgotEmail" required placeholder="sara@example.com" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors">
+          </div>
+
+          <button type="submit" id="forgotSubmitBtn" class="w-full bg-charcoal hover:bg-dustyRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md">
+            Send Reset Instructions
+          </button>
+        </form>
+
+        <div class="pt-6 mt-6 border-t border-subtleBorder text-center">
+          <button onclick="switchView('login')" class="text-xs text-mutedText hover:text-charcoal transition-colors">
+            ← Back to Sign In
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. RESET PASSWORD VIEW (TOKEN IN URL) -->
+      <div id="resetView" class="hidden">
+        <div class="text-center mb-6">
+          <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">SECURE CREDENTIALS</span>
+          <h1 class="font-serif text-3xl font-bold text-charcoal mt-1">Set New Password</h1>
+          <p class="text-xs text-mutedText mt-1.5">Please choose a strong, secure password for your account.</p>
+        </div>
+
+        <form id="resetForm" onsubmit="handleResetPassword(event)" class="space-y-4">
+          <input type="hidden" id="resetTokenInput">
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1.5">New Password *</label>
+            <div class="relative">
+              <input type="password" id="resetNewPassword" required placeholder="Minimum 8 characters" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors pr-10">
+              <button type="button" onclick="togglePasswordVisibility('resetNewPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-mutedText hover:text-charcoal p-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1.5">Confirm New Password *</label>
+            <div class="relative">
+              <input type="password" id="resetConfirmPassword" required placeholder="Re-enter new password" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors pr-10">
+              <button type="button" onclick="togglePasswordVisibility('resetConfirmPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-mutedText hover:text-charcoal p-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="resetSubmitBtn" class="w-full bg-dustyRose hover:bg-deepRose text-white font-semibold py-3.5 rounded-xl uppercase tracking-widest text-xs transition-all shadow-md gold-sheen-hover">
+            Update Password & Sign In
+          </button>
+        </form>
+
+        <div class="pt-6 mt-6 border-t border-subtleBorder text-center">
+          <button onclick="switchView('login')" class="text-xs text-mutedText hover:text-charcoal transition-colors">
+            ← Back to Sign In
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer Notice -->
+  <footer class="py-6 text-center text-xs text-mutedText border-t border-subtleBorder/60 bg-white/40">
+    <p>© <span id="authYear"></span> Meher Mahel. All transactions and client data encrypted with strict privacy protocols.</p>
+  </footer>
+
+  <script>
+    document.getElementById('authYear').textContent = new Date().getFullYear();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectUrl = urlParams.get('redirect') || '/account';
+
+    // Toggle views
+    function switchView(viewName) {
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('registerView').classList.add('hidden');
+      document.getElementById('forgotView').classList.add('hidden');
+      document.getElementById('resetView').classList.add('hidden');
+
+      showAlert('', ''); // clear alert
+
+      if (viewName === 'register') {
+        document.getElementById('registerView').classList.remove('hidden');
+      } else if (viewName === 'forgot') {
+        document.getElementById('forgotView').classList.remove('hidden');
+      } else if (viewName === 'reset') {
+        document.getElementById('resetView').classList.remove('hidden');
+      } else {
+        document.getElementById('loginView').classList.remove('hidden');
+      }
+    }
+
+    function showAlert(type, message) {
+      const el = document.getElementById('authAlert');
+      if (!message) {
+        el.classList.add('hidden');
+        el.textContent = '';
+        return;
+      }
+      el.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-red-50', 'text-red-800', 'border-red-200');
+      if (type === 'success') {
+        el.classList.add('bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
+        el.innerHTML = `<span>✓</span><span>${message}</span>`;
+      } else {
+        el.classList.add('bg-red-50', 'text-red-800', 'border-red-200');
+        el.innerHTML = `<span>⚠️</span><span>${message}</span>`;
+      }
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.classList.add('text-dustyRose');
+      } else {
+        input.type = 'password';
+        btn.classList.remove('text-dustyRose');
+      }
+    }
+
+    // Initialize mode from URL params
+    const initialMode = urlParams.get('mode');
+    const tokenParam = urlParams.get('token');
+
+    if (tokenParam && (initialMode === 'reset' || window.location.pathname.includes('reset-password'))) {
+      switchView('reset');
+      document.getElementById('resetTokenInput').value = tokenParam;
+    } else if (initialMode === 'register' || window.location.pathname.includes('register')) {
+      switchView('register');
+    } else if (initialMode === 'forgot' || window.location.pathname.includes('forgot-password')) {
+      switchView('forgot');
+    } else {
+      switchView('login');
+    }
+
+    // Auto-redirect if already signed in
+    const existingToken = localStorage.getItem('mm_token');
+    if (existingToken && !tokenParam && initialMode !== 'reset') {
+      fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${existingToken}` } })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            window.location.href = redirectUrl;
+          }
+        })
+        .catch(() => {});
+    }
+
+    // Form handlers
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Verifying Credentials...';
+      showAlert('', '');
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const remember_me = document.getElementById('loginRemember').checked;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, remember_me }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Login failed.');
+
+        localStorage.setItem('mm_token', data.token);
+        localStorage.setItem('mm_user', JSON.stringify(data.user));
+
+        showAlert('success', 'Sign in successful! Redirecting...');
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 600);
+      } catch (err) {
+        showAlert('error', err.message || 'Invalid email or password.');
+        btn.disabled = false;
+        btn.textContent = 'Sign In to Boutique';
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const btn = document.getElementById('regSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creating Account...';
+      showAlert('', '');
+
+      const full_name = document.getElementById('regFullName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirm_password = document.getElementById('regConfirmPassword').value;
+      const consent = document.getElementById('regConsent').checked;
+
+      if (password !== confirm_password) {
+        showAlert('error', 'Passwords do not match.');
+        btn.disabled = false;
+        btn.textContent = 'Create Client Account';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ full_name, email, phone, password, confirm_password, consent }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Registration failed.');
+
+        localStorage.setItem('mm_token', data.token);
+        localStorage.setItem('mm_user', JSON.stringify(data.user));
+
+        showAlert('success', 'Account created! Welcome to Meher Mahel. Redirecting...');
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 800);
+      } catch (err) {
+        showAlert('error', err.message || 'Registration failed.');
+        btn.disabled = false;
+        btn.textContent = 'Create Client Account';
+      }
+    }
+
+    async function handleForgotPassword(e) {
+      e.preventDefault();
+      const btn = document.getElementById('forgotSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sending Link...';
+      showAlert('', '');
+
+      const email = document.getElementById('forgotEmail').value.trim();
+
+      try {
+        const res = await fetch('/api/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+        showAlert('success', data.message || 'If an account exists, a reset link has been dispatched.');
+        btn.textContent = 'Link Dispatched ✓';
+      } catch (err) {
+        showAlert('error', err.message || 'Could not process request.');
+        btn.disabled = false;
+        btn.textContent = 'Send Reset Instructions';
+      }
+    }
+
+    async function handleResetPassword(e) {
+      e.preventDefault();
+      const btn = document.getElementById('resetSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Updating Password...';
+      showAlert('', '');
+
+      const token = document.getElementById('resetTokenInput').value.trim();
+      const new_password = document.getElementById('resetNewPassword').value;
+      const confirm_password = document.getElementById('resetConfirmPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, new_password, confirm_password }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Password reset failed.');
+
+        showAlert('success', 'Password updated successfully! You can now sign in.');
+        setTimeout(() => {
+          switchView('login');
+        }, 1500);
+      } catch (err) {
+        showAlert('error', err.message || 'Failed to update password.');
+        btn.disabled = false;
+        btn.textContent = 'Update Password & Sign In';
+      }
+    }
+  </script>
+</body>
+</html>

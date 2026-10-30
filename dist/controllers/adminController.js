@@ -1,4 +1,16 @@
+import crypto from 'node:crypto';
 import { db } from '../database/db.js';
+export const logAdminAction = (adminId, adminEmail, action, recordType, recordId, details) => {
+    try {
+        db.prepare(`
+      INSERT INTO admin_audit_logs (admin_id, admin_email, action, record_type, record_id, details)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(adminId, adminEmail, action, recordType, recordId || null, details ? (typeof details === 'string' ? details : JSON.stringify(details)) : null);
+    }
+    catch (err) {
+        console.warn('[Audit Log Warning]:', err.message);
+    }
+};
 export const getAdminStats = (_req, res) => {
     try {
         const totalRevenueRow = db.prepare("SELECT COALESCE(SUM(total), 0) as total FROM orders WHERE payment_status = 'paid'").get();
@@ -253,6 +265,247 @@ export const updateStoreSettings = (req, res) => {
         });
         upsertTx();
         res.json({ success: true, message: 'Store settings saved successfully.' });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+// --------------------------------------------------------
+// USER MANAGEMENT CONTROLLERS
+// --------------------------------------------------------
+export const getAdminUsers = (req, res) => {
+    try {
+        const { search, status, page = 1, limit = 20 } = req.query;
+        const pageNum = Math.max(1, Number(page) || 1);
+        const limitNum = Math.max(1, Number(limit) || 20);
+        let allUsers = db.prepare('SELECT * FROM profiles ORDER BY created_at DESC').all();
+        // Filters
+        if (search && String(search).trim()) {
+            const q = String(search).toLowerCase().trim();
+            allUsers = allUsers.filter(u => u.email.toLowerCase().includes(q) ||
+                u.full_name.toLowerCase().includes(q) ||
+                (u.phone && u.phone.includes(q)));
+        }
+        if (status && status !== 'all') {
+            if (status === 'verified')
+                allUsers = allUsers.filter(u => u.is_verified === 1);
+            else if (status === 'unverified')
+                allUsers = allUsers.filter(u => u.is_verified === 0);
+            else if (status === 'suspended')
+                allUsers = allUsers.filter(u => u.is_suspended === 1);
+        }
+        const totalCount = allUsers.length;
+        const startIndex = (pageNum - 1) * limitNum;
+        const paginated = allUsers.slice(startIndex, startIndex + limitNum);
+        // Enrich with order counts and spent totals
+        const enriched = paginated.map(user => {
+            const orders = db.prepare(`
+        SELECT total, payment_status
+        FROM orders
+        WHERE user_id = ? OR customer_email = ?
+      `).all(user.id, user.email);
+            const totalOrders = orders.length;
+            const totalSpent = orders
+                .filter(o => o.payment_status === 'paid')
+                .reduce((sum, o) => sum + (o.total || 0), 0);
+            return {
+                id: user.id,
+                email: user.email,
+                full_name: user.full_name,
+                phone: user.phone,
+                role: user.role,
+                is_verified: Boolean(user.is_verified),
+                is_suspended: Boolean(user.is_suspended),
+                created_at: user.created_at,
+                order_count: totalOrders,
+                total_spent: totalSpent,
+            };
+        });
+        res.json({
+            success: true,
+            total: totalCount,
+            page: pageNum,
+            limit: limitNum,
+            total_pages: Math.ceil(totalCount / limitNum),
+            users: enriched,
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const getAdminUserDetails = (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = db.prepare('SELECT * FROM profiles WHERE id = ?').get(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+        const addresses = db.prepare('SELECT * FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC').all(id);
+        const orders = db.prepare('SELECT * FROM orders WHERE user_id = ? OR customer_email = ? ORDER BY id DESC').all(id, user.email);
+        orders.forEach(o => {
+            o.items = db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(o.id);
+        });
+        const customOrders = db.prepare('SELECT * FROM custom_abaya_orders WHERE user_id = ? OR customer_email = ? ORDER BY id DESC').all(id, user.email);
+        customOrders.forEach(co => {
+            try {
+                co.measurements = typeof co.measurements === 'string' ? JSON.parse(co.measurements) : co.measurements;
+            }
+            catch { }
+        });
+        const auditLogs = db.prepare('SELECT * FROM admin_audit_logs WHERE record_id = ? ORDER BY created_at DESC').all(id);
+        const totalSpent = orders
+            .filter(o => o.payment_status === 'paid')
+            .reduce((s, o) => s + (o.total || 0), 0);
+        res.json({
+            success: true,
+            user: {
+                id: user.id,
+                email: user.email,
+                full_name: user.full_name,
+                phone: user.phone,
+                avatar_url: user.avatar_url,
+                role: user.role,
+                is_verified: Boolean(user.is_verified),
+                is_suspended: Boolean(user.is_suspended),
+                created_at: user.created_at,
+                total_orders: orders.length,
+                total_spent: totalSpent,
+            },
+            addresses,
+            orders,
+            custom_orders: customOrders,
+            audit_logs: auditLogs,
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const updateAdminUser = (req, res) => {
+    try {
+        const id = String(req.params.id);
+        const { full_name, phone, avatar_url, is_verified } = req.body;
+        const user = db.prepare('SELECT * FROM profiles WHERE id = ?').get(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+        const updatedName = full_name ? String(full_name).trim() : user.full_name;
+        const updatedPhone = phone !== undefined ? String(phone).trim() : user.phone;
+        const updatedAvatar = avatar_url !== undefined ? avatar_url : user.avatar_url;
+        const updatedVerified = is_verified !== undefined ? (is_verified ? 1 : 0) : user.is_verified;
+        db.prepare(`
+      UPDATE profiles
+      SET full_name = ?, phone = ?, avatar_url = ?, is_verified = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(updatedName, updatedPhone, updatedAvatar, updatedVerified, id);
+        logAdminAction(req.user?.id || 'admin', req.user?.email || 'admin@mehermahel.com', 'UPDATE_USER_PROFILE', 'USER', id, { updatedName, updatedPhone, updatedVerified });
+        res.json({ success: true, message: 'Customer profile updated successfully.' });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const suspendUser = (req, res) => {
+    try {
+        const id = String(req.params.id);
+        const user = db.prepare('SELECT * FROM profiles WHERE id = ?').get(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+        if (user.role === 'admin') {
+            return res.status(403).json({ success: false, message: 'Administrators cannot be suspended.' });
+        }
+        const newSuspension = user.is_suspended === 1 ? 0 : 1;
+        db.prepare('UPDATE profiles SET is_suspended = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(newSuspension, id);
+        logAdminAction(req.user?.id || 'admin', req.user?.email || 'admin@mehermahel.com', newSuspension === 1 ? 'SUSPEND_USER' : 'RESTORE_USER', 'USER', id, { previousStatus: user.is_suspended, newStatus: newSuspension });
+        res.json({
+            success: true,
+            message: newSuspension === 1 ? 'Customer account has been suspended.' : 'Customer account has been restored.',
+            is_suspended: Boolean(newSuspension),
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const triggerPasswordReset = (req, res) => {
+    try {
+        const id = String(req.params.id);
+        const user = db.prepare('SELECT * FROM profiles WHERE id = ?').get(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetExpires = new Date(Date.now() + 3600000).toISOString();
+        db.prepare(`
+      UPDATE auth_users
+      SET reset_token = ?, reset_token_expires = ?
+      WHERE id = ?
+    `).run(resetToken, resetExpires, id);
+        logAdminAction(req.user?.id || 'admin', req.user?.email || 'admin@mehermahel.com', 'TRIGGER_PASSWORD_RESET', 'USER', id, { user_email: user.email });
+        res.json({
+            success: true,
+            message: 'Password reset link generated and dispatched.',
+            reset_url: `/auth.html?mode=reset&token=${resetToken}`,
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const deleteAdminUser = (req, res) => {
+    try {
+        const id = String(req.params.id);
+        const user = db.prepare('SELECT * FROM profiles WHERE id = ?').get(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+        if (user.role === 'admin') {
+            return res.status(403).json({ success: false, message: 'Root administrator cannot be deleted.' });
+        }
+        db.prepare('DELETE FROM user_addresses WHERE user_id = ?').run(id);
+        db.prepare('DELETE FROM user_wishlists WHERE user_id = ?').run(id);
+        db.prepare('DELETE FROM profiles WHERE id = ?').run(id);
+        db.prepare('DELETE FROM auth_users WHERE id = ?').run(id);
+        logAdminAction(req.user?.id || 'admin', req.user?.email || 'admin@mehermahel.com', 'DELETE_USER_ACCOUNT', 'USER', id, { deleted_email: user.email });
+        res.json({ success: true, message: 'Customer account and personal data deleted.' });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const exportUserData = (req, res) => {
+    try {
+        const id = String(req.params.id);
+        const user = db.prepare('SELECT * FROM profiles WHERE id = ?').get(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+        const addresses = db.prepare('SELECT * FROM user_addresses WHERE user_id = ?').all(id);
+        const orders = db.prepare('SELECT * FROM orders WHERE user_id = ? OR customer_email = ?').all(id, user.email);
+        orders.forEach(o => {
+            o.items = db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(o.id);
+        });
+        const wishlists = db.prepare('SELECT * FROM user_wishlists WHERE user_id = ?').all(id);
+        logAdminAction(req.user?.id || 'admin', req.user?.email || 'admin@mehermahel.com', 'EXPORT_CUSTOMER_DATA', 'USER', id);
+        res.json({
+            success: true,
+            export_date: new Date().toISOString(),
+            user,
+            addresses,
+            orders,
+            wishlists,
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+export const getAuditLogs = (_req, res) => {
+    try {
+        const logs = db.prepare('SELECT * FROM admin_audit_logs ORDER BY id DESC LIMIT 100').all();
+        res.json({ success: true, count: logs.length, logs });
     }
     catch (error) {
         res.status(500).json({ success: false, message: error.message });

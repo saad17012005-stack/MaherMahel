@@ -10,6 +10,9 @@ let adminState = {
   products: [],
   heroSlides: [],
   settings: {},
+  users: [],
+  userPage: 1,
+  selectedUser: null,
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAdminProducts();
   loadAdminHeroSlides();
   loadAdminSettings();
+  loadAdminUsers();
 });
 
 // Tab Switcher
@@ -44,6 +48,7 @@ function switchTab(tabName) {
   if (tabName === 'custom-queue') loadCustomAbayaQueue();
   if (tabName === 'products') loadAdminProducts();
   if (tabName === 'hero') loadAdminHeroSlides();
+  if (tabName === 'users') loadAdminUsers();
   if (tabName === 'settings') loadAdminSettings();
 }
 
@@ -568,5 +573,257 @@ async function handleSaveSettings(e) {
     alert('Boutique settings updated successfully.');
   } catch (err) {
     alert('Failed to update settings.');
+  }
+}
+
+// ========================================================
+// 7. USER MANAGEMENT (CLIENTS & AUDIT LOGS)
+// ========================================================
+
+async function loadAdminUsers() {
+  const search = document.getElementById('userSearchInput')?.value.trim() || '';
+  const status = document.getElementById('userStatusFilter')?.value || 'all';
+  const page = adminState.userPage || 1;
+
+  const tableBody = document.getElementById('usersTableBody');
+  if (tableBody) tableBody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-mutedText">Loading clients...</td></tr>';
+
+  try {
+    const res = await fetch(`/api/admin/users?search=${encodeURIComponent(search)}&status=${status}&page=${page}&limit=15`);
+    const data = await res.json();
+
+    if (data.success) {
+      adminState.users = data.users || [];
+      renderUsers(adminState.users);
+
+      const countBadge = document.getElementById('badgeUsersCount');
+      if (countBadge) countBadge.textContent = data.total || 0;
+
+      const pageInfo = document.getElementById('userPaginationInfo');
+      if (pageInfo) {
+        pageInfo.textContent = `Showing page ${data.page} of ${data.total_pages || 1} (${data.total || 0} clients)`;
+      }
+
+      const prevBtn = document.getElementById('userPrevPageBtn');
+      const nextBtn = document.getElementById('userNextPageBtn');
+      if (prevBtn) prevBtn.disabled = data.page <= 1;
+      if (nextBtn) nextBtn.disabled = data.page >= (data.total_pages || 1);
+    }
+  } catch (err) {
+    console.error('Error fetching admin users:', err);
+    if (tableBody) tableBody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-red-600">Failed to load clients.</td></tr>';
+  }
+}
+
+function renderUsers(users) {
+  const table = document.getElementById('usersTableBody');
+  if (!table) return;
+
+  if (users.length === 0) {
+    table.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-mutedText">No client records match the current criteria.</td></tr>';
+    return;
+  }
+
+  table.innerHTML = users.map(u => {
+    const joined = new Date(u.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    const isSuspended = u.is_suspended;
+
+    return `
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="p-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-dustyRose/20 text-dustyRose font-serif font-bold text-xs flex items-center justify-center shrink-0">
+              ${(u.full_name || 'U').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <span class="font-bold text-charcoal block">${u.full_name || 'Valued Client'}</span>
+              <span class="text-[10px] text-mutedText font-mono">${u.id}</span>
+            </div>
+          </div>
+        </td>
+        <td class="p-4">
+          <span class="text-charcoal block font-medium">${u.email}</span>
+          <span class="text-[11px] text-mutedText block">${u.phone || 'No phone'}</span>
+        </td>
+        <td class="p-4 text-mutedText">${joined}</td>
+        <td class="p-4">
+          ${u.is_verified
+            ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">Verified ✓</span>'
+            : '<span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200">Unverified</span>'
+          }
+        </td>
+        <td class="p-4">
+          <span class="font-bold text-charcoal block">${u.order_count} Orders</span>
+          <span class="text-dustyRose font-semibold text-[11px]">₹${Number(u.total_spent).toLocaleString()}</span>
+        </td>
+        <td class="p-4">
+          ${isSuspended
+            ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-800 border border-red-200">Suspended</span>'
+            : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">Active</span>'
+          }
+        </td>
+        <td class="p-4 text-right">
+          <div class="flex items-center justify-end gap-2">
+            <button onclick="openAdminUserModal('${u.id}')" class="text-xs bg-ivory hover:bg-subtleBorder text-charcoal px-2.5 py-1 rounded border border-subtleBorder font-semibold">
+              View
+            </button>
+            <button onclick="quickToggleSuspend('${u.id}', ${isSuspended ? 'false' : 'true'})" class="text-[11px] ${isSuspended ? 'text-emerald-700 hover:underline' : 'text-amber-700 hover:underline'} font-medium">
+              ${isSuspended ? 'Restore' : 'Suspend'}
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function changeUserPage(delta) {
+  adminState.userPage = Math.max(1, (adminState.userPage || 1) + delta);
+  loadAdminUsers();
+}
+
+async function openAdminUserModal(userId) {
+  const modal = document.getElementById('adminUserModal');
+  if (!modal) return;
+
+  try {
+    const res = await fetch(`/api/admin/users/${userId}`);
+    const data = await res.json();
+    if (!data.success || !data.user) throw new Error('Could not load user details.');
+
+    adminState.selectedUser = data;
+
+    document.getElementById('aumUserName').textContent = data.user.full_name;
+    document.getElementById('aumUserEmail').textContent = `${data.user.email} • ID: ${data.user.id}`;
+    document.getElementById('aumRole').textContent = data.user.role;
+    document.getElementById('aumVerified').textContent = data.user.is_verified ? 'Verified ✓' : 'Unverified';
+    document.getElementById('aumOrderCount').textContent = data.user.total_orders || 0;
+    document.getElementById('aumTotalSpent').textContent = `₹${(data.user.total_spent || 0).toLocaleString()}`;
+
+    // Suspend button text
+    const suspBtn = document.getElementById('aumSuspendBtn');
+    if (suspBtn) {
+      suspBtn.textContent = data.user.is_suspended ? 'Restore Client Account' : 'Suspend Account';
+      suspBtn.className = data.user.is_suspended
+        ? 'bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors'
+        : 'bg-amber-600 hover:bg-amber-700 text-white font-semibold px-4 py-2 rounded-xl transition-colors';
+    }
+
+    // Addresses
+    const addrContainer = document.getElementById('aumAddressesContainer');
+    if (data.addresses && data.addresses.length > 0) {
+      addrContainer.innerHTML = data.addresses.map(a => `
+        <div class="bg-ivory/60 p-2.5 rounded-lg border border-subtleBorder text-[11px]">
+          <strong>${a.recipient_name} (${a.phone})</strong>${a.is_default ? ' <span class="text-dustyRose font-bold">[Default]</span>' : ''}<br>
+          <span class="text-mutedText">${a.address_line_1}, ${a.city}, ${a.state} - ${a.postal_code}</span>
+        </div>
+      `).join('');
+    } else {
+      addrContainer.innerHTML = '<p class="text-mutedText">No saved addresses on file.</p>';
+    }
+
+    // Orders
+    const ordContainer = document.getElementById('aumOrdersContainer');
+    if (data.orders && data.orders.length > 0) {
+      ordContainer.innerHTML = data.orders.map(o => `
+        <div class="flex items-center justify-between p-2.5 bg-ivory/60 rounded-lg border border-subtleBorder text-[11px]">
+          <div>
+            <span class="font-mono font-bold text-charcoal">${o.order_number}</span>
+            <span class="text-mutedText block">${new Date(o.created_at).toLocaleDateString()} • ${o.order_status}</span>
+          </div>
+          <span class="font-bold text-charcoal">₹${Number(o.total).toLocaleString()}</span>
+        </div>
+      `).join('');
+    } else {
+      ordContainer.innerHTML = '<p class="text-mutedText">No orders placed yet.</p>';
+    }
+
+    modal.classList.remove('hidden');
+  } catch (err) {
+    alert(err.message || 'Error opening client details.');
+  }
+}
+
+function closeAdminUserModal() {
+  const modal = document.getElementById('adminUserModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function quickToggleSuspend(userId, shouldSuspend) {
+  if (!confirm(`Are you sure you want to ${shouldSuspend ? 'SUSPEND' : 'RESTORE'} this client's account?`)) return;
+
+  try {
+    const res = await fetch(`/api/admin/users/${userId}/suspend`, { method: 'POST' });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Failed to update suspension status.');
+
+    alert(data.message);
+    loadAdminUsers();
+  } catch (err) {
+    alert(err.message || 'Action failed.');
+  }
+}
+
+async function handleAdminToggleSuspend() {
+  if (!adminState.selectedUser) return;
+  const user = adminState.selectedUser.user;
+  await quickToggleSuspend(user.id, !user.is_suspended);
+  closeAdminUserModal();
+}
+
+async function handleAdminResetPassword() {
+  if (!adminState.selectedUser) return;
+  const user = adminState.selectedUser.user;
+
+  try {
+    const res = await fetch(`/api/admin/users/${user.id}/reset-password`, { method: 'POST' });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Could not generate reset link.');
+
+    prompt(`Generated Password Reset URL for client (${user.email}):`, window.location.origin + data.reset_url);
+  } catch (err) {
+    alert(err.message || 'Could not trigger reset.');
+  }
+}
+
+async function handleAdminExportData() {
+  if (!adminState.selectedUser) return;
+  const user = adminState.selectedUser.user;
+
+  try {
+    const res = await fetch(`/api/admin/users/${user.id}/export`);
+    const data = await res.json();
+    if (!data.success) throw new Error('Export failed.');
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `client_export_${user.email.replace(/[^a-z0-9]/gi, '_')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message || 'Data export failed.');
+  }
+}
+
+async function handleAdminDeleteUser() {
+  if (!adminState.selectedUser) return;
+  const user = adminState.selectedUser.user;
+
+  if (!confirm(`CAUTION: Are you sure you want to PERMANENTLY delete customer account ${user.email}? This cannot be undone.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/admin/users/${user.id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || 'Deletion failed.');
+
+    alert('Customer account deleted successfully.');
+    closeAdminUserModal();
+    loadAdminUsers();
+  } catch (err) {
+    alert(err.message || 'Could not delete customer.');
   }
 }

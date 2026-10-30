@@ -258,7 +258,8 @@ export const applyCoupon = (req, res) => {
 };
 export const createStoreOrder = async (req, res) => {
     try {
-        const { customer_name, customer_email, customer_phone, shipping_address, billing_address, items, coupon_code, payment_method, utr_id, notes, } = req.body;
+        const { customer_name, customer_email, customer_phone, shipping_address, billing_address, items, coupon_code, payment_method, utr_id, notes, user_id, } = req.body;
+        const resolvedUserId = user_id || req.user?.id || null;
         if (!customer_name || !customer_email || !customer_phone || !shipping_address) {
             return res.status(400).json({ success: false, message: 'Missing required customer details.' });
         }
@@ -326,11 +327,11 @@ export const createStoreOrder = async (req, res) => {
           order_number, customer_name, customer_email, customer_phone,
           shipping_address, billing_address, subtotal, discount,
           shipping_fee, tax, total, payment_method, payment_status,
-          razorpay_order_id, utr_id, order_status, notes
+          razorpay_order_id, utr_id, order_status, notes, user_id
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
-            const orderResult = insertOrderStmt.run(order_number, customer_name, customer_email, customer_phone, typeof shipping_address === 'object' ? JSON.stringify(shipping_address) : shipping_address, billing_address ? (typeof billing_address === 'object' ? JSON.stringify(billing_address) : billing_address) : null, subtotal, discount, shipping_fee, tax, total, payment_method || 'upi_scanner', initialPaymentStatus, razorpay_order_id, utr_id || null, payment_method === 'cod' ? 'Order Placed' : (payment_method === 'upi_scanner' ? 'Payment Submitted (UTR Verification)' : 'Awaiting Payment'), notes || '');
+            const orderResult = insertOrderStmt.run(order_number, customer_name, customer_email, customer_phone, typeof shipping_address === 'object' ? JSON.stringify(shipping_address) : shipping_address, billing_address ? (typeof billing_address === 'object' ? JSON.stringify(billing_address) : billing_address) : null, subtotal, discount, shipping_fee, tax, total, payment_method || 'upi_scanner', initialPaymentStatus, razorpay_order_id, utr_id || null, payment_method === 'cod' ? 'Order Placed' : (payment_method === 'upi_scanner' ? 'Payment Submitted (UTR Verification)' : 'Awaiting Payment'), notes || '', resolvedUserId);
             const orderId = orderResult.lastInsertRowid;
             // Insert line items
             const insertItemStmt = db.prepare(`
@@ -343,16 +344,16 @@ export const createStoreOrder = async (req, res) => {
         INSERT INTO custom_abaya_orders (
           order_id, customer_name, customer_email, customer_phone,
           silhouette, fabric, color, sleeve_style, cuffs, embroidery, details,
-          measurements, special_instructions, reference_image, estimated_price, production_status
+          measurements, special_instructions, reference_image, estimated_price, production_status, user_id
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Awaiting Review')
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Awaiting Review', ?)
       `);
             for (const item of items) {
                 insertItemStmt.run(orderId, item.product_id || null, item.title || 'Bespoke Item', item.variant_id || null, item.size || 'Standard', item.color || 'Standard', item.price, item.quantity || 1, item.custom_config ? JSON.stringify(item.custom_config) : null);
                 // If this item is a custom bespoke abaya, create entry in custom_abaya_orders queue!
                 if (item.custom_config) {
                     const cfg = item.custom_config;
-                    insertCustomAbayaStmt.run(orderId, customer_name, customer_email, customer_phone, cfg.silhouette || 'Custom Silhouette', cfg.fabric || 'Standard Crepe', cfg.color || 'Custom Color', cfg.sleeve_style || 'Bell Sleeve', cfg.cuffs || '', cfg.embroidery || '', cfg.details ? (Array.isArray(cfg.details) ? cfg.details.join(', ') : cfg.details) : '', JSON.stringify(cfg.measurements || {}), cfg.special_instructions || '', cfg.reference_image || null, item.price);
+                    insertCustomAbayaStmt.run(orderId, customer_name, customer_email, customer_phone, cfg.silhouette || 'Custom Silhouette', cfg.fabric || 'Standard Crepe', cfg.color || 'Custom Color', cfg.sleeve_style || 'Bell Sleeve', cfg.cuffs || '', cfg.embroidery || '', cfg.details ? (Array.isArray(cfg.details) ? cfg.details.join(', ') : cfg.details) : '', JSON.stringify(cfg.measurements || {}), cfg.special_instructions || '', cfg.reference_image || null, item.price, resolvedUserId);
                 }
             }
             return orderId;

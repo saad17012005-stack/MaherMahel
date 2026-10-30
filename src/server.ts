@@ -76,6 +76,14 @@ app.get('/', (_req, res) => {
   res.sendFile(resolvePublicFile('index.html'));
 });
 
+app.get('/account', (_req, res) => {
+  res.sendFile(resolvePublicFile('account.html'));
+});
+
+app.get(['/login', '/register', '/forgot-password', '/reset-password'], (_req, res) => {
+  res.sendFile(resolvePublicFile('auth.html'));
+});
+
 app.get('/admin', (_req, res) => {
   res.sendFile(resolvePublicFile('admin.html'));
 });
