@@ -485,9 +485,6 @@ async function loadSettings() {
 // 1. CYLINDRICAL 3D HERO CAROUSEL ENGINE (REELMARK ARCHITECTURE)
 // --------------------------------------------------------
 
-const VIDEO_SRC = 'https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/04fd3d5f-99d7-476e-98a4-46c08518ffb3.mp4';
-const POSTER_SRC = 'https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/b7ebb74a-8c8a-4f7e-8f80-55e2d74ecd05.webp';
-
 const CYLINDER_HERO_ITEMS = [
   {
     id: 1,
@@ -639,30 +636,14 @@ function initCylinderHeroCarousel() {
     const mediaWrapper = document.createElement('div');
     mediaWrapper.className = 'cylinder-card-media';
 
-    // Image Element (User Uploaded Look)
+    // Image Element (User Uploaded Boutique Look)
     const img = document.createElement('img');
     img.src = item.image;
     img.alt = item.title;
     img.className = 'cylinder-card-img';
     img.loading = idx < 4 ? 'eager' : 'lazy';
 
-    // Video Element (5x2 Grid Synchronized Clips)
-    const video = document.createElement('video');
-    video.src = VIDEO_SRC;
-    video.poster = POSTER_SRC;
-    video.muted = true;
-    video.loop = true;
-    video.playsInline = true;
-    video.autoplay = true;
-    video.className = 'cylinder-card-video';
-
-    // Position video tile within 5x2 grid
-    const col = idx % 5;
-    const row = Math.floor(idx / 5);
-    video.style.transform = `translate(-${col * 20}%, -${row * 50}%)`;
-
     mediaWrapper.appendChild(img);
-    mediaWrapper.appendChild(video);
 
     inner.appendChild(mediaWrapper);
     cardEl.appendChild(inner);
@@ -681,7 +662,6 @@ function initCylinderHeroCarousel() {
       el: cardEl,
       inner,
       img,
-      video,
       item,
       index: idx
     });
@@ -883,32 +863,6 @@ function setHeroFilter(category) {
   if (category === 'abayas') document.getElementById('heroTabAbayas')?.classList.add('active');
   if (category === 'traditional') document.getElementById('heroTabTrad')?.classList.add('active');
   if (category === 'handbags') document.getElementById('heroTabBags')?.classList.add('active');
-}
-
-// Toggle between Boutique Looks and Video Reels
-function toggleHeroMediaMode() {
-  cylinderState.currentMode = cylinderState.currentMode === 'fashion' ? 'video' : 'fashion';
-  const label = document.getElementById('heroMediaModeLabel');
-  const icon = document.getElementById('heroMediaModeIcon');
-
-  cylinderState.cards.forEach(c => {
-    if (cylinderState.currentMode === 'video') {
-      c.img.style.display = 'none';
-      c.video.style.display = 'block';
-      c.video.play().catch(() => {});
-    } else {
-      c.img.style.display = 'block';
-      c.video.style.display = 'none';
-    }
-  });
-
-  if (cylinderState.currentMode === 'video') {
-    if (label) label.textContent = 'Switch to Boutique Looks Mode';
-    if (icon) icon.textContent = '✨';
-  } else {
-    if (label) label.textContent = 'Switch to Video Reels Mode';
-    if (icon) icon.textContent = '🎬';
-  }
 }
 
 // Legacy Slide Helpers for backward compatibility
