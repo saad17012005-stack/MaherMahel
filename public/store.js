@@ -221,24 +221,24 @@ const DEFAULT_PRODUCTS = [
   },
   {
     id: 8,
-    title: 'Heritage Rose Gold Mesh Watch',
-    slug: 'heritage-rose-gold-mesh-watch',
+    title: 'Diamond Crystal Pavé Rose Gold Watch',
+    slug: 'diamond-crystal-pave-rose-gold-watch',
     category_id: 4,
     category_name: 'Watches',
     category_slug: 'watches',
-    price: 5299,
-    compare_at_price: 6499,
+    price: 6499,
+    compare_at_price: 7999,
     is_new_arrival: 1,
     is_best_seller: 1,
-    short_description: 'Ultra-slim 6mm rose gold timepiece with Milanese mesh strap.',
-    description: 'An ultra-slim 6mm profile engineered to slide comfortably under abaya sleeves without catching. Features an ivory enamel dial, rose gold Milanese magnetic strap, and Japanese quartz movement.',
+    short_description: 'Radiant rose gold timepiece adorned with diamond crystal pavé bracelet.',
+    description: 'A breathtaking jewelry watch designed for celebration and formal elegance. Features a brilliant crystal-encrusted bezel and bracelet, polished rose gold sunburst dial with Roman numerals, and royal blue hands.',
     images: [
-      'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=900&auto=format&fit=crop'
+      '/images/products/watch-rose-gold-diamond.png'
     ],
-    fabric_care: 'Case: 32mm Rose Gold Stainless Steel. Water Resistance: 3 ATM (Splash resistant).',
-    tags: ['watch', 'rose-gold', 'mesh', 'slim', 'minimal'],
+    fabric_care: 'Case: 32mm Rose Gold Alloy & Pavé Crystals. Japanese Quartz Movement.',
+    tags: ['watch', 'rose-gold', 'diamond', 'crystal', 'luxury'],
     variants: [
-      { id: 23, size: '32mm', color: 'Rose Gold' }
+      { id: 23, size: 'Free Size (Adjustable)', color: 'Rose Gold & Diamond' }
     ]
   },
   {
@@ -255,7 +255,7 @@ const DEFAULT_PRODUCTS = [
     short_description: 'Genuine mother-of-pearl face with antique gold fluted bezel.',
     description: 'Captivating iridescent natural mother-of-pearl dial enclosed within an antique gold fluted bezel set with subtle crystal markers. Fitted with an interchangeable genuine leather strap in blush pink.',
     images: [
-      'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=900&auto=format&fit=crop'
+      '/images/products/watch-rose-gold-diamond.png'
     ],
     fabric_care: 'Dial: Genuine White MOP. Movement: Swiss Quartz. Glass: Sapphire Coated.',
     tags: ['watch', 'mother-of-pearl', 'gold', 'blush'],
@@ -578,13 +578,13 @@ const CYLINDER_HERO_ITEMS = [
   },
   {
     id: 10,
-    title: 'Noor Black Crepe Open-Front Abaya',
-    category: 'Abayas',
-    category_slug: 'abayas',
-    price: '₹4,999',
-    tag: 'Silk Crepe Abaya',
-    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop',
-    productId: 1
+    title: 'Diamond Crystal Pavé Rose Gold Watch',
+    category: 'Watches',
+    category_slug: 'handbags',
+    price: '₹6,499',
+    tag: 'Diamond Rose Gold Watch',
+    image: '/images/hero/watch-rose-gold-diamond.png',
+    productId: 8
   }
 ];
 
