@@ -10,7 +10,7 @@ const DEFAULT_HERO_SLIDES = [
     description: 'Discover graceful abayas and thoughtfully curated pieces designed for the woman who appreciates timeless modest luxury.',
     desktop_image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=2000&auto=format&fit=crop',
     mobile_image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=1000&auto=format&fit=crop',
-    focal_position: 'center 58%',
+    focal_position: 'center 38%',
     cta_primary_text: 'Shop Abayas',
     cta_primary_link: '#shop-section',
     cta_secondary_text: 'Explore Collection',
@@ -23,7 +23,7 @@ const DEFAULT_HERO_SLIDES = [
     description: 'Create an abaya that reflects your individuality, from the drape of silk crepe to delicate pearl and antique gold hand-finishes.',
     desktop_image: 'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=2000&auto=format&fit=crop',
     mobile_image: 'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?q=80&w=1000&auto=format&fit=crop',
-    focal_position: 'center 45%',
+    focal_position: 'center 38%',
     cta_primary_text: 'Design Your Abaya',
     cta_primary_link: '#custom-abaya-section',
     cta_secondary_text: 'View Size Guide',
@@ -357,26 +357,26 @@ function renderHeroSlides() {
   state.heroSlides.forEach((slide, idx) => {
     const slideEl = document.createElement('div');
     slideEl.className = `hero-slide ${idx === 0 ? 'active' : ''}`;
-    const focalPos = slide.focal_position || (idx === 0 ? 'center 58%' : (idx === 1 ? 'center 45%' : 'center center'));
+    const focalPos = slide.focal_position || (idx === 0 ? 'center 38%' : (idx === 1 ? 'center 38%' : 'center center'));
     slideEl.innerHTML = `
       <picture class="w-full h-full block">
-        <source media="(max-width: 640px)" srcset="${slide.mobile_image || slide.desktop_image}">
+        <source media="(max-width: 768px)" srcset="${slide.mobile_image || slide.desktop_image}">
         <img src="${slide.desktop_image}" alt="${slide.heading}" class="hero-image w-full h-full object-cover" style="object-position: ${focalPos};">
       </picture>
       <div class="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-charcoal/40 to-charcoal/25"></div>
       <div class="absolute inset-0 flex items-center justify-center text-center p-6 sm:p-8">
-        <div class="max-w-2xl text-white">
+        <div class="max-w-3xl text-white px-4">
           <span class="text-[11px] sm:text-xs uppercase tracking-[0.3em] text-champagneGold font-semibold mb-3 block drop-shadow-sm">${slide.eyebrow || 'MEHER MAHEL ATELIER'}</span>
-          <h1 class="font-serif text-3xl sm:text-5xl md:text-6xl font-bold mb-4 tracking-tight leading-tight drop-shadow-md">${slide.heading}</h1>
-          <p class="text-xs sm:text-sm md:text-base text-ivory/95 font-light mb-8 max-w-lg mx-auto leading-relaxed drop-shadow">${slide.description || ''}</p>
+          <h1 class="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 tracking-tight leading-tight drop-shadow-md">${slide.heading}</h1>
+          <p class="text-xs sm:text-sm md:text-base lg:text-lg text-ivory/95 font-light mb-8 max-w-xl mx-auto leading-relaxed drop-shadow">${slide.description || ''}</p>
           <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             ${slide.cta_primary_text ? `
-              <a href="${slide.cta_primary_link || '#shop-section'}" class="bg-dustyRose hover:bg-deepRose text-white text-[11px] sm:text-xs uppercase tracking-widest font-semibold px-7 sm:px-8 py-3.5 rounded-full transition-all shadow-xl shadow-dustyRose/30 gold-sheen-hover active:scale-95">
+              <a href="${slide.cta_primary_link || '#shop-section'}" class="bg-dustyRose hover:bg-deepRose text-white text-[11px] sm:text-xs uppercase tracking-widest font-semibold px-8 py-3.5 rounded-full transition-all shadow-xl shadow-dustyRose/30 gold-sheen-hover active:scale-95">
                 ${slide.cta_primary_text}
               </a>
             ` : ''}
             ${slide.cta_secondary_text ? `
-              <button onclick="handleSlideSecondaryCTA('${slide.cta_secondary_link}')" class="border border-white/80 hover:bg-white hover:text-charcoal text-white text-[11px] sm:text-xs uppercase tracking-widest font-semibold px-7 sm:px-8 py-3.5 rounded-full transition-all backdrop-blur-sm active:scale-95">
+              <button onclick="handleSlideSecondaryCTA('${slide.cta_secondary_link}')" class="border border-white/80 hover:bg-white hover:text-charcoal text-white text-[11px] sm:text-xs uppercase tracking-widest font-semibold px-8 py-3.5 rounded-full transition-all backdrop-blur-sm active:scale-95">
                 ${slide.cta_secondary_text}
               </button>
             ` : ''}
