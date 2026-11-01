@@ -715,16 +715,13 @@ function setupCylinderDragging(stage) {
     const dt = (now - cylinderState.lastDragTime) / 1000;
     const dx = clientX - cylinderState.lastDragX;
 
-    const isMobile = stage ? stage.clientWidth < 768 : false;
     const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stage.clientWidth / 1440);
-    
-    // 1:1 direct tracking in pixels on mobile, frame-unit scaled on desktop
-    const delta = isMobile ? dx : (dx / Math.max(u, 0.4));
+    const deltaU = dx / Math.max(u, 0.4);
 
-    cylinderState.scrollPos -= delta;
+    cylinderState.scrollPos -= deltaU;
 
     if (dt > 0.008) {
-      cylinderState.velocity = -delta / dt;
+      cylinderState.velocity = -deltaU / dt;
       cylinderState.lastDragTime = now;
       cylinderState.lastDragX = clientX;
     }
@@ -767,30 +764,11 @@ function renderCylinderLoop(time) {
 
   const stageWidth = stage.clientWidth;
   const stageHeight = stage.clientHeight;
-  const isMobile = stageWidth < 768;
+  const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stageWidth / 1440);
 
   // Safety checks against NaN
   if (isNaN(cylinderState.scrollPos)) cylinderState.scrollPos = 0;
   if (isNaN(cylinderState.velocity)) cylinderState.velocity = 0;
-
-  // Responsive geometry parameters:
-  // On mobile: large, prominent luxury cards (~235px x 355px) with 3 cards visible (center + 2 peeks)
-  // On desktop: wide 1440 panoramic curve (170px x 280px at u=1)
-  let pitch, baseW, baseH, normRadius, totalTrack;
-
-  if (isMobile) {
-    baseW = Math.min(Math.max(stageWidth * 0.62, 210), 255);
-    baseH = Math.round(baseW * 1.5);
-    pitch = Math.round(baseW + 24);
-    normRadius = Math.round(stageWidth * 0.75);
-    totalTrack = cylinderState.NUM_CARDS * pitch;
-  } else {
-    pitch = cylinderState.PITCH; // 196
-    baseW = 170;
-    baseH = 280;
-    normRadius = cylinderState.RADIUS_NORM; // 706
-    totalTrack = cylinderState.TOTAL_TRACK; // 1960
-  }
 
   // Continuous Auto-Scroll & Coasting physics
   if (!cylinderState.isDragging) {
@@ -798,112 +776,73 @@ function renderCylinderLoop(time) {
       cylinderState.scrollPos += cylinderState.velocity * dt;
       cylinderState.velocity *= Math.pow(0.05, dt); // 95% decay per second
     } else {
-      const speed = isMobile ? 42 : (cylinderState.AUTO_SPEED || 52);
-      cylinderState.scrollPos += speed * dt;
+      // Unconditional smooth right->left autoscroll
+      cylinderState.scrollPos += (cylinderState.AUTO_SPEED || 52) * dt;
     }
   }
 
   // Seamless track wrap
-  cylinderState.scrollPos = ((cylinderState.scrollPos % totalTrack) + totalTrack) % totalTrack;
-
-  const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stageWidth / 1440);
+  cylinderState.scrollPos = ((cylinderState.scrollPos % cylinderState.TOTAL_TRACK) + cylinderState.TOTAL_TRACK) % cylinderState.TOTAL_TRACK;
 
   // Render each card according to cylindrical geometry specification
   cylinderState.cards.forEach((cardObj, i) => {
-    let rawX = (i * pitch - cylinderState.scrollPos) % totalTrack;
-    if (rawX < -pitch * 2) rawX += totalTrack;
-    if (rawX > totalTrack - pitch * 2) rawX -= totalTrack;
+    let rawX = (i * cylinderState.PITCH - cylinderState.scrollPos) % cylinderState.TOTAL_TRACK;
+    if (rawX < -cylinderState.PITCH * 2) rawX += cylinderState.TOTAL_TRACK;
+    if (rawX > cylinderState.TOTAL_TRACK - cylinderState.PITCH * 2) rawX -= cylinderState.TOTAL_TRACK;
 
-    if (isMobile) {
-      // MOBILE CYLINDRICAL GEOMETRY:
-      // Offset from center of screen
-      let t = rawX + (pitch / 2) - (totalTrack / 2);
-      while (t < -totalTrack / 2) t += totalTrack;
-      while (t > totalTrack / 2) t -= totalTrack;
+    // Unpushed offset from center
+    const t = rawX + (cylinderState.PITCH / 2) - cylinderState.CENTER_X;
 
-      const tRatio = t / normRadius;
-      const pushedOffset = t * (1 + 0.06 * tRatio * tRatio);
-      const d = Math.abs(pushedOffset) / normRadius;
+    // Cylinder Push: x = 720 + t·(1 + 0.083·(t/706)²)
+    const tRatio = t / cylinderState.RADIUS_NORM;
+    const pushedX = cylinderState.CENTER_X + t * (1 + 0.083 * tRatio * tRatio);
 
-      // Card width & height on mobile
-      const width = baseW * (1 + 0.08 * d * d);
-      const qLeft = Math.abs(pushedOffset - width / 2) / normRadius;
-      const qRight = Math.abs(pushedOffset + width / 2) / normRadius;
-      const hLeft = baseH * (1 + 0.12 * Math.pow(Math.min(qLeft, 2), 2.2));
-      const hRight = baseH * (1 + 0.12 * Math.pow(Math.min(qRight, 2), 2.2));
-      const maxH = Math.max(hLeft, hRight);
-      const yOffset = -10 * d * d;
+    // Normalized distance d = |x - 720| / 706
+    const d = Math.abs(pushedX - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
 
-      const pxX = (stageWidth / 2) + pushedOffset - width / 2;
-      const pxY = (stageHeight / 2) + yOffset - maxH / 2;
+    // Width = (170 + 48·d²)u
+    const width = (170 + 48 * d * d);
 
-      const el = cardObj.el;
-      el.style.width = `${width}px`;
-      el.style.height = `${maxH}px`;
-      el.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
+    // Edge normalized distances
+    const xLeft = pushedX - width / 2;
+    const xRight = pushedX + width / 2;
+    const qLeft = Math.abs(xLeft - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
+    const qRight = Math.abs(xRight - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
 
-      // Rounded quad clip path
-      const wPx = width;
-      const rPx = 16;
-      const yTopLeft = (maxH - hLeft) / 2;
-      const yBottomLeft = yTopLeft + hLeft;
-      const yTopRight = (maxH - hRight) / 2;
-      const yBottomRight = yTopRight + hRight;
+    // Heights = (280 + 92·q^2.6)u
+    const hLeft = 280 + 92 * Math.pow(qLeft, 2.6);
+    const hRight = 280 + 92 * Math.pow(qRight, 2.6);
 
-      const path = `M 0,${yTopLeft + rPx} Q 0,${yTopLeft} ${rPx},${yTopLeft} L ${wPx - rPx},${yTopRight} Q ${wPx},${yTopRight} ${wPx},${yTopRight + rPx} L ${wPx},${yBottomRight - rPx} Q ${wPx},${yBottomRight} ${wPx - rPx},${yBottomRight} L ${rPx},${yBottomLeft} Q 0,${yBottomLeft} 0,${yBottomLeft - rPx} Z`;
-      el.style.clipPath = `path('${path}')`;
-      el.style.webkitClipPath = `path('${path}')`;
+    // Vertical centre = (687 - 12·d²)u
+    const yCenterOffset = (687 - 12 * d * d) - 687;
 
-      el.style.zIndex = Math.round(100 - d * 25);
-    } else {
-      // DESKTOP CYLINDRICAL GEOMETRY:
-      const t = rawX + (pitch / 2) - cylinderState.CENTER_X;
-      const tRatio = t / cylinderState.RADIUS_NORM;
-      const pushedX = cylinderState.CENTER_X + t * (1 + 0.083 * tRatio * tRatio);
-      const d = Math.abs(pushedX - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
-      const width = (170 + 48 * d * d);
-      const xLeft = pushedX - width / 2;
-      const xRight = pushedX + width / 2;
-      const qLeft = Math.abs(xLeft - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
-      const qRight = Math.abs(xRight - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
-      const hLeft = 280 + 92 * Math.pow(qLeft, 2.6);
-      const hRight = 280 + 92 * Math.pow(qRight, 2.6);
-      const yCenterOffset = (687 - 12 * d * d) - 687;
+    // Screen pixel conversion (perfect center alignment for mobile & desktop)
+    const pxX = (stageWidth / 2) + (pushedX - cylinderState.CENTER_X) * u - (width * u) / 2;
+    const maxH = Math.max(hLeft, hRight);
+    const pxY = (stageHeight / 2) + (yCenterOffset * u) - (maxH * u) / 2;
 
-      const pxX = (stageWidth / 2) + (pushedX - cylinderState.CENTER_X) * u - (width * u) / 2;
-      const maxH = Math.max(hLeft, hRight);
-      const pxY = (stageHeight / 2) + (yCenterOffset * u) - (maxH * u) / 2;
+    const el = cardObj.el;
+    el.style.width = `${width * u}px`;
+    el.style.height = `${maxH * u}px`;
+    el.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
 
-      const el = cardObj.el;
-      el.style.width = `${width * u}px`;
-      el.style.height = `${maxH * u}px`;
-      el.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
+    // Rounded quad clip path
+    const wPx = width * u;
+    const rPx = Math.max(8, 14 * u);
+    const yTopLeft = ((maxH - hLeft) / 2) * u;
+    const yBottomLeft = yTopLeft + hLeft * u;
+    const yTopRight = ((maxH - hRight) / 2) * u;
+    const yBottomRight = yTopRight + hRight * u;
 
-      const wPx = width * u;
-      const rPx = Math.max(8, 14 * u);
-      const yTopLeft = ((maxH - hLeft) / 2) * u;
-      const yBottomLeft = yTopLeft + hLeft * u;
-      const yTopRight = ((maxH - hRight) / 2) * u;
-      const yBottomRight = yTopRight + hRight * u;
+    const path = `M 0,${yTopLeft + rPx} Q 0,${yTopLeft} ${rPx},${yTopLeft} L ${wPx - rPx},${yTopRight} Q ${wPx},${yTopRight} ${wPx},${yTopRight + rPx} L ${wPx},${yBottomRight - rPx} Q ${wPx},${yBottomRight} ${wPx - rPx},${yBottomRight} L ${rPx},${yBottomLeft} Q 0,${yBottomLeft} 0,${yBottomLeft - rPx} Z`;
+    el.style.clipPath = `path('${path}')`;
+    el.style.webkitClipPath = `path('${path}')`;
 
-      const path = `M 0,${yTopLeft + rPx} Q 0,${yTopLeft} ${rPx},${yTopLeft} L ${wPx - rPx},${yTopRight} Q ${wPx},${yTopRight} ${wPx},${yTopRight + rPx} L ${wPx},${yBottomRight - rPx} Q ${wPx},${yBottomRight} ${wPx - rPx},${yBottomRight} L ${rPx},${yBottomLeft} Q 0,${yBottomLeft} 0,${yBottomLeft - rPx} Z`;
-      el.style.clipPath = `path('${path}')`;
-      el.style.webkitClipPath = `path('${path}')`;
-
-      el.style.zIndex = Math.round(100 - d * 30);
-    }
+    // Z-index depth layering
+    el.style.zIndex = Math.round(100 - d * 30);
 
     // Filter dimming / highlighting
     if (cylinderState.currentFilter === 'all' || cardObj.item.category_slug === cylinderState.currentFilter) {
-      el.style.opacity = '1';
-      el.style.pointerEvents = 'auto';
-    } else {
-      el.style.opacity = '0.35';
-    }
-  });
-
-  requestAnimationFrame(renderCylinderLoop);
-}
       el.style.opacity = '1';
       el.style.pointerEvents = 'auto';
     } else {
