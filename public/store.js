@@ -422,24 +422,63 @@ document.addEventListener('DOMContentLoaded', () => {
 // Initialize Client Auth State in Navigation
 async function initAuthSession() {
   const token = localStorage.getItem('mm_token');
-  if (!token) return;
 
   try {
     const res = await fetch('/api/auth/me', {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      credentials: 'same-origin',
     });
     const data = await res.json();
     if (data.success && data.user) {
       state.currentUser = data.user;
+      const isAdmin = data.user.role === 'admin' && data.user.email.toLowerCase() === 'lmbhfarah@gmail.com';
+
+      // Admin button visibility (strictly owner only!)
+      const headerAdmin = document.getElementById('headerAdminLink');
+      if (headerAdmin) headerAdmin.style.display = isAdmin ? 'flex' : 'none';
+      const drawerAdmin = document.getElementById('mobileDrawerAdminLink');
+      if (drawerAdmin) drawerAdmin.style.display = isAdmin ? 'block' : 'none';
+      const footerAdmin = document.getElementById('footerAdminLink');
+      if (footerAdmin) footerAdmin.style.display = isAdmin ? 'block' : 'none';
+
       const nameEl = document.getElementById('headerAccountName');
-      if (nameEl) nameEl.textContent = (data.user.full_name || 'Account').split(' ')[0];
+      if (nameEl) nameEl.textContent = isAdmin ? 'Admin' : (data.user.full_name || 'Account').split(' ')[0];
       const avatarEl = document.getElementById('headerAccountAvatar');
       if (avatarEl) {
         avatarEl.innerHTML = `<span>${(data.user.full_name || 'M').charAt(0).toUpperCase()}</span>`;
-        avatarEl.className = 'w-7 h-7 rounded-full bg-dustyRose text-white text-xs font-serif font-bold flex items-center justify-center shadow-sm';
+        avatarEl.className = isAdmin
+          ? 'w-7 h-7 rounded-full bg-emerald-600 text-white text-xs font-serif font-bold flex items-center justify-center shadow-sm'
+          : 'w-7 h-7 rounded-full bg-dustyRose text-white text-xs font-serif font-bold flex items-center justify-center shadow-sm';
       }
       const mobileBadge = document.getElementById('mobileAccountBadge');
-      if (mobileBadge) mobileBadge.textContent = 'Portal';
+      if (mobileBadge) mobileBadge.textContent = isAdmin ? 'Admin' : 'Portal';
+
+      // Restore cart from database
+      if (state.cart.length === 0) {
+        fetch('/api/user/cart', {
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+          credentials: 'same-origin',
+        })
+          .then(r => r.json())
+          .then(cData => {
+            if (cData.success && Array.isArray(cData.cart) && cData.cart.length > 0) {
+              state.cart = cData.cart;
+              localStorage.setItem('mm_cart', JSON.stringify(state.cart));
+              updateCartUI();
+            }
+          })
+          .catch(() => {});
+      } else {
+        fetch('/api/user/cart', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify({ cart: state.cart }),
+        }).catch(() => {});
+      }
 
       // Sync local wishlist to database
       const localWishlist = JSON.parse(localStorage.getItem('mm_wishlist') || '[]');
@@ -447,14 +486,29 @@ async function initAuthSession() {
         fetch('/api/user/wishlist/sync', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
           },
-          body: JSON.stringify({ product_ids: localWishlist })
+          credentials: 'same-origin',
+          body: JSON.stringify({ product_ids: localWishlist }),
         }).catch(() => {});
       }
+    } else {
+      const headerAdmin = document.getElementById('headerAdminLink');
+      if (headerAdmin) headerAdmin.style.display = 'none';
+      const drawerAdmin = document.getElementById('mobileDrawerAdminLink');
+      if (drawerAdmin) drawerAdmin.style.display = 'none';
+      const footerAdmin = document.getElementById('footerAdminLink');
+      if (footerAdmin) footerAdmin.style.display = 'none';
     }
-  } catch (e) {}
+  } catch (e) {
+    const headerAdmin = document.getElementById('headerAdminLink');
+    if (headerAdmin) headerAdmin.style.display = 'none';
+    const drawerAdmin = document.getElementById('mobileDrawerAdminLink');
+    if (drawerAdmin) drawerAdmin.style.display = 'none';
+    const footerAdmin = document.getElementById('footerAdminLink');
+    if (footerAdmin) footerAdmin.style.display = 'none';
+  }
 }
 
 // Load Settings from API

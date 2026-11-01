@@ -3,14 +3,14 @@ import bcrypt from 'bcryptjs';
 
 export function seedAuthUsers() {
   try {
-    const adminEmail = (process.env.ADMIN_EMAIL || 'admin@mehermahel.com').toLowerCase();
-    const adminPassword = process.env.ADMIN_PASSWORD || 'admin12345';
+    const adminEmail = (process.env.ADMIN_EMAIL_ALLOWLIST || process.env.ADMIN_EMAIL || 'lmbhfarah@gmail.com').toLowerCase().split(',')[0].trim();
+    const adminPassword = process.env.ADMIN_PASSWORD || 'Farah123';
 
     const existingAdmin = db.prepare('SELECT id FROM auth_users WHERE email = ?').get(adminEmail);
     if (!existingAdmin) {
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(adminPassword, salt);
-      const adminId = 'usr_admin_mehermahel_root';
+      const adminId = 'usr_admin_farah_root';
 
       db.prepare(`
         INSERT INTO auth_users (id, email, password_hash, role, is_verified, verification_token)
@@ -19,10 +19,15 @@ export function seedAuthUsers() {
 
       db.prepare(`
         INSERT INTO profiles (id, email, full_name, phone, avatar_url, role, is_verified)
-        VALUES (?, ?, 'Meher Mahel Administrator', '+91 76098 74187', NULL, 'admin', 1)
+        VALUES (?, ?, 'Farah (Administrator)', '+91 76098 74187', NULL, 'admin', 1)
       `).run(adminId, adminEmail);
 
       console.log(`[Seed] Bootstrap Administrator created: ${adminEmail}`);
+    } else {
+      try {
+        db.prepare(`UPDATE auth_users SET role = 'admin', is_verified = 1 WHERE email = ?`).run(adminEmail);
+        db.prepare(`UPDATE profiles SET role = 'admin', is_verified = 1 WHERE email = ?`).run(adminEmail);
+      } catch {}
     }
 
     // Sample Customer Account

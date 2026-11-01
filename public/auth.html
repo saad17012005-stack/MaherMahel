@@ -31,6 +31,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="bg-ivory text-charcoal font-sans min-h-screen flex flex-col justify-between selection:bg-dustyRose/20">
 
@@ -61,10 +63,25 @@
 
       <!-- 1. LOGIN VIEW -->
       <div id="loginView">
-        <div class="text-center mb-7">
+        <div class="text-center mb-6">
           <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">CLIENT PRIVILEGE</span>
           <h1 class="font-serif text-3xl font-bold text-charcoal mt-1">Welcome Back</h1>
           <p class="text-xs text-mutedText mt-1.5">Sign in to access your boutique orders, saved addresses, and wishlist.</p>
+        </div>
+
+        <!-- Google Sign-In Option -->
+        <div class="space-y-2 mb-5">
+          <div id="googleBtnContainer" class="flex justify-center"></div>
+          <button type="button" onclick="initiateGoogleOAuthRedirect()" class="w-full flex items-center justify-center gap-2.5 py-3 px-4 border border-subtleBorder rounded-full bg-white hover:bg-slate-50 text-xs font-semibold text-charcoal transition-all shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            <span>Continue with Google</span>
+          </button>
+        </div>
+
+        <div class="relative flex items-center justify-center my-5">
+          <div class="border-t border-subtleBorder w-full"></div>
+          <span class="bg-white px-3 text-[10px] uppercase tracking-widest text-mutedText font-semibold">Or with Email</span>
+          <div class="border-t border-subtleBorder w-full"></div>
         </div>
 
         <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
@@ -89,7 +106,7 @@
           <div class="flex items-center justify-between pt-1">
             <label class="flex items-center gap-2 cursor-pointer text-xs text-mutedText select-none">
               <input type="checkbox" id="loginRemember" checked class="rounded border-subtleBorder text-dustyRose focus:ring-dustyRose">
-              <span>Remember this session</span>
+              <span>Remember this session (30 days)</span>
             </label>
           </div>
 
@@ -112,6 +129,20 @@
           <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">JOIN THE ATELIER</span>
           <h1 class="font-serif text-3xl font-bold text-charcoal mt-1">Create Account</h1>
           <p class="text-xs text-mutedText mt-1.5">Enjoy curated modest luxury, bespoke abaya tailoring, and priority delivery.</p>
+        </div>
+
+        <!-- Google Register Option -->
+        <div class="mb-4">
+          <button type="button" onclick="initiateGoogleOAuthRedirect()" class="w-full flex items-center justify-center gap-2.5 py-3 px-4 border border-subtleBorder rounded-full bg-white hover:bg-slate-50 text-xs font-semibold text-charcoal transition-all shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            <span>Continue with Google</span>
+          </button>
+        </div>
+
+        <div class="relative flex items-center justify-center my-4">
+          <div class="border-t border-subtleBorder w-full"></div>
+          <span class="bg-white px-3 text-[10px] uppercase tracking-widest text-mutedText font-semibold">Or with Email</span>
+          <div class="border-t border-subtleBorder w-full"></div>
         </div>
 
         <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-3.5">
@@ -199,9 +230,9 @@
       <!-- 4. RESET PASSWORD VIEW (TOKEN IN URL) -->
       <div id="resetView" class="hidden">
         <div class="text-center mb-6">
-          <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">SECURE CREDENTIALS</span>
+          <span class="text-[10px] uppercase tracking-[0.25em] text-antiqueGold font-bold">NEW CREDENTIALS</span>
           <h1 class="font-serif text-3xl font-bold text-charcoal mt-1">Set New Password</h1>
-          <p class="text-xs text-mutedText mt-1.5">Please choose a strong, secure password for your account.</p>
+          <p class="text-xs text-mutedText mt-1.5">Please enter and confirm your new secure boutique password.</p>
         </div>
 
         <form id="resetForm" onsubmit="handleResetPassword(event)" class="space-y-4">
@@ -220,7 +251,7 @@
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1.5">Confirm New Password *</label>
             <div class="relative">
-              <input type="password" id="resetConfirmPassword" required placeholder="Re-enter new password" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors pr-10">
+              <input type="password" id="resetConfirmPassword" required placeholder="Re-enter password" class="w-full text-xs p-3.5 rounded-xl border border-subtleBorder focus:border-dustyRose focus:outline-none transition-colors pr-10">
               <button type="button" onclick="togglePasswordVisibility('resetConfirmPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-mutedText hover:text-charcoal p-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
               </button>
@@ -252,6 +283,33 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const redirectUrl = urlParams.get('redirect') || '/account';
+
+    // Handle OAuth Callback params if redirected back
+    const oauthToken = urlParams.get('token');
+    const authSuccess = urlParams.get('auth_success');
+    const authError = urlParams.get('error');
+
+    if (oauthToken && authSuccess) {
+      localStorage.setItem('mm_token', oauthToken);
+      fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${oauthToken}` } })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.user) {
+            localStorage.setItem('mm_user', JSON.stringify(data.user));
+            showAlert('success', `Welcome, ${data.user.full_name}! Redirecting...`);
+            setTimeout(() => {
+              window.location.href = (data.user.role === 'admin') ? '/admin' : redirectUrl;
+            }, 600);
+          } else {
+            window.location.href = redirectUrl;
+          }
+        })
+        .catch(() => {
+          window.location.href = redirectUrl;
+        });
+    } else if (authError) {
+      showAlert('error', decodeURIComponent(authError));
+    }
 
     // Toggle views
     function switchView(viewName) {
@@ -316,20 +374,76 @@
       switchView('login');
     }
 
-    // Auto-redirect if already signed in
+    // Auto-redirect if already signed in (unless explicitly switching account)
+    const switchParam = urlParams.get('switch');
     const existingToken = localStorage.getItem('mm_token');
-    if (existingToken && !tokenParam && initialMode !== 'reset') {
+    if (existingToken && !tokenParam && initialMode !== 'reset' && !authSuccess && !switchParam) {
       fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${existingToken}` } })
         .then(r => r.json())
         .then(data => {
-          if (data.success) {
-            window.location.href = redirectUrl;
+          if (data.success && data.user) {
+            const dest = (data.user.role === 'admin' && redirectUrl === '/admin') ? '/admin' : redirectUrl;
+            window.location.href = dest;
           }
         })
         .catch(() => {});
     }
 
-    // Form handlers
+    // Google Sign-In Callback (Google Identity Services)
+    async function handleGoogleCredentialResponse(response) {
+      showAlert('', '');
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential, remember_me: true }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Google sign-in failed.');
+
+        localStorage.setItem('mm_token', data.token);
+        localStorage.setItem('mm_user', JSON.stringify(data.user));
+
+        showAlert('success', data.message || 'Signed in with Google! Redirecting...');
+        setTimeout(() => {
+          const dest = (data.user.role === 'admin') ? '/admin' : redirectUrl;
+          window.location.href = dest;
+        }, 600);
+      } catch (err) {
+        showAlert('error', err.message || 'Google authentication error.');
+      }
+    }
+
+    // Initiate Google OAuth Redirect flow
+    function initiateGoogleOAuthRedirect() {
+      window.location.href = `/api/auth/google/login?redirect=${encodeURIComponent(redirectUrl)}&remember=1`;
+    }
+
+    // Dynamically initialize Google One Tap / GSI if Client ID configured
+    fetch('/api/auth/google/config')
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.clientId && window.google?.accounts?.id) {
+          window.google.accounts.id.initialize({
+            client_id: data.clientId,
+            callback: handleGoogleCredentialResponse,
+            auto_prompt: false
+          });
+          const btn = document.getElementById('googleBtnContainer');
+          if (btn) {
+            window.google.accounts.id.renderButton(btn, {
+              theme: 'outline',
+              size: 'large',
+              width: 320,
+              text: 'continue_with',
+              shape: 'pill'
+            });
+          }
+        }
+      })
+      .catch(() => {});
+
+    // Email/Password Login
     async function handleLogin(e) {
       e.preventDefault();
       const btn = document.getElementById('loginSubmitBtn');
@@ -355,7 +469,8 @@
 
         showAlert('success', 'Sign in successful! Redirecting...');
         setTimeout(() => {
-          window.location.href = redirectUrl;
+          const dest = (data.user.role === 'admin') ? '/admin' : redirectUrl;
+          window.location.href = dest;
         }, 600);
       } catch (err) {
         showAlert('error', err.message || 'Invalid email or password.');
@@ -364,6 +479,7 @@
       }
     }
 
+    // Email Registration
     async function handleRegister(e) {
       e.preventDefault();
       const btn = document.getElementById('regSubmitBtn');
@@ -399,7 +515,8 @@
 
         showAlert('success', 'Account created! Welcome to Meher Mahel. Redirecting...');
         setTimeout(() => {
-          window.location.href = redirectUrl;
+          const dest = (data.user.role === 'admin') ? '/admin' : redirectUrl;
+          window.location.href = dest;
         }, 800);
       } catch (err) {
         showAlert('error', err.message || 'Registration failed.');
@@ -408,6 +525,7 @@
       }
     }
 
+    // Forgot Password
     async function handleForgotPassword(e) {
       e.preventDefault();
       const btn = document.getElementById('forgotSubmitBtn');
@@ -433,6 +551,7 @@
       }
     }
 
+    // Reset Password
     async function handleResetPassword(e) {
       e.preventDefault();
       const btn = document.getElementById('resetSubmitBtn');

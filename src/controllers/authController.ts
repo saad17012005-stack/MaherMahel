@@ -2,12 +2,124 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
 import { db } from '../database/db.js';
-import { signToken, AuthRequest } from '../middleware/authMiddleware.js';
+import { signToken, AuthRequest, isAdminEmail } from '../middleware/authMiddleware.js';
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+
+// Public Google OAuth Client Config
+export const getGoogleAuthConfig = (_req: Request, res: Response) => {
+  return res.json({
+    clientId: GOOGLE_CLIENT_ID,
+  });
+};
 
 // Helper to generate UUID
 const generateId = (prefix: string = 'usr'): string => {
   return `${prefix}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
 };
+
+// Helper to set secure auth cookie
+const setAuthCookie = (res: Response, token: string, rememberMe: boolean = true) => {
+  const isProd = process.env.NODE_ENV === 'production';
+  const maxAge = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+  res.cookie('auth_token', token, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: 'lax',
+    maxAge,
+    path: '/',
+  });
+};
+
+// Helper to clear auth cookie
+const clearAuthCookie = (res: Response) => {
+  const isProd = process.env.NODE_ENV === 'production';
+  res.clearCookie('auth_token', {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: 'lax',
+    path: '/',
+  });
+};
+
+// Helper: Provision or link a Google authenticated user
+async function provisionGoogleUser({
+  email,
+  name,
+  picture,
+  email_verified,
+}: {
+  email: string;
+  name: string;
+  picture?: string;
+  email_verified: boolean;
+}) {
+  const cleanEmail = String(email).trim().toLowerCase();
+  if (!email_verified) {
+    throw new Error('Google email address is not verified.');
+  }
+
+  const isOwner = isAdminEmail(cleanEmail);
+  const targetRole = isOwner ? 'admin' : 'customer';
+
+  // Check if profile exists
+  let profile = db.prepare('SELECT id, email, full_name, phone, avatar_url, role, is_suspended, is_verified FROM profiles WHERE email = ?').get(cleanEmail) as any;
+
+  if (profile) {
+    if (profile.is_suspended) {
+      throw new Error('Your account has been suspended by administration. Please contact concierge@mehermahel.com.');
+    }
+
+    // Update existing profile (and ensure admin role if allowlisted)
+    db.prepare(`
+      UPDATE profiles
+      SET full_name = COALESCE(?, full_name),
+          avatar_url = COALESCE(?, avatar_url),
+          role = ?,
+          is_verified = 1,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(name, picture || null, targetRole, profile.id);
+
+    try {
+      db.prepare(`
+        UPDATE auth_users
+        SET role = ?, is_verified = 1, updated_at = CURRENT_TIMESTAMP
+        WHERE email = ?
+      `).run(targetRole, cleanEmail);
+    } catch {}
+
+    profile.role = targetRole;
+    profile.avatar_url = picture || profile.avatar_url;
+    profile.full_name = name || profile.full_name;
+    profile.is_verified = 1;
+    return profile;
+  } else {
+    // Brand new user from Google
+    const userId = generateId('usr');
+    const dummyHash = bcrypt.hashSync(crypto.randomBytes(16).toString('hex'), 10);
+
+    db.prepare(`
+      INSERT INTO auth_users (id, email, password_hash, role, is_verified, verification_token)
+      VALUES (?, ?, ?, ?, 1, NULL)
+    `).run(userId, cleanEmail, dummyHash, targetRole);
+
+    db.prepare(`
+      INSERT INTO profiles (id, email, full_name, phone, avatar_url, role, is_verified)
+      VALUES (?, ?, ?, NULL, ?, ?, 1)
+    `).run(userId, cleanEmail, name, picture || null, targetRole);
+
+    return {
+      id: userId,
+      email: cleanEmail,
+      full_name: name,
+      avatar_url: picture || null,
+      role: targetRole,
+      is_verified: true,
+    };
+  }
+}
 
 // --------------------------------------------------------
 // 1. REGISTER
@@ -62,25 +174,29 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
+    const isOwner = isAdminEmail(cleanEmail);
+    const assignedRole = isOwner ? 'admin' : 'customer';
+
     const salt = bcrypt.genSaltSync(10);
     const passwordHash = bcrypt.hashSync(password, salt);
     const userId = generateId('usr');
     const verificationToken = crypto.randomBytes(24).toString('hex');
     const cleanPhone = phone ? String(phone).trim() : null;
 
-    // 1. Insert into auth_users (Role is strictly customer)
+    // 1. Insert into auth_users
     db.prepare(`
       INSERT INTO auth_users (id, email, password_hash, role, is_verified, verification_token)
-      VALUES (?, ?, ?, 'customer', 0, ?)
-    `).run(userId, cleanEmail, passwordHash, verificationToken);
+      VALUES (?, ?, ?, ?, 0, ?)
+    `).run(userId, cleanEmail, passwordHash, assignedRole, verificationToken);
 
     // 2. Insert into profiles
     db.prepare(`
       INSERT INTO profiles (id, email, full_name, phone, role, is_verified)
-      VALUES (?, ?, ?, ?, 'customer', 0)
-    `).run(userId, cleanEmail, full_name.trim(), cleanPhone);
+      VALUES (?, ?, ?, ?, ?, 0)
+    `).run(userId, cleanEmail, full_name.trim(), cleanPhone, assignedRole);
 
-    const token = signToken({ id: userId, email: cleanEmail, role: 'customer' }, true);
+    const token = signToken({ id: userId, email: cleanEmail, role: assignedRole }, true);
+    setAuthCookie(res, token, true);
 
     return res.status(201).json({
       success: true,
@@ -91,7 +207,7 @@ export const register = async (req: Request, res: Response) => {
         email: cleanEmail,
         full_name: full_name.trim(),
         phone: cleanPhone,
-        role: 'customer',
+        role: assignedRole,
         is_verified: false,
       },
     });
@@ -101,7 +217,7 @@ export const register = async (req: Request, res: Response) => {
 };
 
 // --------------------------------------------------------
-// 2. LOGIN
+// 2. LOGIN (Email & Password)
 // --------------------------------------------------------
 export const login = async (req: Request, res: Response) => {
   try {
@@ -140,14 +256,20 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
+    // Role check: Only allowlist receives admin privileges
+    const isOwner = isAdminEmail(cleanEmail);
+    const effectiveRole = isOwner ? 'admin' : (user.role === 'admin' ? 'customer' : user.role);
+
     const token = signToken(
-      { id: user.id, email: user.email, role: user.role },
-      Boolean(remember_me)
+      { id: user.id, email: user.email, role: effectiveRole },
+      Boolean(remember_me !== false)
     );
+
+    setAuthCookie(res, token, Boolean(remember_me !== false));
 
     return res.json({
       success: true,
-      message: 'Signed in successfully.',
+      message: effectiveRole === 'admin' ? 'Welcome back, Administrator Farah.' : 'Signed in successfully.',
       token,
       user: {
         id: user.id,
@@ -155,9 +277,10 @@ export const login = async (req: Request, res: Response) => {
         full_name: profile?.full_name || 'Valued Customer',
         phone: profile?.phone || '',
         avatar_url: profile?.avatar_url || '',
-        role: user.role,
+        role: effectiveRole,
         is_verified: Boolean(profile?.is_verified),
       },
+      redirectUrl: effectiveRole === 'admin' ? '/admin' : '/account',
     });
   } catch (err: any) {
     return res.status(500).json({ success: false, message: err.message || 'Login failed.' });
@@ -165,7 +288,186 @@ export const login = async (req: Request, res: Response) => {
 };
 
 // --------------------------------------------------------
-// 3. GET CURRENT AUTHENTICATED USER (ME)
+// 3. GOOGLE SIGN IN (POST: Token-based via Google Identity Services)
+// --------------------------------------------------------
+export const loginWithGoogle = async (req: Request, res: Response) => {
+  try {
+    const { credential, remember_me } = req.body;
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google credential token is required.',
+      });
+    }
+
+    // Verify Google ID Token with Google's public tokeninfo endpoint
+    const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+    const googleUser = (await verifyRes.json()) as any;
+
+    if (!verifyRes.ok || !googleUser.email) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired Google authentication credential.',
+      });
+    }
+
+    const emailVerified = googleUser.email_verified === 'true' || googleUser.email_verified === true;
+    if (!emailVerified) {
+      return res.status(401).json({
+        success: false,
+        message: 'Your Google email address must be verified by Google.',
+      });
+    }
+
+    const user = await provisionGoogleUser({
+      email: googleUser.email,
+      name: googleUser.name || googleUser.given_name || googleUser.email.split('@')[0],
+      picture: googleUser.picture,
+      email_verified: true,
+    });
+
+    const remember = remember_me !== false;
+    const token = signToken({ id: user.id, email: user.email, role: user.role }, remember);
+    setAuthCookie(res, token, remember);
+
+    return res.json({
+      success: true,
+      message: user.role === 'admin' ? 'Welcome back, Administrator Farah.' : 'Signed in with Google successfully.',
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        full_name: user.full_name,
+        avatar_url: user.avatar_url,
+        role: user.role,
+        is_verified: true,
+      },
+      redirectUrl: user.role === 'admin' ? '/admin' : '/account',
+    });
+  } catch (err: any) {
+    return res.status(500).json({ success: false, message: err.message || 'Google authentication failed.' });
+  }
+};
+
+// --------------------------------------------------------
+// 4. GOOGLE OAUTH REDIRECT (GET /api/auth/google/login)
+// --------------------------------------------------------
+export const googleAuthLogin = (req: Request, res: Response) => {
+  try {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const origin = `${protocol}://${host}`;
+    const redirectUri = `${origin}/api/auth/google/callback`;
+
+    const state = Buffer.from(
+      JSON.stringify({
+        redirect: (req.query.redirect as string) || '/account',
+        rememberMe: req.query.remember !== '0',
+      })
+    ).toString('base64');
+
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` + new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      scope: 'openid email profile',
+      access_type: 'offline',
+      prompt: 'select_account',
+      state,
+    }).toString();
+
+    return res.redirect(authUrl);
+  } catch (err: any) {
+    return res.redirect('/login?error=' + encodeURIComponent('Could not initiate Google sign in.'));
+  }
+};
+
+// --------------------------------------------------------
+// 5. GOOGLE OAUTH CALLBACK (GET /api/auth/google/callback)
+// --------------------------------------------------------
+export const googleAuthCallback = async (req: Request, res: Response) => {
+  try {
+    const { code, state, error } = req.query;
+
+    if (error || !code) {
+      return res.redirect('/login?error=' + encodeURIComponent(String(error || 'Google sign-in was cancelled.')));
+    }
+
+    let stateData = { redirect: '/account', rememberMe: true };
+    try {
+      if (state) stateData = JSON.parse(Buffer.from(String(state), 'base64').toString('utf8'));
+    } catch {}
+
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const origin = `${protocol}://${host}`;
+    const redirectUri = `${origin}/api/auth/google/callback`;
+
+    // Exchange authorization code for Google access token
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code: String(code),
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    const tokenData = (await tokenRes.json()) as any;
+    if (!tokenRes.ok || !tokenData.id_token) {
+      console.error('Google token exchange error:', tokenData);
+      return res.redirect('/login?error=' + encodeURIComponent(tokenData.error_description || 'Google authentication failed.'));
+    }
+
+    // Verify token with tokeninfo
+    const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${tokenData.id_token}`);
+    const googleUser = (await verifyRes.json()) as any;
+
+    if (!verifyRes.ok || !googleUser.email) {
+      return res.redirect('/login?error=' + encodeURIComponent('Invalid Google user data received.'));
+    }
+
+    const emailVerified = googleUser.email_verified === 'true' || googleUser.email_verified === true;
+    if (!emailVerified) {
+      return res.redirect('/login?error=' + encodeURIComponent('Unverified Google email address.'));
+    }
+
+    const user = await provisionGoogleUser({
+      email: googleUser.email,
+      name: googleUser.name || googleUser.email.split('@')[0],
+      picture: googleUser.picture,
+      email_verified: true,
+    });
+
+    const token = signToken({ id: user.id, email: user.email, role: user.role }, stateData.rememberMe);
+    setAuthCookie(res, token, stateData.rememberMe);
+
+    const targetUrl = (user.role === 'admin') ? '/admin' : (stateData.redirect || '/account');
+    const separator = targetUrl.includes('?') ? '&' : '?';
+
+    return res.redirect(`${targetUrl}${separator}auth_success=1&token=${encodeURIComponent(token)}`);
+  } catch (err: any) {
+    console.error('Google auth callback error:', err);
+    return res.redirect('/login?error=' + encodeURIComponent(err.message || 'Authentication error.'));
+  }
+};
+
+// --------------------------------------------------------
+// 6. LOGOUT
+// --------------------------------------------------------
+export const logout = async (_req: Request, res: Response) => {
+  clearAuthCookie(res);
+  return res.json({
+    success: true,
+    message: 'Signed out successfully.',
+  });
+};
+
+// --------------------------------------------------------
+// 7. GET CURRENT AUTHENTICATED USER (ME)
 // --------------------------------------------------------
 export const getMe = async (req: AuthRequest, res: Response) => {
   try {
@@ -178,6 +480,9 @@ export const getMe = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ success: false, message: 'Profile not found.' });
     }
 
+    const isOwner = isAdminEmail(profile.email);
+    const effectiveRole = isOwner ? 'admin' : (profile.role === 'admin' ? 'customer' : profile.role);
+
     return res.json({
       success: true,
       user: {
@@ -186,7 +491,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
         full_name: profile.full_name,
         phone: profile.phone,
         avatar_url: profile.avatar_url,
-        role: profile.role,
+        role: effectiveRole,
         is_verified: Boolean(profile.is_verified),
         created_at: profile.created_at,
       },
@@ -197,7 +502,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
 };
 
 // --------------------------------------------------------
-// 4. FORGOT PASSWORD
+// 8. FORGOT PASSWORD
 // --------------------------------------------------------
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
@@ -222,7 +527,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
       console.log(`[Auth Notice] Password Reset Link for ${cleanEmail}: /auth.html?mode=reset&token=${resetToken}`);
     }
 
-    // Always return success message to avoid email enumeration
     return res.json({
       success: true,
       message: 'If an account exists with this email, a password reset link has been dispatched.',
@@ -233,7 +537,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 };
 
 // --------------------------------------------------------
-// 5. RESET PASSWORD
+// 9. RESET PASSWORD
 // --------------------------------------------------------
 export const resetPassword = async (req: Request, res: Response) => {
   try {
@@ -280,7 +584,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 };
 
 // --------------------------------------------------------
-// 6. VERIFY EMAIL
+// 10. VERIFY EMAIL
 // --------------------------------------------------------
 export const verifyEmail = async (req: Request, res: Response) => {
   try {
@@ -307,7 +611,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 };
 
 // --------------------------------------------------------
-// 7. CHANGE PASSWORD (AUTHENTICATED)
+// 11. CHANGE PASSWORD (AUTHENTICATED)
 // --------------------------------------------------------
 export const changePassword = async (req: AuthRequest, res: Response) => {
   try {
@@ -349,7 +653,7 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
 };
 
 // --------------------------------------------------------
-// 8. DELETE ACCOUNT
+// 12. DELETE ACCOUNT
 // --------------------------------------------------------
 export const deleteAccount = async (req: AuthRequest, res: Response) => {
   try {
@@ -367,14 +671,17 @@ export const deleteAccount = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ success: false, message: 'Incorrect password.' });
     }
 
-    if (authRecord.role === 'admin') {
+    if (authRecord.role === 'admin' || isAdminEmail(req.user.email)) {
       return res.status(403).json({ success: false, message: 'Root administrator account cannot be self-deleted.' });
     }
 
     db.prepare('DELETE FROM user_addresses WHERE user_id = ?').run(req.user.id);
     db.prepare('DELETE FROM user_wishlists WHERE user_id = ?').run(req.user.id);
+    db.prepare('DELETE FROM user_carts WHERE user_id = ?').run(req.user.id);
     db.prepare('DELETE FROM profiles WHERE id = ?').run(req.user.id);
     db.prepare('DELETE FROM auth_users WHERE id = ?').run(req.user.id);
+
+    clearAuthCookie(res);
 
     return res.json({
       success: true,

@@ -35,6 +35,11 @@ import {
 import {
   register,
   login,
+  loginWithGoogle,
+  googleAuthLogin,
+  googleAuthCallback,
+  getGoogleAuthConfig,
+  logout,
   getMe,
   forgotPassword,
   resetPassword,
@@ -54,12 +59,16 @@ import {
   getWishlist,
   toggleWishlist,
   syncWishlist,
+  getUserCart,
+  saveUserCart,
 } from '../controllers/userController.js';
 import { requireAuth, requireAdmin, optionalAuth } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
+// --------------------------------------------------------
 // Storefront Endpoints
+// --------------------------------------------------------
 router.get('/settings', getStoreSettings);
 router.get('/categories', getCategories);
 router.get('/hero-slides', getHeroSlides);
@@ -71,9 +80,16 @@ router.post('/orders/create', optionalAuth, createStoreOrder);
 router.get('/orders/track/:orderNumber', trackOrder);
 router.post('/newsletter/subscribe', subscribeNewsletter);
 
+// --------------------------------------------------------
 // Authentication Endpoints
+// --------------------------------------------------------
 router.post('/auth/register', register);
 router.post('/auth/login', login);
+router.post('/auth/google', loginWithGoogle);
+router.get('/auth/google/login', googleAuthLogin);
+router.get('/auth/google/callback', googleAuthCallback);
+router.get('/auth/google/config', getGoogleAuthConfig);
+router.post('/auth/logout', logout);
 router.get('/auth/me', requireAuth, getMe);
 router.post('/auth/forgot-password', forgotPassword);
 router.post('/auth/reset-password', resetPassword);
@@ -81,7 +97,9 @@ router.post('/auth/verify-email', verifyEmail);
 router.put('/auth/change-password', requireAuth, changePassword);
 router.delete('/auth/account', requireAuth, deleteAccount);
 
+// --------------------------------------------------------
 // Protected Customer Account Endpoints
+// --------------------------------------------------------
 router.get('/user/profile', requireAuth, getProfile);
 router.put('/user/profile', requireAuth, updateProfile);
 router.get('/user/orders', requireAuth, getUserOrders);
@@ -93,8 +111,14 @@ router.delete('/user/addresses/:id', requireAuth, deleteAddress);
 router.get('/user/wishlist', requireAuth, getWishlist);
 router.post('/user/wishlist/toggle', requireAuth, toggleWishlist);
 router.post('/user/wishlist/sync', requireAuth, syncWishlist);
+router.get('/user/cart', requireAuth, getUserCart);
+router.post('/user/cart', requireAuth, saveUserCart);
 
-// Admin Dashboard Endpoints (Protected with requireAdmin)
+// --------------------------------------------------------
+// Protected Administrator Endpoints (STRICTLY REQUIRE ADMIN)
+// --------------------------------------------------------
+router.use('/admin', requireAdmin);
+
 router.get('/admin/stats', getAdminStats);
 router.get('/admin/orders', getAdminOrders);
 router.put('/admin/orders/:id/status', updateOrderStatus);

@@ -1,3 +1,34 @@
+// Helper to automatically attach JWT token and handle unauthorized responses
+async function adminFetch(url, options = {}) {
+  const token = localStorage.getItem('mm_token');
+  options.headers = options.headers || {};
+  if (token && !options.headers['Authorization']) {
+    options.headers['Authorization'] = `Bearer ${token}`;
+  }
+  options.credentials = 'same-origin';
+
+  try {
+    const res = await fetch(url, options);
+    if (res.status === 401 || res.status === 403) {
+      window.location.href = '/login?redirect=/admin&error=session_expired';
+      throw new Error('Unauthorized');
+    }
+    return res;
+  } catch (err) {
+    if (err.message === 'Unauthorized') throw err;
+    throw err;
+  }
+}
+
+async function handleAdminLogout() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+  } catch {}
+  localStorage.removeItem('mm_token');
+  localStorage.removeItem('mm_user');
+  window.location.href = '/login?message=' + encodeURIComponent('Signed out of administrator portal.');
+}
+
 // ========================================================
 // MEHER MAHEL ADMIN ATELIER PORTAL JAVASCRIPT
 // ========================================================
@@ -15,7 +46,25 @@ let adminState = {
   selectedUser: null,
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  const token = localStorage.getItem('mm_token');
+  try {
+    const res = await fetch('/api/auth/me', {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+      credentials: 'same-origin',
+    });
+    const data = await res.json();
+    if (!data.success || !data.user || data.user.role !== 'admin' || data.user.email.toLowerCase() !== 'lmbhfarah@gmail.com') {
+      window.location.href = '/login?redirect=/admin&error=unauthorized';
+      return;
+    }
+    const badge = document.getElementById('adminEmailBadge');
+    if (badge) badge.textContent = data.user.email;
+  } catch (err) {
+    window.location.href = '/login?redirect=/admin&error=session_expired';
+    return;
+  }
+
   loadAdminStats();
   loadAdminOrders();
   loadCustomAbayaQueue();
@@ -55,7 +104,7 @@ function switchTab(tabName) {
 // 1. Load Stats
 async function loadAdminStats() {
   try {
-    const res = await fetch('/api/admin/stats');
+    const res = await adminFetch('/api/admin/stats');
     const data = await res.json();
     if (data.success && data.stats) {
       adminState.stats = data.stats;
@@ -240,7 +289,7 @@ async function updateOrderTracking(orderId, tracking_number) {
 // 3. Load Custom Abaya Atelier Queue
 async function loadCustomAbayaQueue() {
   try {
-    const res = await fetch('/api/admin/custom-orders');
+    const res = await adminFetch('/api/admin/custom-orders');
     const data = await res.json();
     if (data.success) {
       adminState.customOrders = data.orders;
@@ -454,7 +503,7 @@ async function handleProductSubmit(e) {
         body: JSON.stringify(payload),
       });
     } else {
-      await fetch('/api/admin/products', {
+      await adminFetch('/api/admin/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -483,7 +532,7 @@ async function deleteProduct(productId) {
 // 5. Hero Slides CMS
 async function loadAdminHeroSlides() {
   try {
-    const res = await fetch('/api/admin/hero-slides');
+    const res = await adminFetch('/api/admin/hero-slides');
     const data = await res.json();
     if (data.success) {
       adminState.heroSlides = data.slides;
@@ -565,7 +614,7 @@ async function handleSaveSettings(e) {
   };
 
   try {
-    await fetch('/api/admin/settings', {
+    await adminFetch('/api/admin/settings', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ settings }),

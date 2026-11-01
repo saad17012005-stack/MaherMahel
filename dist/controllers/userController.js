@@ -306,3 +306,61 @@ export const syncWishlist = async (req, res) => {
         return res.status(500).json({ success: false, message: err.message });
     }
 };
+// --------------------------------------------------------
+// 5. USER PERSISTENT CART
+// --------------------------------------------------------
+export const getUserCart = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: 'Authentication required.' });
+        }
+        const row = db.prepare('SELECT cart_items FROM user_carts WHERE user_id = ?').get(req.user.id);
+        let cart = [];
+        if (row && row.cart_items) {
+            try {
+                cart = typeof row.cart_items === 'string' ? JSON.parse(row.cart_items) : row.cart_items;
+            }
+            catch { }
+        }
+        return res.json({
+            success: true,
+            cart,
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};
+export const saveUserCart = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ success: false, message: 'Authentication required.' });
+        }
+        const { cart } = req.body;
+        const itemsJson = typeof cart === 'string' ? cart : JSON.stringify(cart || []);
+        try {
+            db.prepare(`
+        INSERT INTO user_carts (user_id, cart_items, updated_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id) DO UPDATE SET cart_items = excluded.cart_items, updated_at = CURRENT_TIMESTAMP
+      `).run(req.user.id, itemsJson);
+        }
+        catch {
+            // Fallback for engines without ON CONFLICT syntax
+            const existing = db.prepare('SELECT user_id FROM user_carts WHERE user_id = ?').get(req.user.id);
+            if (existing) {
+                db.prepare('UPDATE user_carts SET cart_items = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?').run(itemsJson, req.user.id);
+            }
+            else {
+                db.prepare('INSERT INTO user_carts (user_id, cart_items, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)').run(req.user.id, itemsJson);
+            }
+        }
+        return res.json({
+            success: true,
+            message: 'Shopping cart preserved in database.',
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};

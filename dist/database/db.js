@@ -225,6 +225,12 @@ export function initDatabase() {
       UNIQUE(user_id, product_id)
     );
 
+    CREATE TABLE IF NOT EXISTS user_carts (
+      user_id TEXT PRIMARY KEY REFERENCES profiles(id) ON DELETE CASCADE,
+      cart_items TEXT NOT NULL,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS admin_audit_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       admin_id TEXT NOT NULL,
@@ -263,6 +269,7 @@ function createMemoryStore() {
         auth_users: [],
         user_addresses: [],
         user_wishlists: [],
+        user_carts: [],
         admin_audit_logs: [],
     };
     let autoId = 1;
@@ -333,6 +340,13 @@ function createMemoryStore() {
                             });
                         }
                         return tables.user_wishlists;
+                    }
+                    // USER_CARTS
+                    if (normalized.includes('FROM user_carts')) {
+                        if (normalized.includes('WHERE user_id = ?')) {
+                            return tables.user_carts.filter(c => c.user_id === params[0]);
+                        }
+                        return tables.user_carts;
                     }
                     // ADMIN_AUDIT_LOGS
                     if (normalized.includes('FROM admin_audit_logs')) {
@@ -578,6 +592,18 @@ function createMemoryStore() {
                         const uid = params[0];
                         const pid = params[1];
                         tables.user_wishlists = tables.user_wishlists.filter(w => !(w.user_id === uid && w.product_id === pid));
+                    }
+                    else if (normalized.includes('user_carts')) {
+                        const uid = params[0];
+                        const items = params[1];
+                        const existing = tables.user_carts.find(c => c.user_id === uid);
+                        if (existing) {
+                            existing.cart_items = items;
+                            existing.updated_at = new Date().toISOString();
+                        }
+                        else {
+                            tables.user_carts.push({ user_id: uid, cart_items: items, updated_at: new Date().toISOString() });
+                        }
                     }
                     else if (normalized.includes('DELETE FROM profiles')) {
                         const uid = params[0];

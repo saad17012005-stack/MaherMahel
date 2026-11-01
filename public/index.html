@@ -141,7 +141,7 @@
           </a>
 
           <!-- Admin Portal Link -->
-          <a href="/admin" title="Admin Dashboard" class="text-mutedText hover:text-charcoal transition-colors p-1.5 text-xs font-semibold uppercase tracking-wider hidden lg:flex items-center gap-1 border border-subtleBorder px-2.5 py-1 rounded-md">
+          <a href="/admin" id="headerAdminLink" title="Admin Dashboard" class="text-mutedText hover:text-charcoal transition-colors p-1.5 text-xs font-semibold uppercase tracking-wider items-center gap-1 border border-subtleBorder px-2.5 py-1 rounded-md" style="display: none !important;">
             <span>Admin</span>
           </a>
         </div>
@@ -177,7 +177,7 @@
           <button onclick="filterCategory('watches'); closeDrawer();" class="w-full text-left py-2 text-charcoal hover:text-dustyRose border-b border-subtleBorder/50">Watches</button>
           <button onclick="openSizeGuideModal(); closeDrawer();" class="w-full text-left py-2 text-mutedText hover:text-charcoal border-b border-subtleBorder/50">Size Guide</button>
           <button onclick="openOrderTrackModal(); closeDrawer();" class="w-full text-left py-2 text-mutedText hover:text-charcoal border-b border-subtleBorder/50">Track Order</button>
-          <a href="/admin" class="block py-2 text-antiqueGold font-semibold">Admin Dashboard</a>
+          <a href="/admin" id="mobileDrawerAdminLink" class="py-2 text-antiqueGold font-semibold" style="display: none !important;">Admin Dashboard</a>
         </nav>
 
         <div class="mt-auto pt-6 border-t border-subtleBorder text-xs text-mutedText">
@@ -636,7 +636,7 @@
             <li><button onclick="openOrderTrackModal()" class="hover:text-dustyRose">Track My Order</button></li>
             <li><button onclick="openPolicyModal('shipping')" class="hover:text-dustyRose">Shipping & Dispatch</button></li>
             <li><button onclick="openPolicyModal('returns')" class="hover:text-dustyRose">Returns & Custom Policy</button></li>
-            <li><a href="/admin" class="hover:text-charcoal font-medium text-antiqueGold">Admin Portal</a></li>
+            <li><a href="/admin" id="footerAdminLink" class="hover:text-charcoal font-medium text-antiqueGold" style="display: none !important;">Admin Portal</a></li>
           </ul>
         </div>
 
