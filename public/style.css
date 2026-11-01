@@ -107,10 +107,16 @@ body {
 .cylinder-stage {
   position: relative;
   width: 100%;
-  height: clamp(330px, 46vw, 450px);
+  height: clamp(390px, 95vw, 440px);
   overflow: hidden;
   touch-action: pan-y;
   cursor: grab;
+}
+
+@media (min-width: 768px) {
+  .cylinder-stage {
+    height: clamp(420px, 42vw, 480px);
+  }
 }
 
 .cylinder-stage.grabbing {
