@@ -107,10 +107,16 @@ body {
 .cylinder-stage {
   position: relative;
   width: 100%;
-  height: clamp(330px, 46vw, 450px);
+  height: clamp(350px, 92vw, 420px);
   overflow: hidden;
   touch-action: pan-y;
   cursor: grab;
+}
+
+@media (min-width: 768px) {
+  .cylinder-stage {
+    height: clamp(330px, 46vw, 450px);
+  }
 }
 
 .cylinder-stage.grabbing {
@@ -212,22 +218,10 @@ body {
 
 /* Legacy Hero Carousel Container & Fallback Support */
 #heroCarousel {
+  position: relative;
   touch-action: pan-y;
   user-select: none;
-}
-
-@media (max-width: 1024px) {
-  #heroCarousel {
-    height: clamp(480px, 65vh, 580px);
-  }
-}
-
-@media (max-width: 768px) {
-  #heroCarousel {
-    height: calc(100vh - 96px);
-    min-height: 480px;
-    max-height: none;
-  }
+  height: auto;
 }
 
 #heroSlidesContainer {

@@ -208,7 +208,7 @@
   <main class="flex-grow">
 
     <!-- 3. SECTION 1: HOMEPAGE HERO CAROUSEL (Cylindrical 3D Curved Fashion Stage) -->
-    <section id="heroCarousel" class="hero-cylinder-section relative w-full overflow-hidden pt-8 pb-14 sm:pt-12 sm:pb-20">
+    <section id="heroCarousel" class="hero-cylinder-section relative w-full overflow-hidden pt-6 pb-8 sm:pt-12 sm:pb-20">
       
       <!-- Ambient Lighting & Soft Silk Glow -->
       <div class="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(200,143,145,0.25),transparent_70%)]"></div>
@@ -250,16 +250,16 @@
         </p>
 
         <!-- Dynamic Carousel Sub-Controls / Filter Pills -->
-        <div class="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs sm:text-sm font-medium">
-          <button onclick="setHeroFilter('all')" id="heroTabAll" class="hero-filter-pill active px-3.5 py-1 rounded-full bg-charcoal text-white transition-all shadow-sm">All Looks</button>
-          <button onclick="setHeroFilter('abayas')" id="heroTabAbayas" class="hero-filter-pill px-3.5 py-1 rounded-full bg-white/80 hover:bg-white text-charcoal border border-subtleBorder transition-all">Abayas</button>
-          <button onclick="setHeroFilter('traditional')" id="heroTabTrad" class="hero-filter-pill px-3.5 py-1 rounded-full bg-white/80 hover:bg-white text-charcoal border border-subtleBorder transition-all">Traditional Wear</button>
-          <button onclick="setHeroFilter('handbags')" id="heroTabBags" class="hero-filter-pill px-3.5 py-1 rounded-full bg-white/80 hover:bg-white text-charcoal border border-subtleBorder transition-all">Bags & Watches</button>
+        <div class="mt-5 sm:mt-6 grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-2 max-w-[320px] sm:max-w-none mx-auto text-xs sm:text-sm font-medium">
+          <button onclick="setHeroFilter('all')" id="heroTabAll" class="hero-filter-pill active w-full sm:w-auto text-center px-4 py-2 sm:py-1.5 rounded-full bg-charcoal text-white transition-all shadow-sm">All Looks</button>
+          <button onclick="setHeroFilter('abayas')" id="heroTabAbayas" class="hero-filter-pill w-full sm:w-auto text-center px-4 py-2 sm:py-1.5 rounded-full bg-white/80 hover:bg-white text-charcoal border border-subtleBorder transition-all">Abayas</button>
+          <button onclick="setHeroFilter('traditional')" id="heroTabTrad" class="hero-filter-pill w-full sm:w-auto text-center px-4 py-2 sm:py-1.5 rounded-full bg-white/80 hover:bg-white text-charcoal border border-subtleBorder transition-all">Traditional Wear</button>
+          <button onclick="setHeroFilter('handbags')" id="heroTabBags" class="hero-filter-pill w-full sm:w-auto text-center px-4 py-2 sm:py-1.5 rounded-full bg-white/80 hover:bg-white text-charcoal border border-subtleBorder transition-all">Bags & Watches</button>
         </div>
       </div>
 
       <!-- 3D CYLINDRICAL CAROUSEL STAGE -->
-      <div id="heroCylinderStage" class="cylinder-stage relative w-full my-6 sm:my-8 overflow-hidden select-none" style="cursor: grab;">
+      <div id="heroCylinderStage" class="cylinder-stage relative w-full my-4 sm:my-8 overflow-hidden select-none" style="cursor: grab;">
         
         <!-- Continuous Cylinder Track (10 curved interactive cards) -->
         <div id="heroCylinderTrack" class="cylinder-track relative w-full h-full">
@@ -280,24 +280,25 @@
       </div>
 
       <!-- ACTION BUTTONS & CALLOUTS -->
-      <div class="relative max-w-xl mx-auto px-4 text-center z-20 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-2">
+      <div class="relative max-w-xl mx-auto px-4 text-center z-20 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mt-1 sm:mt-2">
         
-        <!-- Primary CTA with Spinning Dashed Ring -->
-        <div class="relative inline-flex items-center justify-center">
-          <div class="hero-cta-ring"></div>
-          <a href="#shop-section" class="relative z-10 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-deepRose hover:bg-[#8e4f54] text-white font-semibold text-sm sm:text-base tracking-wide shadow-xl shadow-deepRose/25 hover:shadow-2xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2">
+        <!-- Primary CTA with Spinning Dashed Ring (Ring hidden on mobile) -->
+        <div class="relative inline-flex items-center justify-center w-full sm:w-auto">
+          <div class="hero-cta-ring hidden sm:block"></div>
+          <a href="#shop-section" class="relative z-10 w-full max-w-[280px] sm:w-auto sm:max-w-none px-6 sm:px-10 py-3 sm:py-4 rounded-full bg-deepRose hover:bg-[#8e4f54] text-white font-semibold text-sm sm:text-base tracking-wide shadow-xl shadow-deepRose/25 hover:shadow-2xl transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
             <span>Explore Collection</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </a>
         </div>
 
         <!-- Secondary CTA: Custom Atelier -->
-        <button onclick="openCustomAbayaModal()" class="px-7 sm:px-9 py-3.5 sm:py-4 rounded-full bg-white/95 hover:bg-white text-charcoal border border-subtleBorder font-semibold text-sm sm:text-base tracking-wide shadow-md hover:shadow-lg transition-all flex items-center gap-2.5">
+        <button onclick="openCustomAbayaModal()" class="w-full max-w-[280px] sm:w-auto sm:max-w-none px-5 sm:px-9 py-3 sm:py-4 rounded-full bg-white/95 hover:bg-white text-charcoal border border-subtleBorder font-semibold text-sm sm:text-base tracking-wide shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5">
           <span>Design Custom Abaya</span>
           <span class="text-[11px] uppercase tracking-wider font-bold bg-dustyRose/15 text-deepRose px-2 py-0.5 rounded-full">Atelier</span>
         </button>
+      </div>
 
-        <!-- Hand-drawn Note: Zero Cost Annotation (Desktop) -->
+      <!-- Hand-drawn Note: Zero Cost Annotation (Desktop) -->
         <div class="hidden sm:block absolute -left-28 -bottom-3 pointer-events-none select-none text-left -rotate-12">
           <span class="font-['Caveat'] text-2xl text-antiqueGold font-bold block leading-none">Bespoke fitting<br>zero extra fee</span>
           <svg class="w-10 h-8 ml-6 text-antiqueGold" viewBox="0 0 50 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

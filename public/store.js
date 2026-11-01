@@ -715,8 +715,17 @@ function setupCylinderDragging(stage) {
     const dt = (now - cylinderState.lastDragTime) / 1000;
     const dx = clientX - cylinderState.lastDragX;
 
-    const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stage.clientWidth / 1440);
-    const deltaU = dx / Math.max(u, 0.4);
+    const isMobile = stage.clientWidth < 768;
+    let deltaU;
+    if (isMobile) {
+      const baseW = Math.min(Math.max(stage.clientWidth * 0.62, 210), 245);
+      const mPitch = baseW + 22;
+      const mTrack = cylinderState.NUM_CARDS * mPitch;
+      deltaU = (dx / mTrack) * cylinderState.TOTAL_TRACK;
+    } else {
+      const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stage.clientWidth / 1440);
+      deltaU = dx / Math.max(u, 0.4);
+    }
 
     cylinderState.scrollPos -= deltaU;
 
@@ -764,6 +773,7 @@ function renderCylinderLoop(time) {
 
   const stageWidth = stage.clientWidth;
   const stageHeight = stage.clientHeight;
+  const isMobile = stageWidth < 768;
   const u = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hero-u')) || (stageWidth / 1440);
 
   // Safety checks against NaN
@@ -777,78 +787,126 @@ function renderCylinderLoop(time) {
       cylinderState.velocity *= Math.pow(0.05, dt); // 95% decay per second
     } else {
       // Unconditional smooth right->left autoscroll
-      cylinderState.scrollPos += (cylinderState.AUTO_SPEED || 52) * dt;
+      const autoSpeed = isMobile ? 38 : (cylinderState.AUTO_SPEED || 52);
+      cylinderState.scrollPos += autoSpeed * dt;
     }
   }
 
   // Seamless track wrap
   cylinderState.scrollPos = ((cylinderState.scrollPos % cylinderState.TOTAL_TRACK) + cylinderState.TOTAL_TRACK) % cylinderState.TOTAL_TRACK;
 
-  // Render each card according to cylindrical geometry specification
-  cylinderState.cards.forEach((cardObj, i) => {
-    let rawX = (i * cylinderState.PITCH - cylinderState.scrollPos) % cylinderState.TOTAL_TRACK;
-    if (rawX < -cylinderState.PITCH * 2) rawX += cylinderState.TOTAL_TRACK;
-    if (rawX > cylinderState.TOTAL_TRACK - cylinderState.PITCH * 2) rawX -= cylinderState.TOTAL_TRACK;
+  // Render cards
+  if (isMobile) {
+    // ----------------------------------------------------
+    // MOBILE EDITORIAL CAROUSEL: 1 Prominent Central Card with side peek
+    // ----------------------------------------------------
+    const baseW = Math.min(Math.max(stageWidth * 0.62, 210), 245);
+    const mPitch = baseW + 22;
+    const mTrack = cylinderState.NUM_CARDS * mPitch;
+    const progress = (cylinderState.scrollPos % cylinderState.TOTAL_TRACK) / cylinderState.TOTAL_TRACK;
+    const mobilePos = progress * mTrack;
 
-    // Unpushed offset from center
-    const t = rawX + (cylinderState.PITCH / 2) - cylinderState.CENTER_X;
+    cylinderState.cards.forEach((cardObj, i) => {
+      let rawX = (i * mPitch - mobilePos) % mTrack;
+      if (rawX < -mTrack / 2) rawX += mTrack;
+      if (rawX > mTrack / 2) rawX -= mTrack;
 
-    // Cylinder Push: x = 720 + t·(1 + 0.083·(t/706)²)
-    const tRatio = t / cylinderState.RADIUS_NORM;
-    const pushedX = cylinderState.CENTER_X + t * (1 + 0.083 * tRatio * tRatio);
+      const d = Math.abs(rawX) / mPitch;
+      const cardScale = Math.max(0.85, 1 - Math.min(d, 2.5) * 0.10);
+      const cardW = Math.round(baseW * cardScale);
+      const baseH = Math.min(Math.round(baseW * 1.46), stageHeight - 20);
+      const cardH = Math.round(baseH * cardScale);
 
-    // Normalized distance d = |x - 720| / 706
-    const d = Math.abs(pushedX - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
+      const pxX = Math.round((stageWidth / 2) + rawX - (cardW / 2));
+      const pxY = Math.round((stageHeight - cardH) / 2);
 
-    // Width = (170 + 48·d²)u
-    const width = (170 + 48 * d * d);
+      const el = cardObj.el;
+      el.style.width = `${cardW}px`;
+      el.style.height = `${cardH}px`;
+      el.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
 
-    // Edge normalized distances
-    const xLeft = pushedX - width / 2;
-    const xRight = pushedX + width / 2;
-    const qLeft = Math.abs(xLeft - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
-    const qRight = Math.abs(xRight - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
+      el.style.clipPath = 'none';
+      el.style.webkitClipPath = 'none';
+      el.style.borderRadius = '16px';
+      el.style.zIndex = Math.round(100 - d * 25);
 
-    // Heights = (280 + 92·q^2.6)u
-    const hLeft = 280 + 92 * Math.pow(qLeft, 2.6);
-    const hRight = 280 + 92 * Math.pow(qRight, 2.6);
+      if (cylinderState.currentFilter === 'all' || cardObj.item.category_slug === cylinderState.currentFilter) {
+        el.style.opacity = d < 0.6 ? '1' : (d < 1.4 ? '0.88' : '0.5');
+        el.style.pointerEvents = 'auto';
+      } else {
+        el.style.opacity = '0.3';
+      }
+    });
+  } else {
+    // ----------------------------------------------------
+    // DESKTOP: Approved 1440 Cylindrical 3D Amphitheatre
+    // ----------------------------------------------------
+    cylinderState.cards.forEach((cardObj, i) => {
+      let rawX = (i * cylinderState.PITCH - cylinderState.scrollPos) % cylinderState.TOTAL_TRACK;
+      if (rawX < -cylinderState.PITCH * 2) rawX += cylinderState.TOTAL_TRACK;
+      if (rawX > cylinderState.TOTAL_TRACK - cylinderState.PITCH * 2) rawX -= cylinderState.TOTAL_TRACK;
 
-    // Vertical centre = (687 - 12·d²)u
-    const yCenterOffset = (687 - 12 * d * d) - 687;
+      // Unpushed offset from center
+      const t = rawX + (cylinderState.PITCH / 2) - cylinderState.CENTER_X;
 
-    // Screen pixel conversion (perfect center alignment for mobile & desktop)
-    const pxX = (stageWidth / 2) + (pushedX - cylinderState.CENTER_X) * u - (width * u) / 2;
-    const maxH = Math.max(hLeft, hRight);
-    const pxY = (stageHeight / 2) + (yCenterOffset * u) - (maxH * u) / 2;
+      // Cylinder Push: x = 720 + t·(1 + 0.083·(t/706)²)
+      const tRatio = t / cylinderState.RADIUS_NORM;
+      const pushedX = cylinderState.CENTER_X + t * (1 + 0.083 * tRatio * tRatio);
 
-    const el = cardObj.el;
-    el.style.width = `${width * u}px`;
-    el.style.height = `${maxH * u}px`;
-    el.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
+      // Normalized distance d = |x - 720| / 706
+      const d = Math.abs(pushedX - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
 
-    // Rounded quad clip path
-    const wPx = width * u;
-    const rPx = Math.max(8, 14 * u);
-    const yTopLeft = ((maxH - hLeft) / 2) * u;
-    const yBottomLeft = yTopLeft + hLeft * u;
-    const yTopRight = ((maxH - hRight) / 2) * u;
-    const yBottomRight = yTopRight + hRight * u;
+      // Width = (170 + 48·d²)u
+      const width = (170 + 48 * d * d);
 
-    const path = `M 0,${yTopLeft + rPx} Q 0,${yTopLeft} ${rPx},${yTopLeft} L ${wPx - rPx},${yTopRight} Q ${wPx},${yTopRight} ${wPx},${yTopRight + rPx} L ${wPx},${yBottomRight - rPx} Q ${wPx},${yBottomRight} ${wPx - rPx},${yBottomRight} L ${rPx},${yBottomLeft} Q 0,${yBottomLeft} 0,${yBottomLeft - rPx} Z`;
-    el.style.clipPath = `path('${path}')`;
-    el.style.webkitClipPath = `path('${path}')`;
+      // Edge normalized distances
+      const xLeft = pushedX - width / 2;
+      const xRight = pushedX + width / 2;
+      const qLeft = Math.abs(xLeft - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
+      const qRight = Math.abs(xRight - cylinderState.CENTER_X) / cylinderState.RADIUS_NORM;
 
-    // Z-index depth layering
-    el.style.zIndex = Math.round(100 - d * 30);
+      // Heights = (280 + 92·q^2.6)u
+      const hLeft = 280 + 92 * Math.pow(qLeft, 2.6);
+      const hRight = 280 + 92 * Math.pow(qRight, 2.6);
 
-    // Filter dimming / highlighting
-    if (cylinderState.currentFilter === 'all' || cardObj.item.category_slug === cylinderState.currentFilter) {
-      el.style.opacity = '1';
-      el.style.pointerEvents = 'auto';
-    } else {
-      el.style.opacity = '0.35';
-    }
-  });
+      // Vertical centre = (687 - 12·d²)u
+      const yCenterOffset = (687 - 12 * d * d) - 687;
+
+      // Screen pixel conversion (perfect center alignment for mobile & desktop)
+      const pxX = (stageWidth / 2) + (pushedX - cylinderState.CENTER_X) * u - (width * u) / 2;
+      const maxH = Math.max(hLeft, hRight);
+      const pxY = (stageHeight / 2) + (yCenterOffset * u) - (maxH * u) / 2;
+
+      const el = cardObj.el;
+      el.style.width = `${width * u}px`;
+      el.style.height = `${maxH * u}px`;
+      el.style.transform = `translate3d(${pxX}px, ${pxY}px, 0)`;
+
+      // Rounded quad clip path
+      const wPx = width * u;
+      const rPx = Math.max(8, 14 * u);
+      const yTopLeft = ((maxH - hLeft) / 2) * u;
+      const yBottomLeft = yTopLeft + hLeft * u;
+      const yTopRight = ((maxH - hRight) / 2) * u;
+      const yBottomRight = yTopRight + hRight * u;
+
+      const path = `M 0,${yTopLeft + rPx} Q 0,${yTopLeft} ${rPx},${yTopLeft} L ${wPx - rPx},${yTopRight} Q ${wPx},${yTopRight} ${wPx},${yTopRight + rPx} L ${wPx},${yBottomRight - rPx} Q ${wPx},${yBottomRight} ${wPx - rPx},${yBottomRight} L ${rPx},${yBottomLeft} Q 0,${yBottomLeft} 0,${yBottomLeft - rPx} Z`;
+      el.style.clipPath = `path('${path}')`;
+      el.style.webkitClipPath = `path('${path}')`;
+      el.style.borderRadius = '';
+
+      // Z-index depth layering
+      el.style.zIndex = Math.round(100 - d * 30);
+
+      // Filter dimming / highlighting
+      if (cylinderState.currentFilter === 'all' || cardObj.item.category_slug === cylinderState.currentFilter) {
+        el.style.opacity = '1';
+        el.style.pointerEvents = 'auto';
+      } else {
+        el.style.opacity = '0.35';
+      }
+    });
+  }
 
   requestAnimationFrame(renderCylinderLoop);
 }
