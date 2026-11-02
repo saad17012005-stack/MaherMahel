@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getStoreSettings, getCategories, getHeroSlides, getProducts, getProductBySlug, calculateCustomAbaya, applyCoupon, createStoreOrder, trackOrder, subscribeNewsletter, } from '../controllers/storeController.js';
 import { getAdminStats, getAdminOrders, updateOrderStatus, getCustomAbayaOrders, updateCustomOrderStatus, createProduct, updateProduct, deleteProduct, getHeroSlidesAdmin, updateHeroSlide, updateStoreSettings, getAdminUsers, getAdminUserDetails, updateAdminUser, suspendUser, triggerPasswordReset, deleteAdminUser, exportUserData, getAuditLogs, } from '../controllers/adminController.js';
-import { register, login, loginWithGoogle, googleAuthLogin, googleAuthCallback, getGoogleAuthConfig, logout, getMe, forgotPassword, resetPassword, verifyEmail, changePassword, deleteAccount, } from '../controllers/authController.js';
+import { register, login, loginWithGoogle, googleAuthLogin, googleAuthCallback, getGoogleAuthConfig, getSupabaseConfig, syncSupabaseSession, logout, getMe, forgotPassword, resetPassword, verifyEmail, changePassword, deleteAccount, } from '../controllers/authController.js';
 import { getProfile, updateProfile, getUserOrders, getUserCustomOrders, getAddresses, createAddress, updateAddress, deleteAddress, getWishlist, toggleWishlist, syncWishlist, getUserCart, saveUserCart, } from '../controllers/userController.js';
 import { requireAuth, requireAdmin, optionalAuth } from '../middleware/authMiddleware.js';
 const router = Router();
@@ -27,6 +27,8 @@ router.post('/auth/google', loginWithGoogle);
 router.get('/auth/google/login', googleAuthLogin);
 router.get('/auth/google/callback', googleAuthCallback);
 router.get('/auth/google/config', getGoogleAuthConfig);
+router.get('/config/supabase', getSupabaseConfig);
+router.post('/auth/supabase-session', syncSupabaseSession);
 router.post('/auth/logout', logout);
 router.get('/auth/me', requireAuth, getMe);
 router.post('/auth/forgot-password', forgotPassword);

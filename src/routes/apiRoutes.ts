@@ -39,6 +39,8 @@ import {
   googleAuthLogin,
   googleAuthCallback,
   getGoogleAuthConfig,
+  getSupabaseConfig,
+  syncSupabaseSession,
   logout,
   getMe,
   forgotPassword,
@@ -89,6 +91,8 @@ router.post('/auth/google', loginWithGoogle);
 router.get('/auth/google/login', googleAuthLogin);
 router.get('/auth/google/callback', googleAuthCallback);
 router.get('/auth/google/config', getGoogleAuthConfig);
+router.get('/config/supabase', getSupabaseConfig);
+router.post('/auth/supabase-session', syncSupabaseSession);
 router.post('/auth/logout', logout);
 router.get('/auth/me', requireAuth, getMe);
 router.post('/auth/forgot-password', forgotPassword);

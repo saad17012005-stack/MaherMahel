@@ -31,6 +31,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Supabase JS Client for OAuth Authentication -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -414,10 +416,122 @@
       }
     }
 
-    // Initiate Google OAuth Redirect flow
-    function initiateGoogleOAuthRedirect() {
-      window.location.href = `/api/auth/google/login?redirect=${encodeURIComponent(redirectUrl)}&remember=1`;
+    // --------------------------------------------------------
+    // SUPABASE OAUTH CONFIGURATION & OFFICIAL INTEGRATION
+    // --------------------------------------------------------
+    const DEFAULT_SUPABASE_URL = 'https://eckdiftmhyexuwjdauio.supabase.co';
+    const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVja2RpZnRtaHlleHV3amRhdWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5OTIyNDgsImV4cCI6MjA5MzU2ODI0OH0.yWwucvXB251a4LckWMWdp2NqW78-eVeEqAgKqVbXAws';
+    let sbClient = null;
+
+    function getSupabase() {
+      if (!sbClient && window.supabase) {
+        sbClient = window.supabase.createClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_KEY);
+      }
+      return sbClient;
     }
+
+    // Official Supabase Google OAuth Sign-In
+    async function initiateGoogleOAuthRedirect() {
+      const sb = getSupabase();
+      if (!sb) {
+        // Fallback to server-mediated Supabase authorize
+        window.location.href = `/api/auth/google/login?redirect=${encodeURIComponent(redirectUrl)}`;
+        return;
+      }
+
+      showAlert('info', 'Connecting to Google through Supabase...');
+      const callbackUrl = `${window.location.origin}/auth.html?mode=callback&redirect=${encodeURIComponent(redirectUrl)}`;
+
+      try {
+        const { data, error } = await sb.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: callbackUrl,
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'select_account',
+            }
+          }
+        });
+
+        if (error) {
+          showAlert('error', error.message || 'Google OAuth failed to start.');
+        }
+      } catch (err) {
+        showAlert('error', err.message || 'Failed to start Google sign-in.');
+      }
+    }
+
+    // Sync Supabase Session with Meher Mahel server
+    let isSessionSyncing = false;
+    async function syncSupabaseSessionWithServer(accessToken) {
+      if (isSessionSyncing) return;
+      isSessionSyncing = true;
+      showAlert('info', 'Verifying your atelier credentials...');
+
+      try {
+        const res = await fetch('/api/auth/supabase-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ access_token: accessToken }),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Authentication synchronization failed.');
+
+        localStorage.setItem('mm_token', data.token);
+        localStorage.setItem('mm_user', JSON.stringify(data.user));
+
+        showAlert('success', data.message || 'Signed in successfully! Entering boutique...');
+        setTimeout(() => {
+          const dest = (data.user.role === 'admin') ? '/admin' : redirectUrl;
+          window.location.href = dest;
+        }, 500);
+      } catch (err) {
+        showAlert('error', err.message || 'Session verification failed.');
+        isSessionSyncing = false;
+      }
+    }
+
+    function initSupabaseAuth() {
+      const sb = getSupabase();
+      if (!sb) return;
+
+      // Handle OAuth callback token from URL
+      sb.auth.onAuthStateChange(async (event, session) => {
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session && session.access_token) {
+          const isCallback = window.location.hash.includes('access_token') ||
+                             window.location.search.includes('code=') ||
+                             urlParams.get('mode') === 'callback';
+          if (isCallback) {
+            await syncSupabaseSessionWithServer(session.access_token);
+          }
+        }
+      });
+
+      // Immediate check if URL contains OAuth fragments or code
+      if (window.location.hash.includes('access_token') || window.location.search.includes('code=') || urlParams.get('mode') === 'callback') {
+        sb.auth.getSession().then(({ data }) => {
+          if (data && data.session && data.session.access_token) {
+            syncSupabaseSessionWithServer(data.session.access_token);
+          }
+        });
+      }
+    }
+
+    // Fetch dynamic Supabase configuration from server if configured
+    fetch('/api/config/supabase')
+      .then(r => r.json())
+      .then(cfg => {
+        if (cfg && cfg.url && cfg.anonKey && window.supabase) {
+          sbClient = window.supabase.createClient(cfg.url, cfg.anonKey);
+          initSupabaseAuth();
+        } else {
+          initSupabaseAuth();
+        }
+      })
+      .catch(() => {
+        initSupabaseAuth();
+      });
 
     // Dynamically initialize Google One Tap / GSI if Client ID configured
     fetch('/api/auth/google/config')

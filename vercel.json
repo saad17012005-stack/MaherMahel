@@ -16,6 +16,10 @@
     {
       "source": "/admin/(.*)",
       "destination": "/api"
+    },
+    {
+      "source": "/auth/callback",
+      "destination": "/auth.html"
     }
   ]
 }

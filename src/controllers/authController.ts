@@ -1,11 +1,25 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
+import { createClient } from '@supabase/supabase-js';
 import { db } from '../database/db.js';
 import { signToken, AuthRequest, isAdminEmail } from '../middleware/authMiddleware.js';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+
+// Supabase Configuration
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://eckdiftmhyexuwjdauio.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVja2RpZnRtaHlleHV3amRhdWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5OTIyNDgsImV4cCI6MjA5MzU2ODI0OH0.yWwucvXB251a4LckWMWdp2NqW78-eVeEqAgKqVbXAws';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Public Supabase Configuration
+export const getSupabaseConfig = (_req: Request, res: Response) => {
+  return res.json({
+    url: SUPABASE_URL,
+    anonKey: SUPABASE_ANON_KEY,
+  });
+};
 
 // Public Google OAuth Client Config
 export const getGoogleAuthConfig = (_req: Request, res: Response) => {
@@ -350,35 +364,84 @@ export const loginWithGoogle = async (req: Request, res: Response) => {
 };
 
 // --------------------------------------------------------
-// 4. GOOGLE OAUTH REDIRECT (GET /api/auth/google/login)
+// 4. SUPABASE GOOGLE OAUTH REDIRECT (GET /api/auth/google/login)
 // --------------------------------------------------------
 export const googleAuthLogin = (req: Request, res: Response) => {
   try {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     const origin = `${protocol}://${host}`;
-    const redirectUri = `${origin}/api/auth/google/callback`;
+    const redirectTarget = (req.query.redirect as string) || '/account';
+    const callbackUrl = `${origin}/auth.html?mode=callback&redirect=${encodeURIComponent(redirectTarget)}`;
 
-    const state = Buffer.from(
-      JSON.stringify({
-        redirect: (req.query.redirect as string) || '/account',
-        rememberMe: req.query.remember !== '0',
-      })
-    ).toString('base64');
-
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` + new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID,
-      redirect_uri: redirectUri,
-      response_type: 'code',
-      scope: 'openid email profile',
-      access_type: 'offline',
-      prompt: 'select_account',
-      state,
+    // Redirect through Supabase's official OAuth authorize endpoint
+    const supabaseAuthUrl = `${SUPABASE_URL}/auth/v1/authorize?` + new URLSearchParams({
+      provider: 'google',
+      redirect_to: callbackUrl,
     }).toString();
 
-    return res.redirect(authUrl);
+    return res.redirect(supabaseAuthUrl);
   } catch (err: any) {
     return res.redirect('/login?error=' + encodeURIComponent('Could not initiate Google sign in.'));
+  }
+};
+
+// --------------------------------------------------------
+// 4B. SUPABASE SESSION SYNCHRONIZATION (POST /api/auth/supabase-session)
+// --------------------------------------------------------
+export const syncSupabaseSession = async (req: Request, res: Response) => {
+  try {
+    const { access_token } = req.body;
+    if (!access_token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Supabase access_token is required.',
+      });
+    }
+
+    // Verify token with Supabase Auth
+    const { data: { user }, error: authError } = await supabase.auth.getUser(access_token);
+    if (authError || !user || !user.email) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired Supabase authentication session.',
+      });
+    }
+
+    const email = user.email.toLowerCase().trim();
+    const fullName = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
+    const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
+
+    const profile = await provisionGoogleUser({
+      email,
+      name: fullName,
+      picture: avatarUrl,
+      email_verified: true,
+    });
+
+    const token = signToken({ id: profile.id, email: profile.email, role: profile.role }, true);
+    setAuthCookie(res, token, true);
+
+    return res.json({
+      success: true,
+      message: profile.role === 'admin' ? 'Welcome back, Administrator Farah.' : 'Signed in with Google successfully.',
+      token,
+      user: {
+        id: profile.id,
+        email: profile.email,
+        full_name: profile.full_name,
+        avatar_url: profile.avatar_url,
+        role: profile.role,
+        is_verified: true,
+      },
+      redirectUrl: profile.role === 'admin' ? '/admin' : '/account',
+    });
+  } catch (err: any) {
+    console.error('Supabase session sync error:', err);
+    return res.status(500).json({
+      success: false,
+      message: err.message || 'Supabase authentication synchronization failed.',
+    });
   }
 };
 

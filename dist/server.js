@@ -150,7 +150,7 @@ app.get('/account', (_req, res) => {
 app.get('/reelmark', (_req, res) => {
     res.sendFile(resolvePublicFile('reelmark.html'));
 });
-app.get(['/login', '/register', '/forgot-password', '/reset-password'], (_req, res) => {
+app.get(['/login', '/register', '/forgot-password', '/reset-password', '/auth/callback'], (_req, res) => {
     res.sendFile(resolvePublicFile('auth.html'));
 });
 // Strictly Protected Administrator Frontend Routes
