@@ -157,6 +157,17 @@ app.get(['/login', '/register', '/forgot-password', '/reset-password', '/auth/ca
 app.get(/^\/admin(?:\/.*)?$/, adminPageGuard, (_req, res) => {
     res.sendFile(resolvePublicFile('admin.html'));
 });
+// Global Error Handler (catches malformed JSON payloads and unexpected errors)
+app.use((err, _req, res, _next) => {
+    if (err && (err.type === 'entity.parse.failed' || err.statusCode === 400)) {
+        return res.status(400).json({ success: false, message: 'Invalid JSON payload received.' });
+    }
+    console.error('Unhandled server error:', err);
+    return res.status(err.status || 500).json({
+        success: false,
+        message: err.message || 'Internal server error.',
+    });
+});
 // Start Server if not running in serverless environment (e.g. Vercel)
 if (!process.env.VERCEL) {
     app.listen(PORT, () => {
