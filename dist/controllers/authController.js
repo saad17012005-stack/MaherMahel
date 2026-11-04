@@ -5,15 +5,44 @@ import { db } from '../database/db.js';
 import { signToken, isAdminEmail } from '../middleware/authMiddleware.js';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-// Supabase Configuration
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://eckdiftmhyexuwjdauio.supabase.co';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVja2RpZnRtaHlleHV3amRhdWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5OTIyNDgsImV4cCI6MjA5MzU2ODI0OH0.yWwucvXB251a4LckWMWdp2NqW78-eVeEqAgKqVbXAws';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Strict Meher Mahel Domain & URL Isolation
+const rawSupabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+// Strictly reject Dial & Deal's Supabase project (eckdiftmhyexuwjdauio)
+const isDialAndDeal = rawSupabaseUrl.includes('eckdiftmhyexuwjdauio');
+const SUPABASE_URL = isDialAndDeal ? '' : rawSupabaseUrl;
+const SUPABASE_ANON_KEY = isDialAndDeal ? '' : (process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '');
+const supabase = (SUPABASE_URL && SUPABASE_ANON_KEY)
+    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+// Domain isolation validator: allows only Meher Mahel or relative routes, strictly blocking Dial & Deal
+export const isAllowedRedirect = (url) => {
+    if (!url)
+        return false;
+    const s = String(url).trim();
+    if (s.toLowerCase().includes('dialanddeal'))
+        return false;
+    if (s.startsWith('/') && !s.startsWith('//'))
+        return true;
+    try {
+        const parsed = new URL(s);
+        return ['mahermahel.vercel.app', 'localhost', '127.0.0.1'].includes(parsed.hostname);
+    }
+    catch {
+        return false;
+    }
+};
+export const sanitizeRedirectUrl = (url, fallback = '/account') => {
+    if (isAllowedRedirect(url)) {
+        return String(url).trim();
+    }
+    return fallback;
+};
 // Public Supabase Configuration
 export const getSupabaseConfig = (_req, res) => {
     return res.json({
         url: SUPABASE_URL,
         anonKey: SUPABASE_ANON_KEY,
+        isConfigured: Boolean(SUPABASE_URL && SUPABASE_ANON_KEY),
     });
 };
 // Public Google OAuth Client Config
@@ -314,14 +343,30 @@ export const googleAuthLogin = (req, res) => {
         const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
         const host = req.headers['x-forwarded-host'] || req.headers.host;
         const origin = `${protocol}://${host}`;
-        const redirectTarget = req.query.redirect || '/account';
+        const redirectTarget = sanitizeRedirectUrl(req.query.redirect, '/account');
         const callbackUrl = `${origin}/auth.html?mode=callback&redirect=${encodeURIComponent(redirectTarget)}`;
-        // Redirect through Supabase's official OAuth authorize endpoint
-        const supabaseAuthUrl = `${SUPABASE_URL}/auth/v1/authorize?` + new URLSearchParams({
-            provider: 'google',
-            redirect_to: callbackUrl,
-        }).toString();
-        return res.redirect(supabaseAuthUrl);
+        if (SUPABASE_URL) {
+            // Redirect through Meher Mahel's Supabase project OAuth authorize endpoint
+            const supabaseAuthUrl = `${SUPABASE_URL}/auth/v1/authorize?` + new URLSearchParams({
+                provider: 'google',
+                redirect_to: callbackUrl,
+            }).toString();
+            return res.redirect(supabaseAuthUrl);
+        }
+        if (GOOGLE_CLIENT_ID) {
+            // Direct Google OAuth 2.0 flow
+            const googleOAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + new URLSearchParams({
+                client_id: GOOGLE_CLIENT_ID,
+                redirect_uri: `${origin}/api/auth/google/callback`,
+                response_type: 'code',
+                scope: 'openid email profile',
+                access_type: 'offline',
+                prompt: 'select_account',
+                state: Buffer.from(JSON.stringify({ redirect: redirectTarget, rememberMe: true })).toString('base64'),
+            }).toString();
+            return res.redirect(googleOAuthUrl);
+        }
+        return res.redirect('/login?error=' + encodeURIComponent('Google login provider is not configured yet on this environment.'));
     }
     catch (err) {
         return res.redirect('/login?error=' + encodeURIComponent('Could not initiate Google sign in.'));
@@ -337,6 +382,12 @@ export const syncSupabaseSession = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'Supabase access_token is required.',
+            });
+        }
+        if (!supabase) {
+            return res.status(503).json({
+                success: false,
+                message: 'Supabase authentication service is not configured for this boutique domain.',
             });
         }
         // Verify token with Supabase Auth
@@ -435,7 +486,7 @@ export const googleAuthCallback = async (req, res) => {
         });
         const token = signToken({ id: user.id, email: user.email, role: user.role }, stateData.rememberMe);
         setAuthCookie(res, token, stateData.rememberMe);
-        const targetUrl = (user.role === 'admin') ? '/admin' : (stateData.redirect || '/account');
+        const targetUrl = (user.role === 'admin') ? '/admin' : sanitizeRedirectUrl(stateData.redirect, '/account');
         const separator = targetUrl.includes('?') ? '&' : '?';
         return res.redirect(`${targetUrl}${separator}auth_success=1&token=${encodeURIComponent(token)}`);
     }

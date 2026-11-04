@@ -135,13 +135,40 @@ const adminPageGuard = (req: express.Request, res: express.Response, next: expre
       return res.redirect('/login?redirect=/admin&error=' + encodeURIComponent('Your session has expired. Please sign in again.'));
     }
 
-    if (!isAdminEmail(decoded.email)) {
-      return res.status(403).send(renderUnauthorizedHtml(decoded.email));
+    const cleanEmail = String(decoded.email || '').trim().toLowerCase();
+    if (!isAdminEmail(cleanEmail)) {
+      return res.status(403).send(renderUnauthorizedHtml(cleanEmail));
     }
 
-    const profile = db.prepare('SELECT id, email, role, is_suspended FROM profiles WHERE id = ?').get(decoded.id) as any;
-    if (!profile || profile.role !== 'admin' || !isAdminEmail(profile.email) || profile.is_suspended) {
-      return res.status(403).send(renderUnauthorizedHtml(profile?.email || decoded.email));
+    // Auto-heal or locate administrator profile
+    let profile = db.prepare('SELECT id, email, role, is_suspended FROM profiles WHERE id = ?').get(decoded.id) as any;
+    if (!profile && cleanEmail) {
+      profile = db.prepare('SELECT id, email, role, is_suspended FROM profiles WHERE email = ?').get(cleanEmail) as any;
+    }
+
+    if (profile?.is_suspended) {
+      return res.status(403).send(renderUnauthorizedHtml(cleanEmail));
+    }
+
+    if (!profile) {
+      db.prepare(`
+        INSERT INTO profiles (id, email, full_name, phone, role, is_verified)
+        VALUES (?, ?, 'Farah (Administrator)', '+91 76098 74187', 'admin', 1)
+      `).run(decoded.id, cleanEmail);
+    } else if (profile.role !== 'admin') {
+      db.prepare("UPDATE profiles SET role = 'admin', is_verified = 1 WHERE email = ?").run(cleanEmail);
+    }
+
+    // If query token was supplied and cookie is missing, persist 30-day session cookie
+    if (req.query?.token && (!req.cookies || !req.cookies.auth_token)) {
+      const isProd = process.env.NODE_ENV === 'production';
+      res.cookie('auth_token', token, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: 'lax',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        path: '/',
+      });
     }
 
     // Verified administrator

@@ -538,9 +538,14 @@ function createMemoryStore() {
               created_at: new Date().toISOString(),
             });
           } else if (normalized.includes('UPDATE profiles')) {
-            const pid = params[params.length - 1];
-            const p = tables.profiles.find(item => item.id === pid);
+            const targetVal = String(params[params.length - 1] || '').toLowerCase();
+            const p = tables.profiles.find(item => item.id === targetVal || item.email.toLowerCase() === targetVal);
             if (p) {
+              if (normalized.includes('role = ?')) {
+                p.role = params[0];
+              } else if (normalized.includes("role = 'admin'")) {
+                p.role = 'admin';
+              }
               if (normalized.includes('full_name = ?') && normalized.includes('phone = ?')) {
                 p.full_name = params[0];
                 p.phone = params[1];
@@ -551,6 +556,8 @@ function createMemoryStore() {
               }
               if (normalized.includes('is_verified = ?')) {
                 p.is_verified = params[0];
+              } else if (normalized.includes('is_verified = 1')) {
+                p.is_verified = 1;
               }
               p.updated_at = new Date().toISOString();
             }

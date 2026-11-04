@@ -71,8 +71,36 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
       });
     }
 
+    const cleanEmail = String(decoded.email || '').trim().toLowerCase();
+
     // Verify user exists and check suspension status
-    const profile = db.prepare('SELECT id, email, full_name, avatar_url, role, is_verified, is_suspended FROM profiles WHERE id = ?').get(decoded.id) as any;
+    let profile = db.prepare('SELECT id, email, full_name, avatar_url, role, is_verified, is_suspended FROM profiles WHERE id = ?').get(decoded.id) as any;
+    if (!profile && cleanEmail) {
+      profile = db.prepare('SELECT id, email, full_name, avatar_url, role, is_verified, is_suspended FROM profiles WHERE email = ?').get(cleanEmail) as any;
+    }
+
+    // Auto-heal admin profile for allowlisted owner
+    const isAllowlisted = isAdminEmail(cleanEmail);
+    if (isAllowlisted && (!profile || profile.role !== 'admin')) {
+      if (profile) {
+        db.prepare("UPDATE profiles SET role = 'admin', is_verified = 1 WHERE email = ?").run(cleanEmail);
+        profile.role = 'admin';
+        profile.is_verified = 1;
+      } else {
+        db.prepare(`
+          INSERT INTO profiles (id, email, full_name, phone, role, is_verified)
+          VALUES (?, ?, 'Farah (Administrator)', '+91 76098 74187', 'admin', 1)
+        `).run(decoded.id, cleanEmail);
+        profile = {
+          id: decoded.id,
+          email: cleanEmail,
+          full_name: 'Farah (Administrator)',
+          role: 'admin',
+          is_verified: 1,
+          is_suspended: 0,
+        };
+      }
+    }
 
     if (!profile) {
       return res.status(401).json({
@@ -89,8 +117,7 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
     }
 
     // Strictly enforce server-side allowlist for admin role
-    const isAllowlisted = isAdminEmail(profile.email);
-    const effectiveRole: 'customer' | 'admin' = (profile.role === 'admin' && isAllowlisted) ? 'admin' : 'customer';
+    const effectiveRole: 'customer' | 'admin' = (isAllowlisted || profile.role === 'admin') && isAllowlisted ? 'admin' : 'customer';
 
     req.user = {
       id: profile.id,
@@ -133,10 +160,14 @@ export const optionalAuth = (req: AuthRequest, _res: Response, next: NextFunctio
 
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     if (decoded && decoded.id) {
-      const profile = db.prepare('SELECT id, email, full_name, avatar_url, role, is_verified, is_suspended FROM profiles WHERE id = ?').get(decoded.id) as any;
+      const cleanEmail = String(decoded.email || '').trim().toLowerCase();
+      let profile = db.prepare('SELECT id, email, full_name, avatar_url, role, is_verified, is_suspended FROM profiles WHERE id = ?').get(decoded.id) as any;
+      if (!profile && cleanEmail) {
+        profile = db.prepare('SELECT id, email, full_name, avatar_url, role, is_verified, is_suspended FROM profiles WHERE email = ?').get(cleanEmail) as any;
+      }
       if (profile && !profile.is_suspended) {
         const isAllowlisted = isAdminEmail(profile.email);
-        const effectiveRole: 'customer' | 'admin' = (profile.role === 'admin' && isAllowlisted) ? 'admin' : 'customer';
+        const effectiveRole: 'customer' | 'admin' = (isAllowlisted || profile.role === 'admin') && isAllowlisted ? 'admin' : 'customer';
 
         req.user = {
           id: profile.id,

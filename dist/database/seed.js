@@ -15,8 +15,8 @@ export function seedAuthUsers() {
       `).run(adminId, adminEmail, hash);
             db.prepare(`
         INSERT INTO profiles (id, email, full_name, phone, avatar_url, role, is_verified)
-        VALUES (?, ?, 'Farah (Administrator)', '+91 76098 74187', NULL, 'admin', 1)
-      `).run(adminId, adminEmail);
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(adminId, adminEmail, 'Farah (Administrator)', '+91 76098 74187', null, 'admin', 1);
             console.log(`[Seed] Bootstrap Administrator created: ${adminEmail}`);
         }
         else {

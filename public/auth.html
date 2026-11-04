@@ -376,6 +376,19 @@
       switchView('login');
     }
 
+    function sanitizeRedirect(url) {
+      if (!url || typeof url !== 'string') return '/account';
+      if (url.toLowerCase().includes('dialanddeal')) return '/account';
+      if (url.startsWith('/') && !url.startsWith('//')) return url;
+      try {
+        const u = new URL(url);
+        if (['mahermahel.vercel.app', 'localhost', '127.0.0.1'].includes(u.hostname)) {
+          return u.pathname + u.search + u.hash;
+        }
+      } catch (e) {}
+      return '/account';
+    }
+
     // Auto-redirect if already signed in (unless explicitly switching account)
     const switchParam = urlParams.get('switch');
     const existingToken = localStorage.getItem('mm_token');
@@ -384,7 +397,9 @@
         .then(r => r.json())
         .then(data => {
           if (data.success && data.user) {
-            const dest = (data.user.role === 'admin' && redirectUrl === '/admin') ? '/admin' : redirectUrl;
+            const dest = (data.user.role === 'admin' && redirectUrl === '/admin')
+              ? `/admin?token=${encodeURIComponent(existingToken)}`
+              : sanitizeRedirect(redirectUrl);
             window.location.href = dest;
           }
         })
@@ -408,7 +423,9 @@
 
         showAlert('success', data.message || 'Signed in with Google! Redirecting...');
         setTimeout(() => {
-          const dest = (data.user.role === 'admin') ? '/admin' : redirectUrl;
+          const dest = (data.user.role === 'admin')
+            ? `/admin?token=${encodeURIComponent(data.token)}`
+            : sanitizeRedirect(redirectUrl);
           window.location.href = dest;
         }, 600);
       } catch (err) {
@@ -419,28 +436,44 @@
     // --------------------------------------------------------
     // SUPABASE OAUTH CONFIGURATION & OFFICIAL INTEGRATION
     // --------------------------------------------------------
-    const DEFAULT_SUPABASE_URL = 'https://eckdiftmhyexuwjdauio.supabase.co';
-    const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVja2RpZnRtaHlleHV3amRhdWlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5OTIyNDgsImV4cCI6MjA5MzU2ODI0OH0.yWwucvXB251a4LckWMWdp2NqW78-eVeEqAgKqVbXAws';
     let sbClient = null;
+    let sbConfigLoaded = false;
+    let verifiedSupabaseUrl = '';
+    let verifiedSupabaseKey = '';
 
-    function getSupabase() {
-      if (!sbClient && window.supabase) {
-        sbClient = window.supabase.createClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_KEY);
+    async function fetchSupabaseConfig() {
+      if (sbConfigLoaded) return;
+      try {
+        const res = await fetch('/api/auth/supabase-config');
+        const data = await res.json();
+        if (data && data.url && !data.url.includes('eckdiftmhyexuwjdauio') && data.anonKey) {
+          verifiedSupabaseUrl = data.url;
+          verifiedSupabaseKey = data.anonKey;
+        }
+      } catch {}
+      sbConfigLoaded = true;
+    }
+
+    async function getSupabase() {
+      await fetchSupabaseConfig();
+      if (!sbClient && window.supabase && verifiedSupabaseUrl && verifiedSupabaseKey) {
+        sbClient = window.supabase.createClient(verifiedSupabaseUrl, verifiedSupabaseKey);
       }
       return sbClient;
     }
 
     // Official Supabase Google OAuth Sign-In
     async function initiateGoogleOAuthRedirect() {
-      const sb = getSupabase();
+      const cleanTarget = sanitizeRedirect(redirectUrl);
+      const sb = await getSupabase();
       if (!sb) {
-        // Fallback to server-mediated Supabase authorize
-        window.location.href = `/api/auth/google/login?redirect=${encodeURIComponent(redirectUrl)}`;
+        // Fallback to server-mediated Google login (strict domain protection)
+        window.location.href = `/api/auth/google/login?redirect=${encodeURIComponent(cleanTarget)}`;
         return;
       }
 
       showAlert('info', 'Connecting to Google through Supabase...');
-      const callbackUrl = `${window.location.origin}/auth.html?mode=callback&redirect=${encodeURIComponent(redirectUrl)}`;
+      const callbackUrl = `${window.location.origin}/auth.html?mode=callback&redirect=${encodeURIComponent(cleanTarget)}`;
 
       try {
         const { data, error } = await sb.auth.signInWithOAuth({
@@ -483,7 +516,9 @@
 
         showAlert('success', data.message || 'Signed in successfully! Entering boutique...');
         setTimeout(() => {
-          const dest = (data.user.role === 'admin') ? '/admin' : redirectUrl;
+          const dest = (data.user && data.user.role === 'admin')
+            ? `/admin?token=${encodeURIComponent(data.token)}`
+            : sanitizeRedirect(redirectUrl);
           window.location.href = dest;
         }, 500);
       } catch (err) {
@@ -583,7 +618,9 @@
 
         showAlert('success', 'Sign in successful! Redirecting...');
         setTimeout(() => {
-          const dest = (data.user.role === 'admin') ? '/admin' : redirectUrl;
+          const dest = (data.user && data.user.role === 'admin')
+            ? `/admin?token=${encodeURIComponent(data.token)}`
+            : sanitizeRedirect(redirectUrl);
           window.location.href = dest;
         }, 600);
       } catch (err) {

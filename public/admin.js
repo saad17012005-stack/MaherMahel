@@ -47,6 +47,16 @@ let adminState = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // If token was passed via URL query parameter, store it in localStorage and clean URL
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryToken = urlParams.get('token');
+    if (queryToken) {
+      localStorage.setItem('mm_token', queryToken);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  } catch {}
+
   const token = localStorage.getItem('mm_token');
   try {
     const res = await fetch('/api/auth/me', {
