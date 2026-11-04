@@ -92,6 +92,8 @@ router.get('/auth/google/login', googleAuthLogin);
 router.get('/auth/google/callback', googleAuthCallback);
 router.get('/auth/google/config', getGoogleAuthConfig);
 router.get('/config/supabase', getSupabaseConfig);
+router.get('/auth/supabase-config', getSupabaseConfig);
+router.get('/auth/supabase/config', getSupabaseConfig);
 router.post('/auth/supabase-session', syncSupabaseSession);
 router.post('/auth/logout', logout);
 router.get('/auth/me', requireAuth, getMe);
