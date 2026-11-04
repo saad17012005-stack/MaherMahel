@@ -13,6 +13,12 @@ import { seedDatabase } from './database/seed.js';
 import { JWT_SECRET, isAdminEmail } from './middleware/authMiddleware.js';
 import { db } from './database/db.js';
 dotenv.config();
+process.on('uncaughtException', (err) => {
+    console.error('[Process Uncaught Exception]:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('[Process Unhandled Rejection at]:', promise, 'reason:', reason);
+});
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Initialize & Seed Database
